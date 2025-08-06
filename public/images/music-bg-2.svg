@@ -1,0 +1,85 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#grad1)"/>
+  
+  <!-- Team members silhouettes -->
+  <g fill="url(#grad2)" opacity="0.4">
+    <!-- Person 1 -->
+    <circle cx="300" cy="300" r="40"/>
+    <rect x="280" y="340" width="40" height="80" rx="20"/>
+    
+    <!-- Person 2 -->
+    <circle cx="500" cy="350" r="35"/>
+    <rect x="485" y="385" width="30" height="70" rx="15"/>
+    
+    <!-- Person 3 -->
+    <circle cx="700" cy="280" r="38"/>
+    <rect x="680" y="318" width="40" height="75" rx="20"/>
+    
+    <!-- Person 4 -->
+    <circle cx="900" cy="320" r="32"/>
+    <rect x="888" y="352" width="24" height="65" rx="12"/>
+    
+    <!-- Person 5 -->
+    <circle cx="1100" cy="290" r="36"/>
+    <rect x="1082" y="326" width="36" height="72" rx="18"/>
+    
+    <!-- Person 6 -->
+    <circle cx="1300" cy="340" r="34"/>
+    <rect x="1283" y="374" width="34" height="68" rx="17"/>
+    
+    <!-- Person 7 -->
+    <circle cx="1500" cy="310" r="37"/>
+    <rect x="1481" y="347" width="38" height="74" rx="19"/>
+    
+    <!-- Person 8 -->
+    <circle cx="1700" cy="330" r="33"/>
+    <rect x="1683" y="363" width="34" height="66" rx="17"/>
+  </g>
+  
+  <!-- Connection lines -->
+  <g stroke="white" stroke-width="2" opacity="0.2">
+    <line x1="340" y1="340" x2="485" y2="385"/>
+    <line x1="535" y1="385" x2="680" y2="318"/>
+    <line x1="720" y1="318" x2="888" y2="352"/>
+    <line x1="924" y1="352" x2="1082" y2="326"/>
+    <line x1="1118" y1="326" x2="1283" y2="374"/>
+    <line x1="1317" y1="374" x2="1481" y2="347"/>
+    <line x1="1518" y1="347" x2="1683" y2="363"/>
+  </g>
+  
+  <!-- Musical instruments -->
+  <g fill="white" opacity="0.15">
+    <!-- Guitar -->
+    <ellipse cx="400" cy="600" rx="60" ry="20"/>
+    <rect x="460" y="600" width="4" height="80"/>
+    <rect x="340" y="600" width="4" height="80"/>
+    
+    <!-- Piano -->
+    <rect x="800" y="580" width="200" height="100"/>
+    <rect x="800" y="580" width="25" height="100"/>
+    <rect x="850" y="580" width="25" height="100"/>
+    <rect x="900" y="580" width="25" height="100"/>
+    <rect x="950" y="580" width="25" height="100"/>
+    <rect x="1000" y="580" width="25" height="100"/>
+    <rect x="1050" y="580" width="25" height="100"/>
+    <rect x="1100" y="580" width="25" height="100"/>
+    <rect x="1150" y="580" width="25" height="100"/>
+    
+    <!-- Drums -->
+    <circle cx="1200" cy="650" r="30"/>
+    <circle cx="1250" cy="620" r="25"/>
+    <circle cx="1300" cy="650" r="30"/>
+  </g>
+</svg> 
