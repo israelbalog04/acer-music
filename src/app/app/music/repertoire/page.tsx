@@ -336,24 +336,50 @@ export default function RepertoirePage() {
               </div>
             </div>
           </Card>
-        ))}
+        ))
+        ) : (
+          // Empty State
+          <div className="col-span-full">
+            <Card>
+              <div className="p-12 text-center">
+                <MusicalNoteIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {searchTerm || selectedCategory !== 'tous' || selectedInstrument !== 'tous' 
+                    ? 'Aucun chant trouvé' 
+                    : 'Aucun chant disponible'
+                  }
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  {searchTerm || selectedCategory !== 'tous' || selectedInstrument !== 'tous'
+                    ? 'Essayez de modifier vos critères de recherche ou ajoutez un nouveau chant.'
+                    : 'Commencez par ajouter des chants au répertoire.'
+                  }
+                </p>
+                <Link href="/app/music/upload">
+                  <Button>
+                    <CloudArrowUpIcon className="h-4 w-4 mr-2" />
+                    Ajouter un chant
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
 
-      {/* Empty State */}
-      {filteredSongs.length === 0 && (
-        <Card>
-          <div className="p-12 text-center">
-            <MusicalNoteIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun chant trouvé</h3>
-            <p className="text-gray-500 mb-6">
-              Essayez de modifier vos critères de recherche ou ajoutez un nouveau chant.
-            </p>
-            <Link href="/app/music/upload">
-              <Button>
-                <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-                Ajouter un chant
-              </Button>
-            </Link>
+      {/* Error State */}
+      {error && (
+        <Card className="p-6">
+          <div className="text-center">
+            <MusicalNoteIcon className="h-12 w-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Erreur de chargement</h3>
+            <p className="text-gray-500 mb-4">{error}</p>
+            <button
+              onClick={fetchRepertoireData}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Réessayer
+            </button>
           </div>
         </Card>
       )}
