@@ -1,0 +1,102 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#grad1)"/>
+  
+  <!-- Calendar grid -->
+  <g fill="white" opacity="0.1">
+    <!-- Calendar header -->
+    <rect x="200" y="200" width="1520" height="100"/>
+    
+    <!-- Calendar days -->
+    <rect x="200" y="300" width="217" height="150"/>
+    <rect x="417" y="300" width="217" height="150"/>
+    <rect x="634" y="300" width="217" height="150"/>
+    <rect x="851" y="300" width="217" height="150"/>
+    <rect x="1068" y="300" width="217" height="150"/>
+    <rect x="1285" y="300" width="217" height="150"/>
+    <rect x="1502" y="300" width="217" height="150"/>
+    
+    <rect x="200" y="450" width="217" height="150"/>
+    <rect x="417" y="450" width="217" height="150"/>
+    <rect x="634" y="450" width="217" height="150"/>
+    <rect x="851" y="450" width="217" height="150"/>
+    <rect x="1068" y="450" width="217" height="150"/>
+    <rect x="1285" y="450" width="217" height="150"/>
+    <rect x="1502" y="450" width="217" height="150"/>
+    
+    <rect x="200" y="600" width="217" height="150"/>
+    <rect x="417" y="600" width="217" height="150"/>
+    <rect x="634" y="600" width="217" height="150"/>
+    <rect x="851" y="600" width="217" height="150"/>
+    <rect x="1068" y="600" width="217" height="150"/>
+    <rect x="1285" y="600" width="217" height="150"/>
+    <rect x="1502" y="600" width="217" height="150"/>
+  </g>
+  
+  <!-- Event indicators -->
+  <g fill="url(#grad2)" opacity="0.6">
+    <!-- Service event -->
+    <circle cx="308" cy="375" r="15"/>
+    <rect x="308" y="390" width="2" height="30"/>
+    <ellipse cx="310" cy="420" rx="8" ry="5"/>
+    
+    <!-- Rehearsal event -->
+    <circle cx="525" cy="525" r="12"/>
+    <rect x="525" y="537" width="2" height="25"/>
+    <ellipse cx="527" cy="562" rx="6" ry="4"/>
+    
+    <!-- Practice event -->
+    <circle cx="742" cy="675" r="10"/>
+    <rect x="742" y="685" width="2" height="20"/>
+    <ellipse cx="744" cy="705" rx="5" ry="3"/>
+    
+    <!-- Meeting event -->
+    <circle cx="959" cy="375" r="13"/>
+    <rect x="959" y="388" width="2" height="27"/>
+    <ellipse cx="961" cy="415" rx="7" ry="4"/>
+    
+    <!-- Performance event -->
+    <circle cx="1176" cy="525" r="14"/>
+    <rect x="1176" y="539" width="2" height="28"/>
+    <ellipse cx="1178" cy="567" rx="7" ry="5"/>
+  </g>
+  
+  <!-- Clock elements -->
+  <g fill="white" opacity="0.2">
+    <!-- Clock 1 -->
+    <circle cx="300" cy="800" r="40"/>
+    <line x1="300" y1="800" x2="300" y2="770" stroke="white" stroke-width="3"/>
+    <line x1="300" y1="800" x2="320" y2="800" stroke="white" stroke-width="3"/>
+    
+    <!-- Clock 2 -->
+    <circle cx="600" cy="800" r="35"/>
+    <line x1="600" y1="800" x2="600" y2="775" stroke="white" stroke-width="3"/>
+    <line x1="600" y1="800" x2="615" y2="800" stroke="white" stroke-width="3"/>
+    
+    <!-- Clock 3 -->
+    <circle cx="900" cy="800" r="38"/>
+    <line x1="900" y1="800" x2="900" y2="772" stroke="white" stroke-width="3"/>
+    <line x1="900" y1="800" x2="918" y2="800" stroke="white" stroke-width="3"/>
+    
+    <!-- Clock 4 -->
+    <circle cx="1200" cy="800" r="32"/>
+    <line x1="1200" y1="800" x2="1200" y2="778" stroke="white" stroke-width="3"/>
+    <line x1="1200" y1="800" x2="1212" y2="800" stroke="white" stroke-width="3"/>
+    
+    <!-- Clock 5 -->
+    <circle cx="1500" cy="800" r="36"/>
+    <line x1="1500" y1="800" x2="1500" y2="774" stroke="white" stroke-width="3"/>
+    <line x1="1500" y1="800" x2="1516" y2="800" stroke="white" stroke-width="3"/>
+  </g>
+</svg> 
