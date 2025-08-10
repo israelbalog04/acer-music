@@ -1,0 +1,126 @@
+name: Déploiement Manuel
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environnement de déploiement'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      version:
+        description: 'Version à déployer (optionnel)'
+        required: false
+        type: string
+        default: 'latest'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  deploy:
+    name: Déploiement ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Vérifications pré-déploiement
+        run: |
+          echo "🔍 Vérifications pré-déploiement..."
+          npm run lint
+          npm run type-check
+          npm run build
+
+      - name: Tests de base de données
+        run: |
+          echo "🗄️  Tests de base de données..."
+          npm run db:generate
+          npm run db:push
+          node scripts/test-event-repertoire.js
+
+      - name: Déploiement sur Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+        env:
+          DATABASE_URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_DATABASE_URL || secrets.STAGING_DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}
+
+      - name: Tests post-déploiement
+        run: |
+          echo "🧪 Tests post-déploiement..."
+          sleep 30
+          
+          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}"
+          
+          # Test de santé
+          curl -f "$DEPLOY_URL/api/health" || echo "❌ Health check failed"
+          
+          # Test des APIs critiques
+          curl -f "$DEPLOY_URL/api/auth/providers" || echo "❌ Auth API failed"
+
+      - name: Notification de succès
+        if: success()
+        run: |
+          echo "✅ Déploiement ${{ github.event.inputs.environment }} réussi!"
+          echo "URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}"
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Déployé par: ${{ github.actor }}"
+
+      - name: Notification d'échec
+        if: failure()
+        run: |
+          echo "❌ Déploiement ${{ github.event.inputs.environment }} échoué!"
+          echo "Déployé par: ${{ github.actor }}"
+          echo "Commit: ${{ github.sha }}"
+
+  # Job de notification Slack
+  notify:
+    name: Notification Slack
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+
+    steps:
+      - name: Notification Slack (Succès)
+        if: needs.deploy.result == 'success'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: |
+            🚀 Déploiement ${{ github.event.inputs.environment }} réussi!
+            Environnement: ${{ github.event.inputs.environment }}
+            Version: ${{ github.event.inputs.version }}
+            Déployé par: ${{ github.actor }}
+
+      - name: Notification Slack (Échec)
+        if: needs.deploy.result == 'failure'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: |
+            ❌ Déploiement ${{ github.event.inputs.environment }} échoué!
+            Environnement: ${{ github.event.inputs.environment }}
+            Déployé par: ${{ github.actor }}
+            Commit: ${{ github.sha }}

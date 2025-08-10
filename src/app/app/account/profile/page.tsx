@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import {
   UserIcon,
   CameraIcon,
@@ -11,613 +10,520 @@ import {
   MusicalNoteIcon,
   CalendarIcon,
   StarIcon,
-  TrophyIcon,
-  CloudArrowUpIcon,
-  PlayIcon,
-  EyeIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  XCircleIcon,
   EnvelopeIcon,
   PhoneIcon,
   MapPinIcon,
   BellIcon,
   ShieldCheckIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  CheckIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-export default function ProfilPage() {
+interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  role: string;
+  instruments: string;
+  primaryInstrument?: string;
+  skillLevel?: string;
+  musicalExperience?: number;
+  voiceType?: string;
+  canLead: boolean;
+  preferredGenres?: string;
+  avatar?: string;
+  bio?: string;
+  birthDate?: string;
+  joinedChurchDate?: string;
+  address?: string;
+  whatsapp?: string;
+  emergencyContact?: string;
+  socialMedia?: string;
+  isPublic: boolean;
+  notificationPrefs?: string;
+  language?: string;
+  generalAvailability?: string;
+  church: {
+    name: string;
+    city: string;
+  };
+}
+
+export default function ProfilePage() {
+  const { data: session } = useSession();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'uploads' | 'history' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
+  const [uploading, setUploading] = useState(false);
 
-  // Données simulées du profil utilisateur
-  const [userProfile, setUserProfile] = useState({
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+33 6 12 34 56 78',
-    address: '123 Rue de la Paix, 75001 Paris',
-    avatar: 'JD',
-    role: 'Musicien',
-    status: 'disponible',
-    instruments: ['Guitare Électrique', 'Guitare Acoustique'],
-    experience: 8,
-    joinedDate: '2020-03-15',
-    lastActive: '2024-01-12',
-    bio: 'Guitariste principal avec une forte expérience en louange contemporaine. Passionné par les arrangements et la formation des jeunes musiciens.',
-    specialties: ['Lead Guitar', 'Accompagnement', 'Arrangements'],
-    rating: 4.8,
-    servicesCount: 45,
-    uploadsCount: 12,
-    availability: {
-      sunday: true,
-      weekdays: false,
-      rehearsals: true,
-      evenings: true
-    },
-    preferences: {
-      notifications: true,
-      emailUpdates: true,
-      smsReminders: false,
-      publicProfile: true
-    }
-  });
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-  const myUploads = [
-    {
-      id: 1,
-      song: 'Amazing Grace',
-      instrument: 'Guitare Électrique',
-      uploadedAt: '2024-01-10',
-      plays: 15,
-      status: 'approuvé',
-      rating: 4.6,
-      duration: '4:35'
-    },
-    {
-      id: 2,
-      song: 'How Great Thou Art',
-      instrument: 'Guitare Acoustique',
-      uploadedAt: '2024-01-08',
-      plays: 23,
-      status: 'approuvé',
-      rating: 4.8,
-      duration: '5:18'
-    },
-    {
-      id: 3,
-      song: 'Blessed Be Your Name',
-      instrument: 'Guitare Électrique',
-      uploadedAt: '2024-01-05',
-      plays: 8,
-      status: 'en-attente',
-      rating: 0,
-      duration: '4:15'
-    },
-    {
-      id: 4,
-      song: 'In Christ Alone',
-      instrument: 'Guitare Acoustique',
-      uploadedAt: '2024-01-03',
-      plays: 31,
-      status: 'approuvé',
-      rating: 4.9,
-      duration: '4:52'
-    }
-  ];
-
-  const serviceHistory = [
-    {
-      id: 1,
-      date: '2024-01-07',
-      type: 'Culte du Dimanche',
-      role: 'Guitariste Principal',
-      status: 'terminé',
-      rating: 4.7,
-      feedback: 'Excellente prestation, très bon lead sur Amazing Grace'
-    },
-    {
-      id: 2,
-      date: '2023-12-31',
-      type: 'Service du Nouvel An',
-      role: 'Guitariste Principal',
-      status: 'terminé',
-      rating: 4.9,
-      feedback: 'Performance exceptionnelle, grande créativité dans les solos'
-    },
-    {
-      id: 3,
-      date: '2023-12-24',
-      type: 'Service de Noël',
-      role: 'Guitariste Accompagnement',
-      status: 'terminé',
-      rating: 4.5,
-      feedback: 'Bon accompagnement, harmonies parfaites'
-    },
-    {
-      id: 4,
-      date: '2023-12-17',
-      type: 'Culte du Dimanche',
-      role: 'Guitariste Principal',
-      status: 'terminé',
-      rating: 4.8,
-      feedback: 'Très bonne direction musicale, équipe bien menée'
-    }
-  ];
-
-  const achievements = [
-    { id: 1, title: 'Premier Upload', description: 'Premier enregistrement uploadé', date: '2020-04-01', icon: '🎵' },
-    { id: 2, title: '10 Services', description: '10 services accomplis', date: '2020-08-15', icon: '🎭' },
-    { id: 3, title: 'Mentor', description: 'A formé 3 nouveaux musiciens', date: '2021-06-20', icon: '👨‍🏫' },
-    { id: 4, title: '50 Uploads', description: '50 enregistrements partagés', date: '2023-11-12', icon: '🏆' },
-    { id: 5, title: 'Expert Guitare', description: 'Plus de 100 heures de jeu', date: '2023-12-01', icon: '🎸' }
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approuvé':
-        return 'bg-green-100 text-green-800';
-      case 'en-attente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'rejeté':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const loadProfile = async () => {
+    try {
+      const response = await fetch('/api/users/profile');
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data.user);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du profil:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approuvé':
-        return <CheckCircleIcon className="h-4 w-4 text-green-600" />;
-      case 'en-attente':
-        return <ClockIcon className="h-4 w-4 text-yellow-600" />;
-      case 'rejeté':
-        return <XCircleIcon className="h-4 w-4 text-red-600" />;
-      default:
-        return <ClockIcon className="h-4 w-4 text-gray-600" />;
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const response = await fetch('/api/users/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(prev => prev ? { ...prev, avatar: data.avatar } : null);
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Erreur lors de l\'upload');
+      }
+    } catch (error) {
+      console.error('Erreur upload:', error);
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
     }
   };
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        i < rating ? 
-        <StarSolidIcon key={i} className="h-4 w-4 text-yellow-400" /> :
-        <StarIcon key={i} className="h-4 w-4 text-gray-300" />
-      );
+  const handleSaveProfile = async () => {
+    if (!profile) return;
+
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data.user);
+        setIsEditing(false);
+        alert('Profil mis à jour avec succès');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Erreur lors de la mise à jour');
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error);
+      alert('Erreur lors de la sauvegarde');
     }
-    return stars;
   };
 
-  const tabs = [
-    { id: 'overview', name: 'Vue d\'ensemble', icon: UserIcon },
-    { id: 'uploads', name: 'Mes Uploads', icon: CloudArrowUpIcon },
-    { id: 'history', name: 'Historique', icon: CalendarIcon },
-    { id: 'settings', name: 'Paramètres', icon: Cog6ToothIcon }
-  ];
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  const getInstruments = () => {
+    if (!profile?.instruments) return [];
+    try {
+      return JSON.parse(profile.instruments);
+    } catch {
+      return [profile.instruments];
+    }
+  };
+
+  const getPreferredGenres = () => {
+    if (!profile?.preferredGenres) return [];
+    try {
+      return JSON.parse(profile.preferredGenres);
+    } catch {
+      return [];
+    }
+  };
+
+  const skillLevelLabels = {
+    'BEGINNER': 'Débutant',
+    'INTERMEDIATE': 'Intermédiaire', 
+    'ADVANCED': 'Avancé',
+    'EXPERT': 'Expert'
+  };
+
+  const voiceTypeLabels = {
+    'SOPRANO': 'Soprano',
+    'MEZZO_SOPRANO': 'Mezzo-soprano',
+    'ALTO': 'Alto',
+    'TENOR': 'Ténor',
+    'BARITONE': 'Baryton',
+    'BASS': 'Basse'
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Impossible de charger le profil</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header avec profil */}
-      <Card>
-        <div className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center space-x-6">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="w-24 h-24 bg-[#3244c7] rounded-full flex items-center justify-center">
-                  <span className="text-white text-2xl font-bold">{userProfile.avatar}</span>
-                </div>
-                <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg border-2 border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
-                  <CameraIcon className="h-4 w-4 text-gray-600" />
-                </button>
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header avec photo de profil */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6">
+          {/* Avatar avec upload */}
+          <div className="relative">
+            {profile.avatar ? (
+              <Image
+                src={profile.avatar}
+                alt={`${profile.firstName} ${profile.lastName}`}
+                width={96}
+                height={96}
+                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            ) : (
+              <div className="w-24 h-24 bg-[#3244c7] rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl font-bold">
+                  {getInitials(profile.firstName, profile.lastName)}
+                </span>
               </div>
-
-              {/* Info personnelles */}
-              <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <h1 className="text-2xl font-bold text-gray-900">{userProfile.name}</h1>
-                  <span className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">
-                    {userProfile.status}
-                  </span>
-                </div>
-                <p className="text-gray-600 mb-1">{userProfile.role}</p>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <span className="flex items-center">
-                    <CalendarIcon className="h-4 w-4 mr-1" />
-                    Membre depuis {new Date(userProfile.joinedDate).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
-                  </span>
-                  <span className="flex items-center">
-                    <StarIcon className="h-4 w-4 mr-1" />
-                    {userProfile.rating}/5
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="mt-4 lg:mt-0 flex items-center space-x-3">
-              <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-                <PencilIcon className="h-4 w-4 mr-2" />
-                {isEditing ? 'Annuler' : 'Modifier profil'}
-              </Button>
-              <Button>
-                <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-                Nouvel Upload
-              </Button>
-            </div>
+            )}
+            
+            {/* Bouton upload */}
+            <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg border-2 border-gray-200 flex items-center justify-center hover:bg-gray-50 cursor-pointer transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+                disabled={uploading}
+              />
+              <CameraIcon className={`h-4 w-4 text-gray-600 ${uploading ? 'animate-spin' : ''}`} />
+            </label>
           </div>
-        </div>
-      </Card>
 
-      {/* Tabs Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`
-                flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                ${activeTab === tab.id
-                  ? 'border-[#3244c7] text-[#3244c7]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }
-              `}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.name}</span>
-            </button>
-          ))}
-        </nav>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {profile.firstName} {profile.lastName}
+            </h1>
+            <p className="text-gray-600 capitalize">{profile.role.toLowerCase()}</p>
+            <p className="text-sm text-gray-500">
+              {profile.church.name} • {profile.church.city}
+            </p>
+            
+            {profile.primaryInstrument && (
+              <div className="mt-2">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <MusicalNoteIcon className="h-3 w-3 mr-1" />
+                  {profile.primaryInstrument}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+          >
+            <PencilIcon className="h-4 w-4" />
+            {isEditing ? 'Annuler' : 'Modifier'}
+          </button>
+        </div>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Colonne principale */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Statistiques */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <CalendarIcon className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Services</p>
-                    <p className="text-2xl font-bold text-gray-900">{userProfile.servicesCount}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <CloudArrowUpIcon className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Uploads</p>
-                    <p className="text-2xl font-bold text-gray-900">{userProfile.uploadsCount}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-yellow-100 rounded-lg">
-                    <StarIcon className="h-6 w-6 text-yellow-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Note moyenne</p>
-                    <p className="text-2xl font-bold text-gray-900">{userProfile.rating}</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
+      {/* Onglets */}
+      <div className="bg-white rounded-lg shadow-md">
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Vue d'ensemble
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'settings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Paramètres
+            </button>
+          </nav>
+        </div>
 
-            {/* Bio */}
-            <Card>
-              <CardHeader title="À propos" />
-              <div className="px-6 pb-6">
-                {isEditing ? (
-                  <div className="space-y-4">
-                    <textarea
-                      value={userProfile.bio}
-                      onChange={(e) => setUserProfile(prev => ({ ...prev, bio: e.target.value }))}
-                      rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#3244c7] focus:ring-2 focus:ring-[#3244c7]/20 focus:outline-none transition-all resize-none"
-                      placeholder="Parlez-nous de votre parcours musical..."
-                    />
-                    <div className="flex space-x-3">
-                      <Button size="sm">Sauvegarder</Button>
-                      <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
-                        Annuler
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-700">{userProfile.bio}</p>
-                )}
-              </div>
-            </Card>
-
-            {/* Achievements */}
-            <Card>
-              <CardHeader title="Réalisations" icon={<TrophyIcon className="h-5 w-5 text-[#3244c7]" />} />
-              <div className="px-6 pb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {achievements.slice(0, 4).map((achievement) => (
-                    <div key={achievement.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="text-2xl">{achievement.icon}</div>
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Informations personnelles */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Informations personnelles</h3>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {isEditing ? (
+                    <>
                       <div>
-                        <h4 className="font-medium text-gray-900">{achievement.title}</h4>
-                        <p className="text-sm text-gray-600">{achievement.description}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(achievement.date).toLocaleDateString('fr-FR')}
-                        </p>
+                        <label className="block text-sm font-medium text-gray-700">Prénom</label>
+                        <input
+                          type="text"
+                          value={profile.firstName}
+                          onChange={(e) => setProfile({...profile, firstName: e.target.value})}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
                       </div>
-                    </div>
-                  ))}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Nom</label>
+                        <input
+                          type="text"
+                          value={profile.lastName}
+                          onChange={(e) => setProfile({...profile, lastName: e.target.value})}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input
+                          type="email"
+                          value={profile.email}
+                          disabled
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Téléphone</label>
+                        <input
+                          type="tel"
+                          value={profile.phone || ''}
+                          onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                        <span className="text-gray-700">{profile.email}</span>
+                      </div>
+                      {profile.phone && (
+                        <div className="flex items-center space-x-3">
+                          <PhoneIcon className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-700">{profile.phone}</span>
+                        </div>
+                      )}
+                      {profile.address && (
+                        <div className="flex items-center space-x-3">
+                          <MapPinIcon className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-700">{profile.address}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Présentation</h4>
+                  {isEditing ? (
+                    <textarea
+                      value={profile.bio || ''}
+                      onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Parlez-nous de vous..."
+                    />
+                  ) : (
+                    <p className="text-gray-700">{profile.bio || 'Aucune présentation'}</p>
+                  )}
                 </div>
               </div>
-            </Card>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Instruments */}
-            <Card>
-              <CardHeader title="Mes Instruments" icon={<MusicalNoteIcon className="h-5 w-5 text-[#3244c7]" />} />
-              <div className="px-6 pb-6">
-                <div className="space-y-2">
-                  {userProfile.instruments.map((instrument, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-                      <span className="text-sm font-medium text-blue-900">{instrument}</span>
-                      <span className="text-sm text-blue-600">{userProfile.experience} ans</span>
-                    </div>
-                  ))}
-                </div>
-                {isEditing && (
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    <PencilIcon className="h-4 w-4 mr-1" />
-                    Modifier
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            {/* Spécialités */}
-            <Card>
-              <CardHeader title="Spécialités" />
-              <div className="px-6 pb-6">
-                <div className="flex flex-wrap gap-2">
-                  {userProfile.specialties.map((specialty, index) => (
-                    <span key={index} className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
-                      {specialty}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </Card>
-
-            {/* Disponibilités */}
-            <Card>
-              <CardHeader title="Disponibilités" />
-              <div className="px-6 pb-6 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Dimanche</span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    userProfile.availability.sunday ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {userProfile.availability.sunday ? 'Disponible' : 'Indisponible'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Répétitions</span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    userProfile.availability.rehearsals ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {userProfile.availability.rehearsals ? 'Disponible' : 'Indisponible'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Soirées</span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    userProfile.availability.evenings ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {userProfile.availability.evenings ? 'Disponible' : 'Indisponible'}
-                  </span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Contact */}
-            <Card>
-              <CardHeader title="Contact" />
-              <div className="px-6 pb-6 space-y-3">
-                <div className="flex items-center space-x-3">
-                  <EnvelopeIcon className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{userProfile.email}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <PhoneIcon className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{userProfile.phone}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MapPinIcon className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{userProfile.address}</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'uploads' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Mes Enregistrements ({myUploads.length})</h2>
-            <Button>
-              <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-              Nouvel Upload
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {myUploads.map((upload) => (
-              <Card key={upload.id} className="hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{upload.song}</h3>
-                      <p className="text-sm text-gray-600">{upload.instrument}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Uploadé le {new Date(upload.uploadedAt).toLocaleDateString('fr-FR')}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(upload.status)}
-                      <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(upload.status)}`}>
-                        {upload.status}
+              {/* Informations musicales */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Profil musical</h3>
+                
+                {/* Instruments */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Instruments</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {getInstruments().map((instrument: string, index: number) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        {instrument}
                       </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Durée</p>
-                      <p className="font-medium text-gray-900">{upload.duration}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Écoutes</p>
-                      <p className="font-medium text-gray-900">{upload.plays}</p>
-                    </div>
-                  </div>
-
-                  {upload.status === 'approuvé' && upload.rating > 0 && (
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 mb-1">Note de l'équipe :</p>
-                      <div className="flex items-center space-x-1">
-                        {renderStars(Math.floor(upload.rating))}
-                        <span className="text-sm text-gray-500">({upload.rating}/5)</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <PlayIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <EyeIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="ml-auto">
-                      Modifier
-                    </Button>
+                    ))}
                   </div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {activeTab === 'history' && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">Historique des Services ({serviceHistory.length})</h2>
-
-          <div className="space-y-4">
-            {serviceHistory.map((service) => (
-              <Card key={service.id}>
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{service.type}</h3>
-                      <p className="text-sm text-gray-600">{service.role}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(service.date).toLocaleDateString('fr-FR')}
+                {/* Niveau et expérience */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Niveau</h4>
+                    {isEditing ? (
+                      <select
+                        value={profile.skillLevel || 'BEGINNER'}
+                        onChange={(e) => setProfile({...profile, skillLevel: e.target.value})}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="BEGINNER">Débutant</option>
+                        <option value="INTERMEDIATE">Intermédiaire</option>
+                        <option value="ADVANCED">Avancé</option>
+                        <option value="EXPERT">Expert</option>
+                      </select>
+                    ) : (
+                      <p className="text-gray-700">
+                        {profile.skillLevel ? skillLevelLabels[profile.skillLevel as keyof typeof skillLevelLabels] : 'Non renseigné'}
                       </p>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      {renderStars(Math.floor(service.rating))}
-                      <span className="text-sm text-gray-500 ml-2">({service.rating}/5)</span>
-                    </div>
+                    )}
                   </div>
-
-                  {service.feedback && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-sm text-blue-700">
-                        <strong>Retour de l'équipe :</strong> {service.feedback}
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Expérience</h4>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        value={profile.musicalExperience || ''}
+                        onChange={(e) => setProfile({...profile, musicalExperience: parseInt(e.target.value) || 0})}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Années"
+                      />
+                    ) : (
+                      <p className="text-gray-700">
+                        {profile.musicalExperience ? `${profile.musicalExperience} ans` : 'Non renseigné'}
                       </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </Card>
-            ))}
-          </div>
+
+                {/* Type vocal */}
+                {(profile.voiceType || isEditing) && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Type vocal</h4>
+                    {isEditing ? (
+                      <select
+                        value={profile.voiceType || ''}
+                        onChange={(e) => setProfile({...profile, voiceType: e.target.value})}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">Non renseigné</option>
+                        <option value="SOPRANO">Soprano</option>
+                        <option value="MEZZO_SOPRANO">Mezzo-soprano</option>
+                        <option value="ALTO">Alto</option>
+                        <option value="TENOR">Ténor</option>
+                        <option value="BARITONE">Baryton</option>
+                        <option value="BASS">Basse</option>
+                      </select>
+                    ) : (
+                      <p className="text-gray-700">
+                        {profile.voiceType ? voiceTypeLabels[profile.voiceType as keyof typeof voiceTypeLabels] : 'Non renseigné'}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Peut diriger */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={profile.canLead}
+                    onChange={(e) => setProfile({...profile, canLead: e.target.checked})}
+                    disabled={!isEditing}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 text-sm text-gray-700">
+                    Peut diriger la louange
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-gray-900">Préférences</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Profil public</label>
+                    <p className="text-xs text-gray-500">Votre profil sera visible par les autres membres</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={profile.isPublic}
+                    onChange={(e) => setProfile({...profile, isPublic: e.target.checked})}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Langue</label>
+                  <select
+                    value={profile.language || 'fr'}
+                    onChange={(e) => setProfile({...profile, language: e.target.value})}
+                    className="block w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
-      {activeTab === 'settings' && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">Paramètres du Compte</h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Informations personnelles */}
-            <Card>
-              <CardHeader title="Informations Personnelles" icon={<UserIcon className="h-5 w-5 text-[#3244c7]" />} />
-              <div className="px-6 pb-6 space-y-4">
-                <Input label="Nom complet" value={userProfile.name} />
-                <Input label="Email" type="email" value={userProfile.email} />
-                <Input label="Téléphone" type="tel" value={userProfile.phone} />
-                <Input label="Adresse" value={userProfile.address} />
-                <Button size="sm">Sauvegarder</Button>
-              </div>
-            </Card>
-
-            {/* Notifications */}
-            <Card>
-              <CardHeader title="Notifications" icon={<BellIcon className="h-5 w-5 text-[#3244c7]" />} />
-              <div className="px-6 pb-6 space-y-4">
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Notifications push</span>
-                  <input type="checkbox" checked={userProfile.preferences.notifications} className="rounded" />
-                </label>
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Mises à jour par email</span>
-                  <input type="checkbox" checked={userProfile.preferences.emailUpdates} className="rounded" />
-                </label>
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Rappels SMS</span>
-                  <input type="checkbox" checked={userProfile.preferences.smsReminders} className="rounded" />
-                </label>
-                <label className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Profil public</span>
-                  <input type="checkbox" checked={userProfile.preferences.publicProfile} className="rounded" />
-                </label>
-              </div>
-            </Card>
-
-            {/* Sécurité */}
-            <Card>
-              <CardHeader title="Sécurité" icon={<ShieldCheckIcon className="h-5 w-5 text-[#3244c7]" />} />
-              <div className="px-6 pb-6 space-y-4">
-                <Button variant="outline" className="w-full">
-                  Changer le mot de passe
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Configurer l'authentification 2FA
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Télécharger mes données
-                </Button>
-              </div>
-            </Card>
+        {/* Actions */}
+        {isEditing && (
+          <div className="border-t border-gray-200 px-6 py-4">
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
+                <XMarkIcon className="h-4 w-4" />
+                Annuler
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+              >
+                <CheckIcon className="h-4 w-4" />
+                Sauvegarder
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

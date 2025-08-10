@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="16" cy="16" r="15" fill="#3244c7"/>
+  
+  <!-- Music note -->
+  <g transform="translate(16, 8)">
+    <circle cx="0" cy="8" r="3" fill="white"/>
+    <rect x="2.5" y="2" width="1" height="6" fill="white"/>
+    <path d="M3.5 2 Q6 1 8 2 Q6 3 3.5 2" fill="white"/>
+  </g>
+  
+  <!-- A letter -->
+  <text x="16" y="26" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="8">A</text>
+</svg>

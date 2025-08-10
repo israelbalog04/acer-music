@@ -6,94 +6,141 @@ import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
 
 interface BreadcrumbItem {
   label: string;
-  href?: string;
-  icon?: React.ReactNode;
+  href: string;
+  icon?: React.ReactElement;
 }
 
 export function Breadcrumb() {
   const pathname = usePathname();
   
-  // Mapping des routes vers des labels lisibles
-  const routeLabels: Record<string, string> = {
-    'app': 'Dashboard',
-    'music': 'Musique',
-    'repertoire': 'Répertoire',
-    'upload': 'Upload',
-    'my-recordings': 'Mes Enregistrements',
-    'team': 'Équipe',
-    'members': 'Membres',
-    'planning': 'Planning',
-    'account': 'Mon Compte',
-    'profile': 'Profil',
-    'notifications': 'Notifications',
-    'settings': 'Paramètres',
-    'auth': 'Authentification',
-    'login': 'Connexion',
-    'register': 'Inscription'
-  };
+  const generateBreadcrumbs = (): BreadcrumbItem[] => {
+    const segments = pathname.split('/').filter(Boolean);
+    const breadcrumbs: BreadcrumbItem[] = [
+      {
+        label: 'Accueil',
+        href: '/app',
+        icon: <HomeIcon className="h-4 w-4" />
+      }
+    ];
 
-  // Générer les éléments du breadcrumb
-  const generateBreadcrumbItems = (): BreadcrumbItem[] => {
-    const pathSegments = pathname.split('/').filter(segment => segment !== '');
-    const items: BreadcrumbItem[] = [];
-
-    // Toujours commencer par l'accueil
-    items.push({
-      label: 'Accueil',
-      href: '/',
-      icon: <HomeIcon className="h-4 w-4" />
-    });
-
-    // Construire le chemin progressivement
     let currentPath = '';
     
-    pathSegments.forEach((segment, index) => {
+    segments.forEach((segment, index) => {
       currentPath += `/${segment}`;
-      const label = routeLabels[segment] || segment;
       
-      // Le dernier élément n'a pas de lien (page actuelle)
-      const isLast = index === pathSegments.length - 1;
+      // Skip the first segment (app)
+      if (index === 0) return;
       
-      items.push({
+      const label = getSegmentLabel(segment, segments.slice(0, index + 1));
+      breadcrumbs.push({
         label,
-        href: isLast ? undefined : currentPath
+        href: currentPath
       });
     });
 
-    return items;
+    return breadcrumbs;
   };
 
-  const breadcrumbItems = generateBreadcrumbItems();
+  const getSegmentLabel = (segment: string, allSegments: string[]): string => {
+    // Mapping des segments vers des labels lisibles
+    const segmentMap: Record<string, string> = {
+      'music': 'Musique',
+      'team': 'Équipe',
+      'admin': 'Administration',
+      'account': 'Mon Compte',
+      'notifications': 'Notifications',
+      'upload': 'Upload',
+      'repertoire': 'Répertoire',
+      'songs': 'Chants',
+      'add': 'Ajouter',
+      'planning': 'Planning',
+      'members': 'Membres',
+      'profile': 'Profil',
+      'settings': 'Paramètres',
+      'users': 'Utilisateurs',
+      'analytics': 'Analytics',
+      'events': 'Événements',
+      'recordings': 'Enregistrements',
+      'sequences': 'Séquences',
+      'multimedia': 'Multimédia',
+      'photos': 'Photos',
+      'availability': 'Disponibilité',
+      'my-availability': 'Ma Disponibilité',
+      'my-recordings': 'Mes Enregistrements',
+      'my-assignments': 'Mes Affectations',
+      'event-availability': 'Disponibilité Événement',
+      'sunday-availability': 'Disponibilité Dimanche',
+      'weekend-availability': 'Disponibilité Weekend',
+      'weekly-availability': 'Disponibilité Hebdomadaire',
+      'assign': 'Assigner',
+      'generate-sundays': 'Générer Dimanches',
+      'recent-uploads': 'Uploads Récents',
+      'activity': 'Activité',
+      'stats': 'Statistiques',
+      'upcoming-services': 'Services à Venir'
+    };
 
-  // Ne pas afficher si on est sur la page d'accueil
-  if (pathname === '/') {
+    // Gestion spéciale pour les IDs (segments qui ressemblent à des IDs)
+    if (segment.match(/^[a-f0-9-]+$/i) && segment.length > 10) {
+      return 'Détails';
+    }
+
+    // Gestion spéciale pour les segments avec des tirets
+    if (segment.includes('-')) {
+      const key = segment;
+      if (segmentMap[key]) {
+        return segmentMap[key];
+      }
+      // Fallback: capitaliser chaque mot
+      return segment.split('-').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
+    }
+
+    return segmentMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+  };
+
+  const breadcrumbs = generateBreadcrumbs();
+
+  // Ne pas afficher le breadcrumb sur la page d'accueil
+  if (breadcrumbs.length <= 1) {
     return null;
   }
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-      {breadcrumbItems.map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          {index > 0 && (
-            <ChevronRightIcon className="h-4 w-4 text-gray-400" />
-          )}
-          
-          {item.href ? (
-            <Link
-              href={item.href}
-              className="flex items-center space-x-1 hover:text-[#3244c7] transition-colors"
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          ) : (
-            <div className="flex items-center space-x-1 text-gray-900 font-medium">
-              {item.icon}
-              <span>{item.label}</span>
-            </div>
-          )}
-        </div>
-      ))}
+    <nav className="flex items-center space-x-1 text-sm text-neutral-600 mb-4">
+      {breadcrumbs.map((item, index) => {
+        const isLast = index === breadcrumbs.length - 1;
+        
+        return (
+          <div key={item.href} className="flex items-center">
+            {index > 0 && (
+              <ChevronRightIcon className="h-4 w-4 mx-2 text-neutral-400" />
+            )}
+            
+            {isLast ? (
+              <span className="font-medium text-neutral-900 flex items-center space-x-1">
+                {item.icon && <span className="text-primary-600">{item.icon}</span>}
+                <span>{item.label}</span>
+              </span>
+            ) : (
+              <Link
+                href={item.href}
+                className="hover:text-primary-600 transition-colors duration-200 flex items-center space-x-1 group"
+              >
+                {item.icon && (
+                  <span className="text-neutral-400 group-hover:text-primary-600 transition-colors">
+                    {item.icon}
+                  </span>
+                )}
+                <span className="group-hover:text-primary-600 transition-colors">
+                  {item.label}
+                </span>
+              </Link>
+            )}
+          </div>
+        );
+      })}
     </nav>
   );
 }

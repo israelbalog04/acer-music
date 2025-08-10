@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useUserData } from '@/hooks/useUserData';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, StatCard } from '@/components/ui/card';
+import { showToast } from '@/components/ui/toaster';
 import {
   MusicalNoteIcon,
   CalendarIcon,
@@ -13,7 +14,11 @@ import {
   PlayIcon,
   ClockIcon,
   CheckCircleIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  SparklesIcon,
+  ChartBarIcon,
+  StarIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 
 interface DashboardStats {
@@ -28,13 +33,17 @@ interface DashboardStats {
 }
 
 interface UpcomingService {
-  id: number;
+  id: string;
+  title: string;
   date: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   type: string;
-  role: string;
-  status: string;
-  rehearsal: string;
+  description?: string;
+  location?: string;
+  daysUntil: number;
+  formattedDate: string;
+  formattedTime: string;
 }
 
 interface RecentUpload {
@@ -54,13 +63,33 @@ interface Activity {
 }
 
 export default function DashboardPage() {
-  const { firstName } = useUserData();
+  const { firstName, userRole } = useUserData();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats[]>([]);
   const [upcomingServices, setUpcomingServices] = useState<UpcomingService[]>([]);
   const [recentUploads, setRecentUploads] = useState<RecentUpload[]>([]);
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [greeting, setGreeting] = useState('');
+
+  // Redirection automatique pour le rôle MULTIMEDIA
+  useEffect(() => {
+    if (userRole === 'MULTIMEDIA') {
+      window.location.href = '/app/multimedia/upload';
+    }
+  }, [userRole]);
+
+  // Définir le message de salutation selon l'heure
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('Bonjour');
+    } else if (hour < 18) {
+      setGreeting('Bon après-midi');
+    } else {
+      setGreeting('Bonsoir');
+    }
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -88,31 +117,31 @@ export default function DashboardPage() {
             color: 'blue' as const
           },
           {
-            title: 'Services ce mois',
-            value: statsData.services?.total || 0,
+            title: 'Événements ce mois',
+            value: statsData.stats?.eventsThisMonth || 0,
             change: { 
-              value: statsData.services?.change || 'Aucune donnée', 
-              trend: statsData.services?.trend || 'neutral' as const 
+              value: `${statsData.stats?.upcomingEvents || 0} prochains`, 
+              trend: 'up' as const 
             },
             icon: <CalendarIcon className="h-6 w-6" />,
             color: 'green' as const
           },
           {
-            title: 'Répertoire total',
-            value: statsData.repertoire?.total || 0,
+            title: 'Chants enregistrés',
+            value: statsData.stats?.totalSongs || 0,
             change: { 
-              value: statsData.repertoire?.change || 'Aucune donnée', 
-              trend: statsData.repertoire?.trend || 'neutral' as const 
+              value: 'Total répertoire', 
+              trend: 'neutral' as const 
             },
             icon: <MusicalNoteIcon className="h-6 w-6" />,
             color: 'purple' as const
           },
           {
-            title: 'Équipe active',
-            value: statsData.team?.total || 0,
+            title: 'Membres actifs',
+            value: statsData.stats?.totalUsers || 0,
             change: { 
-              value: statsData.team?.change || 'Aucune donnée', 
-              trend: statsData.team?.trend || 'neutral' as const 
+              value: 'Équipe complète', 
+              trend: 'neutral' as const 
             },
             icon: <UsersIcon className="h-6 w-6" />,
             color: 'orange' as const
@@ -122,22 +151,27 @@ export default function DashboardPage() {
 
       if (servicesRes.ok) {
         const servicesData = await servicesRes.json();
-        setUpcomingServices(servicesData);
+        setUpcomingServices(servicesData.events || []);
       }
 
       if (uploadsRes.ok) {
         const uploadsData = await uploadsRes.json();
-        setRecentUploads(uploadsData);
+        setRecentUploads(uploadsData.uploads || []);
       }
 
       if (activityRes.ok) {
         const activityData = await activityRes.json();
-        setRecentActivity(activityData);
+        setRecentActivity(activityData.activities || []);
       }
       
     } catch (error) {
       console.error('Erreur lors du chargement du dashboard:', error);
       setError('Erreur lors du chargement des données');
+      showToast({
+        type: 'error',
+        title: 'Erreur de chargement',
+        message: 'Impossible de charger les données du dashboard'
+      });
     } finally {
       setLoading(false);
     }
@@ -147,57 +181,85 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
+  // Si c'est un utilisateur MULTIMEDIA, afficher un message de chargement
+  if (userRole === 'MULTIMEDIA') {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-neutral-600">Redirection vers la page de dépôt de photos...</p>
+        </div>
+      </div>
+    );
+  }
+
   const quickActions = [
     {
       title: 'Nouveau Upload',
       description: 'Enregistrer une nouvelle version',
       href: '/app/music/upload',
       icon: <CloudArrowUpIcon className="h-5 w-5" />,
-      color: 'bg-[#3244c7] hover:bg-[#2938b3]'
+      color: 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800',
+      gradient: 'from-primary-500 to-primary-600'
     },
     {
       title: 'Voir le Répertoire',
       description: 'Parcourir tous les chants',
       href: '/app/music/repertoire',
       icon: <MusicalNoteIcon className="h-5 w-5" />,
-      color: 'bg-green-600 hover:bg-green-700'
+      color: 'bg-gradient-to-r from-success-600 to-success-700 hover:from-success-700 hover:to-success-800',
+      gradient: 'from-success-500 to-success-600'
     },
     {
       title: 'Planning',
       description: 'Consulter mes services',
       href: '/app/team/planning',
       icon: <CalendarIcon className="h-5 w-5" />,
-      color: 'bg-purple-600 hover:bg-purple-700'
+      color: 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800',
+      gradient: 'from-purple-500 to-purple-600'
     }
   ];
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Bonjour {firstName} ! 👋
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Voici un aperçu de votre activité musicale à Acer Paris
-        </p>
+      {/* Enhanced Header */}
+      <div className="relative">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gradient mb-2">
+              {greeting} {firstName} ! 👋
+            </h1>
+            <p className="text-neutral-600 text-lg">
+              Voici un aperçu de votre activité musicale à Acer Paris
+            </p>
+          </div>
+          <div className="hidden lg:flex items-center space-x-2">
+            <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-neutral-500">En ligne</span>
+          </div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 opacity-10">
+          <SparklesIcon className="h-24 w-24 text-primary-400" />
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Enhanced Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {loading ? (
-          // Skeleton loading states
+          // Enhanced Skeleton loading states
           Array.from({ length: 4 }).map((_, index) => (
-            <Card key={index} className="p-6 animate-pulse">
+            <Card key={index} className="p-6 animate-pulse card-hover">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-24"></div>
-                    <div className="h-8 bg-gray-200 rounded w-16"></div>
+                    <div className="h-4 bg-neutral-200 rounded w-24 skeleton"></div>
+                    <div className="h-8 bg-neutral-200 rounded w-16 skeleton"></div>
                   </div>
-                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                  <div className="w-12 h-12 bg-neutral-200 rounded-full skeleton"></div>
                 </div>
-                <div className="h-3 bg-gray-200 rounded w-32"></div>
+                <div className="h-3 bg-neutral-200 rounded w-32 skeleton"></div>
               </div>
             </Card>
           ))
@@ -214,38 +276,39 @@ export default function DashboardPage() {
           <div className="col-span-4">
             <Card className="p-6">
               <div className="text-center">
-                <ExclamationTriangleIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Aucune statistique disponible</p>
+                <ExclamationTriangleIcon className="h-8 w-8 text-neutral-400 mx-auto mb-2" />
+                <p className="text-sm text-neutral-500">Aucune statistique disponible</p>
               </div>
             </Card>
           </div>
         )}
       </div>
 
-      {/* Quick Actions */}
+      {/* Enhanced Quick Actions */}
       <div className="animate-fadeInUp animate-delay-500">
-        <Card>
+        <Card className="card-glow">
           <CardHeader 
             title="Actions Rapides" 
             subtitle="Raccourcis vers les fonctionnalités principales"
+            icon={<SparklesIcon className="h-5 w-5 text-primary-600" />}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
             {quickActions.map((action, index) => (
               <div
                 key={index}
                 className={`animate-slideInLeft animate-delay-${(index + 6) * 100} hover-lift`}
               >
                 <Link href={action.href}>
-                  <div className="p-4 border border-gray-200 rounded-lg hover:border-[#3244c7] hover:shadow-md transition-all duration-200 cursor-pointer group">
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-lg text-white ${action.color} transition-transform duration-200 hover:scale-110 hover:rotate-6`}>
+                  <div className="p-6 border border-neutral-200 rounded-xl hover:border-primary-300 hover:shadow-xl transition-all duration-300 cursor-pointer group bg-gradient-to-br from-white to-neutral-50">
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-3 rounded-xl text-white ${action.color} transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 shadow-lg`}>
                         {action.icon}
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900 group-hover:text-[#3244c7]">
+                        <h3 className="font-semibold text-neutral-900 group-hover:text-primary-700 transition-colors">
                           {action.title}
                         </h3>
-                        <p className="text-sm text-gray-500">{action.description}</p>
+                        <p className="text-sm text-neutral-600">{action.description}</p>
                       </div>
                     </div>
                   </div>
@@ -257,115 +320,180 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Upcoming Services */}
-        <Card>
+        {/* Enhanced Upcoming Services */}
+        <Card className="card-hover">
           <CardHeader 
             title="Prochains Services" 
             subtitle="Vos affectations à venir"
             action={
               <Link href="/app/team/planning">
-                <Button variant="outline" size="sm">Voir tout</Button>
+                <Button variant="outline" size="sm" className="hover:bg-primary-50 hover:border-primary-300">
+                  Voir tout
+                </Button>
               </Link>
             }
-            icon={<CalendarIcon className="h-5 w-5 text-[#3244c7]" />}
+            icon={<CalendarIcon className="h-5 w-5 text-primary-600" />}
           />
-          <div className="space-y-4">
+          <div className="space-y-4 p-6">
             {loading ? (
               Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-100 animate-pulse">
+                <div key={index} className="p-4 bg-neutral-50 rounded-lg border border-neutral-100 animate-pulse">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="h-4 bg-gray-200 rounded w-32"></div>
-                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      <div className="h-4 bg-neutral-200 rounded w-32 skeleton"></div>
+                      <div className="h-4 bg-neutral-200 rounded w-24 skeleton"></div>
                     </div>
-                    <div className="h-3 bg-gray-200 rounded w-40"></div>
-                    <div className="h-3 bg-gray-200 rounded w-36"></div>
+                    <div className="h-3 bg-neutral-200 rounded w-40 skeleton"></div>
+                    <div className="h-3 bg-neutral-200 rounded w-36 skeleton"></div>
                   </div>
                 </div>
               ))
             ) : upcomingServices.length > 0 ? (
-              upcomingServices.map((service) => (
-                <div key={service.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <h4 className="font-medium text-gray-900">{service.type}</h4>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        service.status === 'confirmé' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {service.status}
+              upcomingServices.map((service, index) => {
+                const getTypeColor = (type: string) => {
+                  switch (type) {
+                    case 'SERVICE': return 'bg-primary-100 text-primary-800 border-primary-200';
+                    case 'REPETITION': return 'bg-success-100 text-success-800 border-success-200';
+                    case 'SPECIAL': return 'bg-purple-100 text-purple-800 border-purple-200';
+                    case 'CONCERT': return 'bg-warning-100 text-warning-800 border-warning-200';
+                    case 'FORMATION': return 'bg-error-100 text-error-800 border-error-200';
+                    default: return 'bg-neutral-100 text-neutral-800 border-neutral-200';
+                  }
+                };
+
+                const getTypeLabel = (type: string) => {
+                  switch (type) {
+                    case 'SERVICE': return 'Service';
+                    case 'REPETITION': return 'Répétition';
+                    case 'SPECIAL': return 'Événement Spécial';
+                    case 'CONCERT': return 'Concert';
+                    case 'FORMATION': return 'Formation';
+                    default: return type;
+                  }
+                };
+
+                return (
+                  <div 
+                    key={service.id} 
+                    className="p-4 bg-gradient-to-r from-neutral-50 to-white rounded-xl border border-neutral-100 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-neutral-900 group-hover:text-primary-700 transition-colors">
+                        {service.title}
+                      </h4>
+                      <span className={`px-3 py-1 text-xs rounded-full border ${getTypeColor(service.type)}`}>
+                        {getTypeLabel(service.type)}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-500">
-                      {new Date(service.date).toLocaleDateString('fr-FR')} à {service.time}
-                    </span>
+                    <div className="text-sm text-neutral-600 mb-3">
+                      <div className="flex items-center space-x-2">
+                        <ClockIcon className="h-4 w-4" />
+                        <span>{service.formattedDate} à {service.formattedTime}</span>
+                      </div>
+                    </div>
+                    {service.daysUntil === 0 && (
+                      <div className="flex items-center space-x-2 mb-2">
+                        <StarIcon className="h-4 w-4 text-success-600" />
+                        <p className="text-sm text-success-600 font-medium">
+                          🎉 Aujourd'hui !
+                        </p>
+                      </div>
+                    )}
+                    {service.daysUntil === 1 && (
+                      <div className="flex items-center space-x-2 mb-2">
+                        <ClockIcon className="h-4 w-4 text-warning-600" />
+                        <p className="text-sm text-warning-600 font-medium">
+                          ⏰ Demain
+                        </p>
+                      </div>
+                    )}
+                    {service.daysUntil > 1 && (
+                      <p className="text-sm text-neutral-500 mb-2">
+                        Dans {service.daysUntil} jours
+                      </p>
+                    )}
+                    {service.description && (
+                      <p className="text-sm text-neutral-600 mb-2">
+                        {service.description}
+                      </p>
+                    )}
+                    {service.location && (
+                      <p className="text-sm text-neutral-500 flex items-center">
+                        📍 {service.location}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    <strong>Rôle :</strong> {service.role}
-                  </p>
-                  <p className="text-xs text-gray-500 flex items-center">
-                    <ClockIcon className="h-3 w-3 mr-1" />
-                    Répétition : {new Date(service.rehearsal.split(' ')[0]).toLocaleDateString('fr-FR')} {service.rehearsal.split(' ')[2]}
-                  </p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-8">
-                <CalendarIcon className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Aucun service programmé</p>
+                <CalendarIcon className="h-12 w-12 text-neutral-300 mx-auto mb-3" />
+                <p className="text-neutral-500 font-medium">Aucun service programmé</p>
+                <p className="text-sm text-neutral-400 mt-1">Vous serez notifié des nouveaux services</p>
               </div>
             )}
           </div>
         </Card>
 
-        {/* Recent Uploads */}
-        <Card>
+        {/* Enhanced Recent Uploads */}
+        <Card className="card-hover">
           <CardHeader 
             title="Mes Enregistrements Récents" 
             subtitle="Vos derniers uploads"
             action={
               <Link href="/app/music/upload">
-                <Button variant="outline" size="sm">Nouveau Upload</Button>
+                <Button variant="outline" size="sm" className="hover:bg-primary-50 hover:border-primary-300">
+                  Nouveau Upload
+                </Button>
               </Link>
             }
-            icon={<CloudArrowUpIcon className="h-5 w-5 text-[#3244c7]" />}
+            icon={<CloudArrowUpIcon className="h-5 w-5 text-primary-600" />}
           />
-          <div className="space-y-4">
+          <div className="space-y-4 p-6">
             {loading ? (
               Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-100 animate-pulse">
+                <div key={index} className="p-4 bg-neutral-50 rounded-lg border border-neutral-100 animate-pulse">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="h-4 bg-gray-200 rounded w-32"></div>
-                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                      <div className="h-4 bg-neutral-200 rounded w-32 skeleton"></div>
+                      <div className="h-4 bg-neutral-200 rounded w-20 skeleton"></div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="h-3 bg-gray-200 rounded w-24"></div>
-                      <div className="h-3 bg-gray-200 rounded w-16"></div>
+                      <div className="h-3 bg-neutral-200 rounded w-24 skeleton"></div>
+                      <div className="h-3 bg-neutral-200 rounded w-16 skeleton"></div>
                     </div>
                   </div>
                 </div>
               ))
             ) : recentUploads.length > 0 ? (
-              recentUploads.map((upload) => (
-                <div key={upload.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-gray-900">{upload.song}</h4>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
+              recentUploads.map((upload, index) => (
+                <div 
+                  key={upload.id} 
+                  className="p-4 bg-gradient-to-r from-neutral-50 to-white rounded-xl border border-neutral-100 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-neutral-900 group-hover:text-primary-700 transition-colors">
+                      {upload.song}
+                    </h4>
+                    <span className={`px-3 py-1 text-xs rounded-full border ${
                       upload.status === 'approuvé' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-success-100 text-success-800 border-success-200' 
+                        : 'bg-warning-100 text-warning-800 border-warning-200'
                     }`}>
                       {upload.status}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>{upload.instrument}</span>
+                  <div className="flex items-center justify-between text-sm text-neutral-600">
+                    <span className="flex items-center space-x-1">
+                      <MusicalNoteIcon className="h-4 w-4" />
+                      <span>{upload.instrument}</span>
+                    </span>
                     <div className="flex items-center space-x-4">
-                      <span className="flex items-center">
-                        <PlayIcon className="h-3 w-3 mr-1" />
-                        {upload.plays}
+                      <span className="flex items-center space-x-1">
+                        <PlayIcon className="h-3 w-3" />
+                        <span>{upload.plays}</span>
                       </span>
                       <span>{new Date(upload.uploadedAt).toLocaleDateString('fr-FR')}</span>
                     </div>
@@ -374,67 +502,73 @@ export default function DashboardPage() {
               ))
             ) : (
               <div className="text-center py-8">
-                <CloudArrowUpIcon className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Aucun enregistrement récent</p>
+                <CloudArrowUpIcon className="h-12 w-12 text-neutral-300 mx-auto mb-3" />
+                <p className="text-neutral-500 font-medium">Aucun enregistrement récent</p>
+                <p className="text-sm text-neutral-400 mt-1">Commencez par uploader votre premier enregistrement</p>
               </div>
             )}
           </div>
         </Card>
       </div>
 
-      {/* Recent Activity / Notifications */}
-      <Card>
+      {/* Enhanced Recent Activity */}
+      <Card className="card-hover">
         <CardHeader 
           title="Activité Récente" 
           subtitle="Dernières mises à jour de l'équipe"
-          icon={<ExclamationTriangleIcon className="h-5 w-5 text-[#3244c7]" />}
+          icon={<ChartBarIcon className="h-5 w-5 text-primary-600" />}
         />
-        <div className="space-y-3">
+        <div className="space-y-3 p-6">
           {loading ? (
             Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg animate-pulse">
-                <div className="w-2 h-2 bg-gray-200 rounded-full"></div>
+              <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-lg animate-pulse">
+                <div className="w-2 h-2 bg-neutral-200 rounded-full skeleton"></div>
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-3/4 mb-1 skeleton"></div>
+                  <div className="h-3 bg-neutral-200 rounded w-1/2 skeleton"></div>
                 </div>
-                <div className="h-3 bg-gray-200 rounded w-12"></div>
+                <div className="h-3 bg-neutral-200 rounded w-12 skeleton"></div>
               </div>
             ))
           ) : recentActivity.length > 0 ? (
-            recentActivity.map((activity) => {
-              const bgColor = activity.type === 'success' ? 'bg-green-50' : 
-                            activity.type === 'warning' ? 'bg-yellow-50' : 'bg-blue-50';
-              const dotColor = activity.type === 'success' ? 'bg-green-500' : 
-                             activity.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            recentActivity.map((activity, index) => {
+              const bgColor = activity.type === 'success' ? 'bg-success-50' : 
+                            activity.type === 'warning' ? 'bg-warning-50' : 'bg-primary-50';
+              const dotColor = activity.type === 'success' ? 'bg-success-500' : 
+                             activity.type === 'warning' ? 'bg-warning-500' : 'bg-primary-500';
               
               return (
-                <div key={activity.id} className={`flex items-center space-x-3 p-3 ${bgColor} rounded-lg`}>
-                  <div className={`w-2 h-2 ${dotColor} rounded-full`}></div>
-                  <p className="text-sm text-gray-700 flex-1">{activity.message}</p>
-                  <span className="text-xs text-gray-500">{activity.timestamp}</span>
+                <div 
+                  key={activity.id} 
+                  className={`flex items-center space-x-3 p-4 ${bgColor} rounded-lg hover:shadow-md transition-all duration-300 hover:scale-[1.01]`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={`w-3 h-3 ${dotColor} rounded-full animate-pulse`}></div>
+                  <p className="text-sm text-neutral-700 flex-1 font-medium">{activity.message}</p>
+                  <span className="text-xs text-neutral-500">{activity.timestamp}</span>
                 </div>
               );
             })
           ) : (
             <div className="text-center py-8">
-              <ExclamationTriangleIcon className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Aucune activité récente</p>
+              <ChartBarIcon className="h-12 w-12 text-neutral-300 mx-auto mb-3" />
+              <p className="text-neutral-500 font-medium">Aucune activité récente</p>
+              <p className="text-sm text-neutral-400 mt-1">L'activité de l'équipe apparaîtra ici</p>
             </div>
           )}
         </div>
       </Card>
 
-      {/* Error State */}
+      {/* Enhanced Error State */}
       {error && (
-        <Card className="p-6">
+        <Card className="p-6 border-error-200 bg-error-50">
           <div className="text-center">
-            <ExclamationTriangleIcon className="h-12 w-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Erreur de chargement</h3>
-            <p className="text-gray-500 mb-4">{error}</p>
+            <ExclamationTriangleIcon className="h-12 w-12 text-error-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-error-900 mb-2">Erreur de chargement</h3>
+            <p className="text-error-700 mb-4">{error}</p>
             <button
               onClick={fetchDashboardData}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-6 py-2 bg-error-600 text-white rounded-lg hover:bg-error-700 transition-colors focus:ring-4 focus:ring-error-200"
             >
               Réessayer
             </button>

@@ -1,81 +1,243 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
-  HomeIcon,
   MusicalNoteIcon,
-  UsersIcon,
+  UserGroupIcon,
+  Cog6ToothIcon,
+  BellIcon,
+  HomeIcon,
+  CalendarIcon,
+  CloudArrowUpIcon,
+  PhotoIcon,
+  ChartBarIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
 
-interface Section {
-  name: string;
-  color: string;
-  bgColor: string;
-  icon: React.ReactNode;
+interface SectionInfo {
+  title: string;
   description: string;
+  icon: React.ReactElement;
+  color: string;
 }
 
 export function SectionIndicator() {
   const pathname = usePathname();
+  const [sectionInfo, setSectionInfo] = useState<SectionInfo | null>(null);
 
-  const getSectionInfo = (): Section | null => {
-    if (pathname === '/app') {
+  useEffect(() => {
+    const info = getSectionInfo(pathname);
+    setSectionInfo(info);
+  }, [pathname]);
+
+  const getSectionInfo = (path: string): SectionInfo | null => {
+    // Dashboard
+    if (path === '/app') {
       return {
-        name: 'Dashboard',
-        color: 'text-gray-700',
-        bgColor: 'bg-gray-100',
+        title: 'Tableau de bord',
+        description: 'Vue d\'ensemble de votre activité musicale',
         icon: <HomeIcon className="h-5 w-5" />,
-        description: 'Vue d\'ensemble de votre activité'
+        color: 'text-primary-600'
       };
-    } else if (pathname.startsWith('/app/music/')) {
+    }
+
+    // Music section
+    if (path.includes('/music')) {
+      if (path.includes('/upload')) {
+        return {
+          title: 'Upload Musical',
+          description: 'Enregistrer et partager vos performances',
+          icon: <CloudArrowUpIcon className="h-5 w-5" />,
+          color: 'text-success-600'
+        };
+      }
+      if (path.includes('/repertoire')) {
+        return {
+          title: 'Répertoire',
+          description: 'Explorer la collection de chants',
+          icon: <MusicalNoteIcon className="h-5 w-5" />,
+          color: 'text-purple-600'
+        };
+      }
+      if (path.includes('/songs')) {
+        return {
+          title: 'Gestion des Chants',
+          description: 'Ajouter et modifier les chants',
+          icon: <MusicalNoteIcon className="h-5 w-5" />,
+          color: 'text-purple-600'
+        };
+      }
+      if (path.includes('/recordings')) {
+        return {
+          title: 'Enregistrements',
+          description: 'Vos performances enregistrées',
+          icon: <CloudArrowUpIcon className="h-5 w-5" />,
+          color: 'text-success-600'
+        };
+      }
+      if (path.includes('/sequences')) {
+        return {
+          title: 'Séquences',
+          description: 'Gérer les partitions et arrangements',
+          icon: <MusicalNoteIcon className="h-5 w-5" />,
+          color: 'text-purple-600'
+        };
+      }
+      if (path.includes('/photos')) {
+        return {
+          title: 'Photos',
+          description: 'Galerie des photos d\'événements',
+          icon: <PhotoIcon className="h-5 w-5" />,
+          color: 'text-warning-600'
+        };
+      }
       return {
-        name: 'Musique',
-        color: 'text-blue-700',
-        bgColor: 'bg-blue-100',
+        title: 'Musique',
+        description: 'Gestion du répertoire et des enregistrements',
         icon: <MusicalNoteIcon className="h-5 w-5" />,
-        description: 'Gestion des enregistrements et répertoire'
+        color: 'text-purple-600'
       };
-    } else if (pathname.startsWith('/app/team/')) {
+    }
+
+    // Team section
+    if (path.includes('/team')) {
+      if (path.includes('/planning')) {
+        return {
+          title: 'Planning',
+          description: 'Organisation des services et événements',
+          icon: <CalendarIcon className="h-5 w-5" />,
+          color: 'text-primary-600'
+        };
+      }
+      if (path.includes('/members')) {
+        return {
+          title: 'Membres de l\'Équipe',
+          description: 'Gérer les musiciens et leurs rôles',
+          icon: <UserGroupIcon className="h-5 w-5" />,
+          color: 'text-success-600'
+        };
+      }
+      if (path.includes('/availability')) {
+        return {
+          title: 'Disponibilités',
+          description: 'Gérer les créneaux disponibles',
+          icon: <CalendarIcon className="h-5 w-5" />,
+          color: 'text-primary-600'
+        };
+      }
       return {
-        name: 'Équipe',
-        color: 'text-green-700',
-        bgColor: 'bg-green-100',
-        icon: <UsersIcon className="h-5 w-5" />,
-        description: 'Organisation et planning des musiciens'
+        title: 'Équipe',
+        description: 'Gestion de l\'équipe musicale',
+        icon: <UserGroupIcon className="h-5 w-5" />,
+        color: 'text-success-600'
       };
-    } else if (pathname.startsWith('/app/account/')) {
+    }
+
+    // Admin section
+    if (path.includes('/admin')) {
+      if (path.includes('/users')) {
+        return {
+          title: 'Gestion Utilisateurs',
+          description: 'Administrer les comptes utilisateurs',
+          icon: <UserIcon className="h-5 w-5" />,
+          color: 'text-error-600'
+        };
+      }
+      if (path.includes('/analytics')) {
+        return {
+          title: 'Analytics',
+          description: 'Statistiques et analyses',
+          icon: <ChartBarIcon className="h-5 w-5" />,
+          color: 'text-warning-600'
+        };
+      }
+      if (path.includes('/events')) {
+        return {
+          title: 'Gestion Événements',
+          description: 'Créer et organiser les événements',
+          icon: <CalendarIcon className="h-5 w-5" />,
+          color: 'text-primary-600'
+        };
+      }
       return {
-        name: 'Mon Compte',
-        color: 'text-purple-700',
-        bgColor: 'bg-purple-100',
+        title: 'Administration',
+        description: 'Outils de gestion avancés',
+        icon: <Cog6ToothIcon className="h-5 w-5" />,
+        color: 'text-error-600'
+      };
+    }
+
+    // Account section
+    if (path.includes('/account')) {
+      if (path.includes('/profile')) {
+        return {
+          title: 'Mon Profil',
+          description: 'Gérer vos informations personnelles',
+          icon: <UserIcon className="h-5 w-5" />,
+          color: 'text-primary-600'
+        };
+      }
+      if (path.includes('/settings')) {
+        return {
+          title: 'Paramètres',
+          description: 'Configurer vos préférences',
+          icon: <Cog6ToothIcon className="h-5 w-5" />,
+          color: 'text-neutral-600'
+        };
+      }
+      if (path.includes('/notifications')) {
+        return {
+          title: 'Notifications',
+          description: 'Gérer vos alertes',
+          icon: <BellIcon className="h-5 w-5" />,
+          color: 'text-warning-600'
+        };
+      }
+      return {
+        title: 'Mon Compte',
+        description: 'Gestion de votre compte utilisateur',
         icon: <UserIcon className="h-5 w-5" />,
-        description: 'Paramètres personnels et notifications'
+        color: 'text-primary-600'
+      };
+    }
+
+    // Notifications
+    if (path.includes('/notifications')) {
+      return {
+        title: 'Notifications',
+        description: 'Centre de notifications',
+        icon: <BellIcon className="h-5 w-5" />,
+        color: 'text-warning-600'
+      };
+    }
+
+    // Multimedia
+    if (path.includes('/multimedia')) {
+      return {
+        title: 'Multimédia',
+        description: 'Gestion des photos et médias',
+        icon: <PhotoIcon className="h-5 w-5" />,
+        color: 'text-warning-600'
       };
     }
 
     return null;
   };
 
-  const section = getSectionInfo();
-
-  if (!section) {
-    return null;
-  }
+  if (!sectionInfo) return null;
 
   return (
-    <div className="flex items-center space-x-3 mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-      <div className={`p-2 rounded-lg ${section.bgColor}`}>
-        <div className={section.color}>
-          {section.icon}
-        </div>
+    <div className="flex items-center space-x-3 p-3 bg-white border border-neutral-200 rounded-lg shadow-sm mb-4 animate-fadeInUp">
+      <div className={`p-2 rounded-lg bg-neutral-100 ${sectionInfo.color}`}>
+        {sectionInfo.icon}
       </div>
       <div>
-        <h2 className={`font-semibold ${section.color}`}>
-          Section {section.name}
+        <h2 className="text-lg font-semibold text-neutral-900">
+          {sectionInfo.title}
         </h2>
-        <p className="text-sm text-gray-600">
-          {section.description}
+        <p className="text-sm text-neutral-600">
+          {sectionInfo.description}
         </p>
       </div>
     </div>

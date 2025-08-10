@@ -305,14 +305,32 @@ export default function MyRecordingsPage() {
                       )}
                     </div>
                   </Button>
-                  <Button variant="ghost" size="sm" title="Voir détails" className="hover-scale">
-                    <EyeIcon className="h-4 w-4" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-blue-700 border-blue-200 hover:bg-blue-50 px-2 py-1"
+                    title="Voir les détails"
+                  >
+                    <EyeIcon className="h-3 w-3" />
+                    <span className="text-xs font-medium">Détails</span>
                   </Button>
-                  <Button variant="ghost" size="sm" title="Modifier" className="hover-scale">
-                    <PencilIcon className="h-4 w-4" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-amber-700 border-amber-200 hover:bg-amber-50 px-2 py-1"
+                    title="Modifier l'enregistrement"
+                  >
+                    <PencilIcon className="h-3 w-3" />
+                    <span className="text-xs font-medium">Modifier</span>
                   </Button>
-                  <Button variant="ghost" size="sm" title="Supprimer" className="hover-scale">
-                    <TrashIcon className="h-4 w-4" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-red-700 border-red-200 hover:bg-red-50 px-2 py-1"
+                    title="Supprimer l'enregistrement"
+                  >
+                    <TrashIcon className="h-3 w-3" />
+                    <span className="text-xs font-medium">Supprimer</span>
                   </Button>
                 </div>
               </div>

@@ -1,0 +1,230 @@
+name: CI/CD Pipeline - ACER Music
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+
+jobs:
+  # Job de vérification et tests
+  test:
+    name: Tests et Vérifications
+    runs-on: ubuntu-latest
+    
+    services:
+      # Base de données SQLite pour les tests
+      sqlite:
+        image: alpine:latest
+        options: >-
+          --health-cmd "echo 'SQLite is ready'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Vérification du formatage
+        run: npm run lint
+
+      - name: Vérification des types TypeScript
+        run: npm run type-check
+
+      - name: Tests unitaires
+        run: npm run test
+
+      - name: Tests de base de données
+        run: |
+          npm run db:generate
+          npm run db:push
+          node scripts/test-event-repertoire.js
+          node scripts/test-repertoire-apis.js
+
+      - name: Build de l'application
+        run: npm run build
+
+      - name: Upload des artefacts de build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: |
+            .next/
+            public/
+            package.json
+            package-lock.json
+
+  # Job de sécurité
+  security:
+    name: Analyse de Sécurité
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Audit de sécurité npm
+        run: npm audit --audit-level moderate
+
+      - name: Scan des vulnérabilités avec Snyk
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Scan des secrets dans le code
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: .
+          base: HEAD~1
+
+  # Job de déploiement en staging
+  deploy-staging:
+    name: Déploiement Staging
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Build de l'application
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.STAGING_URL }}
+
+      - name: Déploiement sur Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+  # Job de déploiement en production
+  deploy-production:
+    name: Déploiement Production
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Build de l'application
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.PRODUCTION_URL }}
+
+      - name: Déploiement sur Vercel (Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+      - name: Notification de déploiement
+        run: |
+          echo "🚀 Déploiement en production terminé!"
+          echo "URL: ${{ secrets.PRODUCTION_URL }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Auteur: ${{ github.actor }}"
+
+  # Job de tests post-déploiement
+  post-deploy-tests:
+    name: Tests Post-Déploiement
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+
+    steps:
+      - name: Tests de santé de l'application
+        run: |
+          # Attendre que l'application soit prête
+          sleep 30
+          
+          # Tests de base
+          curl -f ${{ secrets.STAGING_URL }}/api/health || echo "Staging health check failed"
+          curl -f ${{ secrets.PRODUCTION_URL }}/api/health || echo "Production health check failed"
+
+      - name: Tests des APIs critiques
+        run: |
+          # Test de l'API d'authentification
+          curl -X POST ${{ secrets.STAGING_URL }}/api/auth/register \
+            -H "Content-Type: application/json" \
+            -d '{"email":"test@example.com","password":"test123"}' || echo "Auth API test failed"
+
+  # Job de notification
+  notify:
+    name: Notifications
+    runs-on: ubuntu-latest
+    needs: [test, security, deploy-staging, deploy-production, post-deploy-tests]
+    if: always()
+
+    steps:
+      - name: Notification Slack (Succès)
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: '✅ Pipeline ACER Music réussie!'
+
+      - name: Notification Slack (Échec)
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: '❌ Pipeline ACER Music échouée!'

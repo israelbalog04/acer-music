@@ -1,0 +1,735 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Church {
+  id          String   @id @default(cuid())
+  name        String   @unique // "ACER Paris", "ACER Rennes", "ACER Lyon"
+  city        String   // "Paris", "Rennes", "Lyon"
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  description String?
+  isActive    Boolean  @default(true)
+  
+  // Configuration spécifique
+  settings    String?  // JSON: config specifique par église
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  users            User[]
+  recordings       Recording[]
+  songs            Song[]
+  schedules        Schedule[]
+  teams            Team[]
+  availabilities   Availability[]
+  sequences        Sequence[]
+  sequenceDownloads SequenceDownload[]
+  eventDirectors   EventDirector[]
+  eventTeamMembers EventTeamMember[]
+  eventSessions    EventSession[]
+  sessionMembers   SessionMember[]
+  sessionDirectors SessionDirector[]
+  eventSongs       EventSong[]
+  notifications    Notification[]
+  musicianImages   MusicianImage[]
+  
+  @@map("churches")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  emailVerified   DateTime?
+  firstName       String
+  lastName        String
+  phone           String?
+  password        String?
+  role            UserRole @default(MUSICIEN)
+  
+  // Informations musicales détaillées
+  instruments       String   // JSON string: ["Piano", "Guitare"]
+  primaryInstrument String?  // Instrument principal
+  skillLevel        SkillLevel? @default(BEGINNER)
+  musicalExperience Int?     // Années d'expérience
+  voiceType         VoiceType?
+  canLead           Boolean  @default(false) // Peut diriger la louange
+  preferredGenres   String?  // JSON: ["Gospel", "Contemporain", "Classique"]
+  
+  // Profil et présentation
+  avatar            String?  // URL de la photo de profil
+  bio               String?  // Présentation personnelle
+  birthDate         DateTime?
+  joinedChurchDate  DateTime?
+  
+  // Coordonnées étendues
+  address           String?  // Adresse complète
+  whatsapp          String?  // Numéro WhatsApp
+  emergencyContact  String?  // Contact d'urgence (JSON: {name, phone, relation})
+  socialMedia       String?  // JSON: {instagram, facebook, youtube}
+  
+  // Préférences et paramètres
+  isPublic          Boolean  @default(true)  // Profil visible par les autres
+  notificationPrefs String?  // JSON: préférences notifications
+  language          String?  @default("fr")  // Langue préférée
+  generalAvailability String? // JSON: disponibilités générales
+  
+  // Validation admin
+  isApproved        Boolean  @default(false) // Validation par l'admin
+  approvedAt        DateTime? // Date de validation
+  approvedBy        String?   // ID de l'admin qui a validé
+  
+  // Multi-tenant
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations NextAuth
+  accounts                   Account[]
+  sessions                   Session[]
+  
+  // Relations
+  createdEvents              Schedule[] @relation("EventCreator")
+  teamMembers                TeamMember[]
+  availabilities             Availability[]
+  createdSequences           Sequence[] @relation("SequenceCreator")
+  sequenceDownloads          SequenceDownload[]
+  eventDirectorships         EventDirector[] @relation("EventDirectors")
+  directorAssignments        EventDirector[] @relation("DirectorAssignments")
+  eventTeamMemberships       EventTeamMember[] @relation("EventTeamMembers")
+  teamAssignments            EventTeamMember[] @relation("TeamAssignments")
+  sessionMemberships         SessionMember[] @relation("SessionMemberships")
+  sessionDirectorships       SessionDirector[] @relation("SessionDirectorships")
+  sessionDirectorAssignments SessionDirector[] @relation("SessionDirectorAssignments")
+  recordings                 Recording[] @relation("UserRecordings")
+  recordingReviews           Recording[] @relation("RecordingReviews")
+  notifications              Notification[] @relation("UserNotifications")
+  createdNotifications       Notification[] @relation("NotificationCreator")
+  musicianImageUploads       MusicianImage[] @relation("MusicianImageUploads")
+  
+  @@map("users")
+}
+
+// NextAuth tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Recording {
+  id          String          @id @default(cuid())
+  title       String
+  instrument  String
+  songId      String?
+  audioUrl    String?
+  duration    Int? // en secondes
+  status      RecordingStatus @default(DRAFT)
+  notes       String?
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Créateur de l'enregistrement
+  userId      String
+  user        User @relation("UserRecordings", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Admin qui a validé/refusé
+  reviewedById String?
+  reviewedBy   User? @relation("RecordingReviews", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  song   Song?  @relation(fields: [songId], references: [id])
+  
+  @@map("recordings")
+}
+
+model Song {
+  id          String   @id @default(cuid())
+  title       String
+  artist      String?
+  key         String?
+  bpm         Int?
+  duration    Int? // en secondes
+  lyrics      String?
+  chords      String?
+  notes       String?
+  youtubeUrl  String?  // Lien YouTube
+  tags        String   // JSON string: ["gospel", "louange"]
+  isActive    Boolean  @default(true)
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  recordings  Recording[]
+  sequences   Sequence[]
+  eventSongs  EventSong[]
+  
+  @@map("songs")
+}
+
+// Table de liaison Many-to-Many entre Songs et Events/Schedules
+model EventSong {
+  id         String   @id @default(cuid())
+  
+  // Relations
+  songId     String
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  // Métadonnées spécifiques à l'événement
+  order      Int?     // Ordre dans la liste de l'événement
+  key        String?  // Tonalité spécifique pour cet événement
+  notes      String?  // Notes spécifiques pour cet événement
+  
+  // Multi-tenant
+  churchId   String
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([songId, scheduleId])
+  @@map("event_songs")
+}
+
+model Schedule {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime      // Date principale de l'événement
+  startTime   String?       // Heure de début (format HH:MM)
+  endTime     String?       // Heure de fin (format HH:MM)
+  type        ScheduleType  @default(REPETITION)
+  location    String?
+  status      ScheduleStatus @default(PLANNED)
+  isActive    Boolean       @default(true)
+  
+  // Métadonnées événement
+  hasMultipleSessions Boolean @default(false)
+  sessionCount       Int     @default(1)
+  notes              String?
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  createdById String?
+  createdBy   User?   @relation("EventCreator", fields: [createdById], references: [id])
+  sessions    EventSession[]
+  sequences   Sequence[]
+  teamMembers TeamMember[]
+  directors   EventDirector[]
+  eventTeamMembers EventTeamMember[]
+  availabilities Availability[]
+  eventSongs  EventSong[]
+  musicianImages MusicianImage[]
+  
+  @@map("schedules")
+}
+
+model EventSession {
+  id          String   @id @default(cuid())
+  name        String   // "Session Matin", "Session Soir", etc.
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  notes       String?
+  sessionOrder Int     @default(1) // Ordre des sessions (1, 2, 3...)
+  
+  // Relations
+  scheduleId  String
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Équipe et DM de cette session
+  members     SessionMember[]
+  directors   SessionDirector[]
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("event_sessions")
+}
+
+model SessionMember {
+  id String @id @default(cuid())
+  
+  // Relations
+  sessionId String
+  session   EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation("SessionMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Rôle dans cette session
+  role        String? // "Pianiste", "Guitariste", "Chanteur", etc.
+  isConfirmed Boolean @default(false)
+  notes       String?
+  
+  // Multi-tenant
+  churchId String
+  church   Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  assignedAt DateTime @default(now())
+  
+  @@unique([sessionId, userId])
+  @@map("session_members")
+}
+
+model SessionDirector {
+  id String @id @default(cuid())
+  
+  // Relations
+  sessionId String
+  session   EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation("SessionDirectorships", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Attribution
+  assignedById String
+  assignedBy   User   @relation("SessionDirectorAssignments", fields: [assignedById], references: [id])
+  assignedAt   DateTime @default(now())
+  
+  // Statut
+  isActive     Boolean  @default(true)
+  isPrimary    Boolean  @default(false) // DM principal vs assistant
+  notes        String?
+  
+  // Multi-tenant
+  churchId String
+  church   Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([sessionId, userId])
+  @@map("session_directors")
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  isActive    Boolean  @default(true)
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  members TeamMember[]
+  
+  @@map("teams")
+}
+
+model TeamMember {
+  id String @id @default(cuid())
+  
+  // Relations
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  scheduleId String?
+  schedule   Schedule? @relation(fields: [scheduleId], references: [id])
+  
+  // Metadata
+  joinedAt DateTime @default(now())
+  
+  @@unique([userId, teamId])
+  @@map("team_members")
+}
+
+model EventDirector {
+  id String @id @default(cuid())
+  
+  // Relations
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation("EventDirectors", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant
+  churchId   String
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Attribution
+  assignedById String
+  assignedBy   User     @relation("DirectorAssignments", fields: [assignedById], references: [id])
+  assignedAt   DateTime @default(now())
+  
+  // Statut
+  isActive     Boolean  @default(true)
+  notes        String?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([scheduleId, userId])
+  @@map("event_directors")
+}
+
+model EventTeamMember {
+  id String @id @default(cuid())
+  
+  // Relations
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation("EventTeamMembers", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant
+  churchId   String
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Rôle dans l'équipe
+  role       String   // "PIANO", "GUITAR", "LEAD_VOCAL", etc.
+  instruments String? // JSON: ["Piano", "Guitare"]
+  
+  // Attribution
+  assignedById String
+  assignedBy   User     @relation("TeamAssignments", fields: [assignedById], references: [id])
+  assignedAt   DateTime @default(now())
+  
+  // Statut
+  isActive     Boolean  @default(true)
+  notes        String?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([scheduleId, userId])
+  @@map("event_team_members")
+}
+
+// Enums
+enum UserRole {
+  MUSICIEN
+  CHEF_LOUANGE
+  TECHNICIEN
+  ADMIN
+  MULTIMEDIA
+  SUPER_ADMIN
+}
+
+enum RecordingStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  ARCHIVED
+}
+
+enum ScheduleType {
+  REPETITION
+  SERVICE
+  CONCERT
+  FORMATION
+}
+
+enum ScheduleStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SequenceScope {
+  EVENT    // Spécifique à un événement
+  GLOBAL   // Disponible pour toute l'église
+}
+
+model Availability {
+  id     String @id @default(cuid())
+  
+  // Disponibilité peut être liée à un événement OU être générique
+  scheduleId  String?  // Optionnel - si null, c'est une dispo générique
+  schedule    Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  // Pour les disponibilités génériques (dimanches, etc.)
+  availabilityType String @default("GENERIC") // "EVENT" ou "GENERIC"
+  dayOfWeek       Int?    // 0=dimanche, 1=lundi, ... (pour dispos génériques)
+  specificDate    DateTime? // Date spécifique (optionnel)
+  
+  // Statut de disponibilité
+  isAvailable Boolean  @default(true)
+  timeSlots   String   // JSON: ["matin", "apres-midi", "soir"]
+  cultGroups  String?  // JSON: ["1-2"] ou ["3-5"] ou ["1-5"] pour les dimanches
+  notes       String?
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Contraintes flexibles
+  @@unique([userId, scheduleId], name: "user_event_availability") // Pour les événements spécifiques
+  @@unique([userId, availabilityType, dayOfWeek, churchId], name: "user_generic_availability") // Pour les dispos génériques
+  @@map("availabilities")
+}
+
+model Sequence {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  songId      String?
+  song        Song?    @relation(fields: [songId], references: [id])
+  
+  // Lié à un événement spécifique
+  scheduleId  String?
+  schedule    Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  // Fichiers de séquence
+  fileUrl     String?  // URL du fichier principal
+  fileName    String?  // Nom original du fichier
+  fileSize    Int?     // Taille en bytes
+  fileType    String?  // Type MIME
+  
+  // Métadonnées musicales
+  key         String?  // Tonalité
+  bpm         Int?     // Tempo
+  duration    Int?     // Durée en secondes
+  instruments String?  // JSON: ["Piano", "Guitare", "Batterie"]
+  difficulty  String?  // "Débutant", "Intermédiaire", "Avancé"
+  
+  // Catégorisation
+  category    String?  // "Louange", "Adoraton", "Évangélisation"
+  tags        String?  // JSON: ["moderne", "classique", "gospel"]
+  
+  // Statut et visibilité
+  isActive    Boolean  @default(true)
+  isPublic    Boolean  @default(true) // Visible par tous les musiciens de l'église
+  scope       SequenceScope @default(EVENT) // Portée: EVENT ou GLOBAL
+  
+  // Multi-tenant
+  churchId    String
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Relations - Créateur (DM pour cet événement)
+  createdById String
+  createdBy   User     @relation("SequenceCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Suivi des téléchargements
+  downloads   SequenceDownload[]
+  
+  @@map("sequences")
+}
+
+model SequenceDownload {
+  id         String   @id @default(cuid())
+  
+  // Relations
+  sequenceId String
+  sequence   Sequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant
+  churchId   String
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Métadonnées du téléchargement
+  downloadedAt DateTime @default(now())
+  ipAddress    String?
+  userAgent    String?
+  
+  @@unique([sequenceId, userId])
+  @@map("sequence_downloads")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  title       String   // "Nouveaux dimanches créés", "Remplissez vos disponibilités"
+  message     String   // Message détaillé
+  type        NotificationType
+  priority    NotificationPriority @default(MEDIUM)
+  
+  // Destinataire
+  userId      String
+  user        User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Créateur (admin qui a déclenché l'action)
+  createdById String?
+  createdBy   User?    @relation("NotificationCreator", fields: [createdById], references: [id])
+  
+  // Statut
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  
+  // Action liée (optionnel)
+  actionType  String?  // "sunday_creation", "availability_request", "event_assignment"
+  actionId    String?  // ID de l'élément lié (event, availability, etc.)
+  actionUrl   String?  // URL vers l'action à effectuer
+  
+  // Multi-tenant
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("notifications")
+}
+
+model MusicianImage {
+  id          String   @id @default(cuid())
+  title       String   // "Répétition du 15 janvier", "Culte du dimanche"
+  description String?  // Description optionnelle
+  
+  // Fichier image
+  fileName    String   // Nom original du fichier
+  fileUrl     String   // URL de l'image
+  fileSize    Int      // Taille en bytes
+  fileType    String   // Type MIME (image/jpeg, image/png, etc.)
+  dimensions  String?  // JSON: {width: 1920, height: 1080}
+  
+  // Métadonnées
+  tags        String?  // JSON: ["répétition", "culte", "piano", "guitare"]
+  location    String?  // Lieu de prise de vue
+  eventDate   DateTime? // Date de l'événement photographié
+  
+  // Statut et visibilité
+  isActive    Boolean  @default(true)
+  isPublic    Boolean  @default(true) // Visible par tous les musiciens
+  isApproved  Boolean  @default(false) // Approuvé par l'admin
+  
+  // Relations
+  uploadedById String
+  uploadedBy   User     @relation("MusicianImageUploads", fields: [uploadedById], references: [id], onDelete: Cascade)
+  
+  // Événement lié (optionnel)
+  eventId     String?
+  event       Schedule? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  
+  // Multi-tenant
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("musician_images")
+}
+
+enum NotificationType {
+  INFO        // Information générale
+  ACTION      // Action requise
+  WARNING     // Avertissement
+  SUCCESS     // Confirmation de succès
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum SkillLevel {
+  BEGINNER     // Débutant
+  INTERMEDIATE // Intermédiaire
+  ADVANCED     // Avancé
+  EXPERT       // Expert
+}
+
+enum VoiceType {
+  SOPRANO      // Soprano
+  MEZZO_SOPRANO // Mezzo-soprano
+  ALTO         // Alto
+  TENOR        // Ténor
+  BARITONE     // Baryton
+  BASS         // Basse
+}

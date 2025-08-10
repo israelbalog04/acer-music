@@ -1,0 +1,89 @@
+==================================================
+             COMPTES UTILISATEURS ACER MUSIC
+==================================================
+
+🏛️ ÉGLISE: ACER Paris
+📍 Adresse: 123 Rue de la République, 75011 Paris
+📞 Téléphone: +33 1 23 45 67 89
+📧 Email: contact@acerparis.fr
+🌐 Site web: https://acerparis.fr
+
+==================================================
+                  👥 UTILISATEURS
+==================================================
+
+1. 👨‍💼 ADMINISTRATEUR
+   Nom: Jean Durand
+   Email: admin@acerparis.fr
+   Mot de passe: AdminAcer2024!
+   Téléphone: +33 1 23 45 67 89
+   Rôle: ADMIN
+   Instruments: Piano, Direction
+
+2. 🎵 CHEF DE LOUANGE
+   Nom: Marie Martin
+   Email: chef@acerparis.fr
+   Mot de passe: ChefLouange2024!
+   Téléphone: +33 1 23 45 67 90
+   Rôle: CHEF_LOUANGE
+   Instruments: Chant, Piano, Direction
+
+3. 🎹 PIANISTE
+   Nom: Pierre Dubois
+   Email: pianiste@acerparis.fr
+   Mot de passe: Pianiste2024!
+   Téléphone: +33 1 23 45 67 91
+   Rôle: MUSICIEN
+   Instruments: Piano, Orgue
+
+4. 🎸 GUITARISTE
+   Nom: Sophie Leroy
+   Email: guitariste@acerparis.fr
+   Mot de passe: Guitariste2024!
+   Téléphone: +33 1 23 45 67 92
+   Rôle: MUSICIEN
+   Instruments: Guitare, Chant
+
+5. 🥁 BATTEUR
+   Nom: Thomas Bernard
+   Email: batteur@acerparis.fr
+   Mot de passe: Batteur2024!
+   Téléphone: +33 1 23 45 67 93
+   Rôle: MUSICIEN
+   Instruments: Batterie, Percussions
+
+6. 🔧 TECHNICIEN
+   Nom: David Moreau
+   Email: technicien@acerparis.fr
+   Mot de passe: Technicien2024!
+   Téléphone: +33 1 23 45 67 94
+   Rôle: TECHNICIEN
+   Instruments: Son, Éclairage
+
+==================================================
+                📝 NOTES IMPORTANTES
+==================================================
+
+🔒 SÉCURITÉ:
+- Tous les mots de passe sont sécurisés et hashés en base
+- Changez les mots de passe après la première connexion
+- Gardez ce fichier dans un endroit sûr
+
+🚀 CONNEXION:
+- URL de connexion: http://localhost:3000/auth/login
+- Utilisez l'email et le mot de passe correspondants
+
+👨‍💻 ADMINISTRATION:
+- L'administrateur (Jean Durand) a tous les droits
+- Le chef de louange (Marie Martin) peut gérer les équipes
+- Les musiciens peuvent voir et gérer leurs disponibilités
+
+📅 Date de création: 2025-08-07
+🎯 Environnement: Développement
+
+==================================================
+            🎵 BONNE UTILISATION! 🎵
+==================================================
+
+  - Email: admin@acer-paris.com
+    - Mot de passe: AdminAcer2024!

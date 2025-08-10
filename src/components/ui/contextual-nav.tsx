@@ -1,192 +1,228 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { useUserData } from '@/hooks/useUserData';
 import {
-  CloudArrowUpIcon,
-  MusicalNoteIcon,
+  ClockIcon,
   CalendarIcon,
-  UsersIcon,
-  RectangleStackIcon,
-  UserIcon,
+  MusicalNoteIcon,
+  CloudArrowUpIcon,
   BellIcon,
-  Cog6ToothIcon
+  UserIcon,
+  Cog6ToothIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 
 interface ContextualAction {
-  label: string;
+  title: string;
+  description: string;
   href: string;
-  icon: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline';
-  priority: number;
+  icon: React.ReactElement;
+  priority: 'high' | 'medium' | 'low';
+  badge?: string;
 }
 
 export function ContextualNav() {
   const pathname = usePathname();
+  const { userRole } = useUserData();
+  const [suggestions, setSuggestions] = useState<ContextualAction[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Define contextual actions based on current page
-  const getContextualActions = (): ContextualAction[] => {
+  const generateContextualSuggestions = useCallback(() => {
     const actions: ContextualAction[] = [];
 
-    // Music domain actions
-    if (pathname.startsWith('/app/music/')) {
-      if (pathname === '/app/music/repertoire') {
-        actions.push({
-          label: 'Nouveau Upload',
+    // Suggestions basées sur la page actuelle
+    if (pathname.includes('/dashboard') || pathname === '/app') {
+      actions.push(
+        {
+          title: 'Nouveau Upload',
+          description: 'Enregistrer une nouvelle version',
           href: '/app/music/upload',
           icon: <CloudArrowUpIcon className="h-4 w-4" />,
-          variant: 'primary',
-          priority: 1
-        });
-        actions.push({
-          label: 'Mes Enregistrements',
-          href: '/app/music/my-recordings',
-          icon: <RectangleStackIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 2
-        });
-      } else if (pathname === '/app/music/upload') {
-        actions.push({
-          label: 'Voir Répertoire',
-          href: '/app/music/repertoire',
-          icon: <MusicalNoteIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 1
-        });
-        actions.push({
-          label: 'Mes Uploads',
-          href: '/app/music/my-recordings',
-          icon: <RectangleStackIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 2
-        });
-      } else if (pathname === '/app/music/my-recordings') {
-        actions.push({
-          label: 'Nouveau Upload',
-          href: '/app/music/upload',
-          icon: <CloudArrowUpIcon className="h-4 w-4" />,
-          variant: 'primary',
-          priority: 1
-        });
-        actions.push({
-          label: 'Répertoire',
-          href: '/app/music/repertoire',
-          icon: <MusicalNoteIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 2
-        });
-      }
-    }
-
-    // Team domain actions
-    else if (pathname.startsWith('/app/team/')) {
-      if (pathname === '/app/team/planning') {
-        actions.push({
-          label: 'Voir Équipe',
-          href: '/app/team/members',
-          icon: <UsersIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 1
-        });
-        actions.push({
-          label: 'Mon Profil',
-          href: '/app/account/profile',
-          icon: <UserIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 2
-        });
-      } else if (pathname === '/app/team/members') {
-        actions.push({
-          label: 'Planning',
+          priority: 'high'
+        },
+        {
+          title: 'Voir le Planning',
+          description: 'Consulter les prochains services',
           href: '/app/team/planning',
           icon: <CalendarIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 1
-        });
-      }
+          priority: 'medium'
+        }
+      );
     }
 
-    // Account domain actions
-    else if (pathname.startsWith('/app/account/')) {
-      if (pathname === '/app/account/profile') {
-        actions.push({
-          label: 'Notifications',
-          href: '/app/account/notifications',
-          icon: <BellIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 1
-        });
-        actions.push({
-          label: 'Paramètres',
+    if (pathname.includes('/music')) {
+      actions.push(
+        {
+          title: 'Ajouter un Chant',
+          description: 'Créer une nouvelle entrée',
+          href: '/app/music/songs/add',
+          icon: <MusicalNoteIcon className="h-4 w-4" />,
+          priority: 'high'
+        },
+        {
+          title: 'Mes Enregistrements',
+          description: 'Voir tous mes uploads',
+          href: '/app/music/my-recordings',
+          icon: <CloudArrowUpIcon className="h-4 w-4" />,
+          priority: 'medium'
+        }
+      );
+    }
+
+    if (pathname.includes('/team')) {
+      actions.push(
+        {
+          title: 'Ma Disponibilité',
+          description: 'Gérer mes créneaux',
+          href: '/app/team/my-availability',
+          icon: <ClockIcon className="h-4 w-4" />,
+          priority: 'high'
+        },
+        {
+          title: 'Membres de l\'Équipe',
+          description: 'Voir tous les musiciens',
+          href: '/app/team/members',
+          icon: <UserIcon className="h-4 w-4" />,
+          priority: 'medium'
+        }
+      );
+    }
+
+    if (pathname.includes('/notifications')) {
+      actions.push(
+        {
+          title: 'Paramètres',
+          description: 'Configurer les notifications',
           href: '/app/account/settings',
           icon: <Cog6ToothIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 2
-        });
-      } else if (pathname === '/app/account/notifications') {
-        actions.push({
-          label: 'Paramètres',
-          href: '/app/account/settings',
-          icon: <Cog6ToothIcon className="h-4 w-4" />,
-          variant: 'outline',
-          priority: 1
-        });
+          priority: 'medium'
+        }
+      );
+    }
+
+    // Suggestions basées sur le rôle
+    if (userRole === 'MULTIMEDIA') {
+      actions.push(
+        {
+          title: 'Upload Photos',
+          description: 'Déposer de nouvelles photos',
+          href: '/app/multimedia/upload',
+          icon: <CloudArrowUpIcon className="h-4 w-4" />,
+          priority: 'high',
+          badge: 'Nouveau'
+        }
+      );
+    }
+
+    if (userRole === 'ADMIN') {
+      actions.push(
+        {
+          title: 'Gestion Utilisateurs',
+          description: 'Administrer les comptes',
+          href: '/app/admin/users',
+          icon: <UserIcon className="h-4 w-4" />,
+          priority: 'high'
+        },
+        {
+          title: 'Analytics',
+          description: 'Voir les statistiques',
+          href: '/app/admin/analytics',
+          icon: <SparklesIcon className="h-4 w-4" />,
+          priority: 'medium'
+        }
+      );
+    }
+
+    // Suggestions générales
+    actions.push(
+      {
+        title: 'Notifications',
+        description: 'Voir les dernières notifications',
+        href: '/app/notifications',
+        icon: <BellIcon className="h-4 w-4" />,
+        priority: 'low'
+      },
+      {
+        title: 'Mon Profil',
+        description: 'Modifier mes informations',
+        href: '/app/account/profile',
+        icon: <UserIcon className="h-4 w-4" />,
+        priority: 'low'
       }
-    }
+    );
 
-    // Dashboard actions
-    else if (pathname === '/app') {
-      actions.push({
-        label: 'Nouveau Upload',
-        href: '/app/music/upload',
-        icon: <CloudArrowUpIcon className="h-4 w-4" />,
-        variant: 'primary',
-        priority: 1
-      });
-      actions.push({
-        label: 'Répertoire',
-        href: '/app/music/repertoire',
-        icon: <MusicalNoteIcon className="h-4 w-4" />,
-        variant: 'outline',
-        priority: 2
-      });
-      actions.push({
-        label: 'Planning',
-        href: '/app/team/planning',
-        icon: <CalendarIcon className="h-4 w-4" />,
-        variant: 'outline',
-        priority: 3
-      });
-    }
+    // Trier par priorité et limiter à 4 suggestions
+    const sortedActions = actions
+      .sort((a, b) => {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      })
+      .slice(0, 4);
 
-    return actions.sort((a, b) => a.priority - b.priority);
-  };
+    setSuggestions(sortedActions);
+  }, [pathname, userRole]);
 
-  const actions = getContextualActions();
+  useEffect(() => {
+    generateContextualSuggestions();
+  }, [pathname, userRole, generateContextualSuggestions]);
 
-  // Don't render if no contextual actions
-  if (actions.length === 0) {
-    return null;
-  }
+  if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex items-center space-x-2 mb-6">
-      <div className="text-xs text-gray-500 font-medium mr-2 uppercase tracking-wider">
-        Actions rapides :
+    <div className="relative">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <SparklesIcon className="h-4 w-4 text-primary-600" />
+          <span className="text-sm font-medium text-neutral-700">Suggestions</span>
+        </div>
+        <button
+          onClick={() => setShowSuggestions(!showSuggestions)}
+          className="text-xs text-primary-600 hover:text-primary-700 transition-colors"
+        >
+          {showSuggestions ? 'Masquer' : 'Voir tout'}
+        </button>
       </div>
-      {actions.map((action, index) => (
-        <Link key={index} href={action.href}>
-          <Button 
-            size="sm" 
-            variant={action.variant || 'outline'}
-            className="text-xs"
-          >
-            {action.icon}
-            {action.label}
-          </Button>
-        </Link>
-      ))}
+
+      <div className={`mt-3 transition-all duration-300 ${showSuggestions ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {suggestions.map((action, index) => (
+            <Link
+              key={action.title}
+              href={action.href}
+              className="group block"
+            >
+              <div 
+                className="p-3 bg-white border border-neutral-200 rounded-lg hover:border-primary-300 hover:shadow-md transition-all duration-200 hover:scale-[1.02] group-hover:bg-gradient-to-br group-hover:from-primary-50 group-hover:to-white"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 p-2 bg-primary-100 rounded-lg group-hover:bg-primary-200 transition-colors">
+                    {action.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <h4 className="text-sm font-medium text-neutral-900 group-hover:text-primary-700 transition-colors">
+                        {action.title}
+                      </h4>
+                      {action.badge && (
+                        <span className="px-1.5 py-0.5 text-xs bg-success-100 text-success-800 rounded-full">
+                          {action.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-neutral-600 mt-1 line-clamp-2">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
