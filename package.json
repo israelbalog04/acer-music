@@ -25,6 +25,7 @@
     "setup-prod-db": "node scripts/setup-production-db.js",
     "check-db": "node scripts/check-db-status.js",
     "debug-build": "node scripts/debug-build.js",
+    "test-supabase": "node scripts/test-supabase-connection.js",
     "postinstall": "prisma generate",
     "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed"
   },
