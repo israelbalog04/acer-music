@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Seuls les admins peuvent générer les dimanches
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // Envoyer des notifications aux musiciens si des événements ont été créés
     if (generatedEvents.length > 0) {
       try {
-        const adminName = `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim();
+        const adminName = `${session.user.name || 'Admin'}`.trim();
         
         // Notification 1: Informer de la création des dimanches
         const creationNotification = NotificationTemplates.sundayCreation(generatedEvents.length, adminName);
@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 

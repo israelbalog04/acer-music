@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 // POST /api/sequences/[sequenceId]/download - Enregistrer un téléchargement
 export async function POST(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,10 +14,12 @@ export async function POST(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { sequenceId } = await params;
+    
     // Vérifier que la séquence existe et appartient à l'église
     const sequence = await prisma.sequence.findFirst({
       where: {
-        id: params.sequenceId,
+        id: sequenceId,
         churchId: session.user.churchId,
         isActive: true
       }
@@ -31,7 +33,7 @@ export async function POST(
     const existingDownload = await prisma.sequenceDownload.findUnique({
       where: {
         sequenceId_userId: {
-          sequenceId: params.sequenceId,
+          sequenceId: sequenceId,
           userId: session.user.id
         }
       }
@@ -41,10 +43,10 @@ export async function POST(
       // Créer un nouvel enregistrement de téléchargement
       await prisma.sequenceDownload.create({
         data: {
-          sequenceId: params.sequenceId,
+          sequenceId: sequenceId,
           userId: session.user.id,
           churchId: session.user.churchId,
-          ipAddress: request.ip || 'unknown',
+          ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           userAgent: request.headers.get('user-agent') || 'unknown'
         }
       });
@@ -69,7 +71,7 @@ export async function POST(
 // GET /api/sequences/[sequenceId]/download - Récupérer les statistiques de téléchargement
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -77,10 +79,12 @@ export async function GET(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { sequenceId } = await params;
+    
     // Vérifier que la séquence existe
     const sequence = await prisma.sequence.findFirst({
       where: {
-        id: params.sequenceId,
+        id: sequenceId,
         churchId: session.user.churchId,
         isActive: true
       }
@@ -93,7 +97,7 @@ export async function GET(
     // Récupérer les statistiques de téléchargement
     const downloads = await prisma.sequenceDownload.findMany({
       where: {
-        sequenceId: params.sequenceId
+        sequenceId: sequenceId
       },
       include: {
         user: {

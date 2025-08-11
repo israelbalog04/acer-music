@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 // PUT /api/recordings/[recordingId] - Modifier le statut d'un enregistrement (validation admin)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { recordingId: string } }
+  { params }: { params: Promise<{ recordingId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,19 +16,20 @@ export async function PUT(
     }
 
     // Vérifier les permissions - seuls les admins et chefs de louange peuvent valider
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ 
         error: 'Permissions insuffisantes pour valider les enregistrements' 
       }, { status: 403 });
     }
 
+    const { recordingId } = await params;
     const body = await request.json();
     const { status, reviewNotes } = body;
 
     // Vérifier que l'enregistrement existe
     const existingRecording = await prisma.recording.findFirst({
       where: {
-        id: params.recordingId,
+        id: recordingId,
         churchId: session.user.churchId
       },
       include: {
@@ -61,7 +62,7 @@ export async function PUT(
 
     // Mettre à jour l'enregistrement
     const updatedRecording = await prisma.recording.update({
-      where: { id: params.recordingId },
+      where: { id: recordingId },
       data: {
         status: status,
         reviewNotes: reviewNotes || null,
@@ -92,7 +93,7 @@ export async function PUT(
     });
 
     // Log de l'action pour audit
-    console.log(`Enregistrement ${params.recordingId} ${status} par ${session.user.firstName} ${session.user.lastName} (${session.user.email})`);
+    console.log(`Enregistrement ${recordingId} ${status} par ${session.user.name || session.user.email} (${session.user.email})`);
 
     return NextResponse.json({
       id: updatedRecording.id,
@@ -116,7 +117,7 @@ export async function PUT(
 // DELETE /api/recordings/[recordingId] - Supprimer un enregistrement
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { recordingId: string } }
+  { params }: { params: Promise<{ recordingId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -124,10 +125,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { recordingId } = await params;
+    
     // Vérifier que l'enregistrement existe
     const existingRecording = await prisma.recording.findFirst({
       where: {
-        id: params.recordingId,
+        id: recordingId,
         churchId: session.user.churchId
       }
     });
@@ -138,7 +141,7 @@ export async function DELETE(
 
     // Vérifier les permissions - créateur, admin ou chef de louange
     const canDelete = existingRecording.userId === session.user.id ||
-      [UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole);
+      ((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE));
 
     if (!canDelete) {
       return NextResponse.json({ 
@@ -148,7 +151,7 @@ export async function DELETE(
 
     // Suppression en base (on garde le fichier pour audit)
     await prisma.recording.delete({
-      where: { id: params.recordingId }
+      where: { id: recordingId }
     });
 
     return NextResponse.json({ message: 'Enregistrement supprimé avec succès' });

@@ -163,7 +163,7 @@ export default function MyAssignmentsPage() {
   ];
 
   const filteredAssignments = allAssignments.filter(assignment => {
-    const matchesFilter = filterType === 'ALL' || assignment.schedule.type === filterType;
+    const matchesFilter = filterType === 'ALL' || (assignment.schedule as any).type === filterType || !(assignment.schedule as any).type;
     const eventDate = new Date(assignment.schedule.date);
     const today = new Date();
     const daysUntil = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -321,8 +321,8 @@ export default function MyAssignmentsPage() {
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
                                 <h3 className="text-lg font-semibold text-gray-900">{assignment.schedule.title}</h3>
-                                <span className={`px-2 py-1 text-xs rounded-full ${getEventTypeColor(assignment.schedule.type)}`}>
-                                  {getEventTypeLabel(assignment.schedule.type)}
+                                <span className={`px-2 py-1 text-xs rounded-full ${getEventTypeColor((assignment.schedule as any).type)}`}>
+                                  {getEventTypeLabel((assignment.schedule as any).type)}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
@@ -337,7 +337,7 @@ export default function MyAssignmentsPage() {
                                 </span>
                                 <span className="flex items-center">
                                   <ClockIcon className="h-4 w-4 mr-1" />
-                                  {assignment.schedule.startTime} - {assignment.schedule.endTime}
+                                  {(assignment.schedule as any).startTime} - {(assignment.schedule as any).endTime}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-500">
@@ -389,8 +389,8 @@ export default function MyAssignmentsPage() {
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
                                 <h3 className="text-lg font-semibold text-gray-700">{assignment.schedule.title}</h3>
-                                <span className={`px-2 py-1 text-xs rounded-full ${getEventTypeColor(assignment.schedule.type)}`}>
-                                  {getEventTypeLabel(assignment.schedule.type)}
+                                <span className={`px-2 py-1 text-xs rounded-full ${getEventTypeColor((assignment.schedule as any).type)}`}>
+                                  {getEventTypeLabel((assignment.schedule as any).type)}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
@@ -405,7 +405,7 @@ export default function MyAssignmentsPage() {
                                 </span>
                                 <span className="flex items-center">
                                   <ClockIcon className="h-4 w-4 mr-1" />
-                                  {assignment.schedule.startTime} - {assignment.schedule.endTime}
+                                  {(assignment.schedule as any).startTime} - {(assignment.schedule as any).endTime}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-400">

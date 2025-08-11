@@ -338,11 +338,11 @@ export default function EventAvailabilityPage() {
           {showAddForm && (
             <div className="lg:col-span-2">
               <Card className="p-6">
-                <CardHeader>
+                <div className="p-6 border-b">
                   <h3 className="text-lg font-semibold text-gray-900">
                     {editingId ? 'Modifier ma Disponibilité' : 'Nouvelle Disponibilité'}
                   </h3>
-                </CardHeader>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Sélection événement */}
@@ -462,9 +462,9 @@ export default function EventAvailabilityPage() {
           {/* Mes réponses */}
           <div className={showAddForm ? 'lg:col-span-1' : 'lg:col-span-2'}>
             <Card>
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold text-gray-900">Mes Réponses</h3>
-              </CardHeader>
+              </div>
 
               {loading ? (
                 <div className="p-6 text-center">

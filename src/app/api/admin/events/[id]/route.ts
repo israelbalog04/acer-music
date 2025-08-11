@@ -83,7 +83,7 @@ export async function PATCH(
       where: { email: session.user.email }
     });
 
-    if (!user || ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(user.role as UserRole)) {
+    if (!user || !(user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -156,7 +156,7 @@ export async function DELETE(
       where: { email: session.user.email }
     });
 
-    if (!user || ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(user.role as UserRole)) {
+    if (!user || !(user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 

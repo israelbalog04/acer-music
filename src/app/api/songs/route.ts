@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.churchId || !['ADMIN', 'CHEF_LOUANGE'].includes(session.user.role)) {
+    if (!session?.user?.churchId || (session.user.role !== 'ADMIN' && session.user.role !== 'CHEF_LOUANGE')) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
     }
 

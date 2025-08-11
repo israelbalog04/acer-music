@@ -206,7 +206,7 @@ export default function SundayAvailabilityPage() {
           {/* État actuel */}
           {availability && !showForm ? (
             <Card className="p-8">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-gray-900 flex items-center">
                     <MusicalNoteIcon className="h-6 w-6 mr-2" />
@@ -220,7 +220,7 @@ export default function SundayAvailabilityPage() {
                     Modifier
                   </Button>
                 </div>
-              </CardHeader>
+              </div>
 
               <div className={`border-2 rounded-xl p-6 ${
                 availability.isAvailable 
@@ -275,11 +275,11 @@ export default function SundayAvailabilityPage() {
           ) : (
             /* Formulaire */
             <Card className="p-8">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h2 className="text-2xl font-semibold text-gray-900">
                   {availability ? 'Modifier ma Disponibilité' : 'Définir ma Disponibilité du Dimanche'}
                 </h2>
-              </CardHeader>
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Statut principal */}

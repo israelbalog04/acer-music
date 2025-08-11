@@ -6,7 +6,7 @@ import { UserRole } from '@prisma/client';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -25,13 +25,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { firstName, lastName, email, phone, role, instruments } = body;
 
     // Vérifier que l'utilisateur existe et appartient à la même église
     const existingUser = await prisma.user.findFirst({
       where: {
-        id: params.id,
+        id: id,
         churchId: admin.churchId
       }
     });
@@ -42,7 +43,7 @@ export async function PATCH(
 
     // Mettre à jour l'utilisateur
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
@@ -77,7 +78,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -96,10 +97,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 });
     }
 
+    const { id } = await params;
+    
     // Vérifier que l'utilisateur existe et appartient à la même église
     const existingUser = await prisma.user.findFirst({
       where: {
-        id: params.id,
+        id: id,
         churchId: admin.churchId
       }
     });
@@ -109,7 +112,7 @@ export async function DELETE(
     }
 
     // Empêcher la suppression de l'admin lui-même
-    if (params.id === admin.id) {
+    if (id === admin.id) {
       return NextResponse.json(
         { error: 'Vous ne pouvez pas supprimer votre propre compte' },
         { status: 400 }
@@ -118,7 +121,7 @@ export async function DELETE(
 
     // Supprimer l'utilisateur
     await prisma.user.delete({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     return NextResponse.json({ message: 'Utilisateur supprimé avec succès' });

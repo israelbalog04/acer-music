@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
           data: {
             userId: directorId,
             scheduleId: eventId,
-            churchId: user.churchId
+            churchId: user.churchId,
+            assignedById: user.id
           }
         });
       }

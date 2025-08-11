@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 // GET /api/availability/[availabilityId] - Récupérer une disponibilité spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { availabilityId: string } }
+  { params }: { params: Promise<{ availabilityId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,9 +15,10 @@ export async function GET(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { availabilityId } = await params;
     const availability = await prisma.availability.findFirst({
       where: {
-        id: params.availabilityId,
+        id: availabilityId,
         churchId: session.user.churchId
       },
       include: {
@@ -39,7 +40,7 @@ export async function GET(
 
     // Vérifier les permissions
     if (availability.userId !== session.user.id && 
-        ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+        (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -62,7 +63,7 @@ export async function GET(
 // PUT /api/availability/[availabilityId] - Modifier une disponibilité
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { availabilityId: string } }
+  { params }: { params: Promise<{ availabilityId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -70,10 +71,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { availabilityId } = await params;
+    
     // Vérifier que la disponibilité existe
     const existingAvailability = await prisma.availability.findFirst({
       where: {
-        id: params.availabilityId,
+        id: availabilityId,
         churchId: session.user.churchId
       }
     });
@@ -84,7 +87,7 @@ export async function PUT(
 
     // Vérifier les permissions
     if (existingAvailability.userId !== session.user.id && 
-        ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+        (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -100,7 +103,7 @@ export async function PUT(
     }
 
     const updatedAvailability = await prisma.availability.update({
-      where: { id: params.availabilityId },
+      where: { id: availabilityId },
       data: {
         specificDate: specificDate ? new Date(specificDate) : undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
@@ -140,7 +143,7 @@ export async function PUT(
 // DELETE /api/availability/[availabilityId] - Supprimer une disponibilité
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { availabilityId: string } }
+  { params }: { params: Promise<{ availabilityId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -149,9 +152,10 @@ export async function DELETE(
     }
 
     // Vérifier que la disponibilité existe
+    const { availabilityId } = await params;
     const existingAvailability = await prisma.availability.findFirst({
       where: {
-        id: params.availabilityId,
+        id: availabilityId,
         churchId: session.user.churchId
       }
     });
@@ -162,12 +166,12 @@ export async function DELETE(
 
     // Vérifier les permissions
     if (existingAvailability.userId !== session.user.id && 
-        ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+        (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
     await prisma.availability.delete({
-      where: { id: params.availabilityId }
+      where: { id: availabilityId }
     });
 
     return NextResponse.json({ message: 'Disponibilité supprimée avec succès' });

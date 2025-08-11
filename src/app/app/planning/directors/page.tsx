@@ -333,12 +333,12 @@ export default function EventDirectorsPage() {
         {showAssignModal && (
           <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50">
             <Card className="w-full max-w-md mx-4">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                   <UserPlusIcon className="h-5 w-5 mr-2" />
                   Assigner un Directeur Musical
                 </h3>
-              </CardHeader>
+              </div>
 
               <div className="p-6 pt-0">
                 <div className="space-y-4">

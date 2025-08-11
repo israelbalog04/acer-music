@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 // GET - Récupérer les DM d'un événement
 export async function GET(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,10 +14,12 @@ export async function GET(
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
+    const { eventId } = await params;
+    
     // Vérifier que l'événement appartient à la même église
     const event = await prisma.schedule.findFirst({
       where: {
-        id: params.eventId,
+        id: eventId,
         churchId: session.user.churchId
       }
     });
@@ -29,7 +31,7 @@ export async function GET(
     // Récupérer les DM de cet événement
     const directors = await prisma.eventDirector.findMany({
       where: {
-        scheduleId: params.eventId,
+        scheduleId: eventId,
         isActive: true
       },
       include: {
@@ -64,7 +66,7 @@ export async function GET(
 // POST - Assigner un DM à un événement
 export async function POST(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -79,10 +81,12 @@ export async function POST(
 
     const { userId, notes } = await request.json();
 
+    const { eventId } = await params;
+    
     // Vérifier que l'événement appartient à la même église
     const event = await prisma.schedule.findFirst({
       where: {
-        id: params.eventId,
+        id: eventId,
         churchId: session.user.churchId
       }
     });
@@ -107,7 +111,7 @@ export async function POST(
     const existingDirector = await prisma.eventDirector.findUnique({
       where: {
         scheduleId_userId: {
-          scheduleId: params.eventId,
+          scheduleId: eventId,
           userId: userId
         }
       }
@@ -121,7 +125,7 @@ export async function POST(
     const director = await prisma.eventDirector.upsert({
       where: {
         scheduleId_userId: {
-          scheduleId: params.eventId,
+          scheduleId: eventId,
           userId: userId
         }
       },
@@ -132,7 +136,7 @@ export async function POST(
         notes: notes || null
       },
       create: {
-        scheduleId: params.eventId,
+        scheduleId: eventId,
         userId: userId,
         churchId: session.user.churchId,
         assignedById: session.user.id,
@@ -162,7 +166,7 @@ export async function POST(
 // DELETE - Révoquer un DM d'un événement
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -177,10 +181,12 @@ export async function DELETE(
 
     const { userId } = await request.json();
 
+    const { eventId } = await params;
+    
     // Désactiver l'attribution
     await prisma.eventDirector.updateMany({
       where: {
-        scheduleId: params.eventId,
+        scheduleId: eventId,
         userId: userId,
         churchId: session.user.churchId
       },

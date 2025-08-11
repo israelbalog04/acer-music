@@ -10,7 +10,7 @@ import { existsSync } from 'fs';
 // PATCH - Mettre à jour une image
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -29,23 +29,25 @@ export async function PATCH(
 
     // Vérifier les permissions
     const allowedRoles = [UserRole.MULTIMEDIA, UserRole.ADMIN];
-    if (!allowedRoles.includes(user.role as UserRole)) {
+    if (user.role !== UserRole.ADMIN && user.role !== UserRole.MULTIMEDIA) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
     const body = await request.json();
     const { isActive, isPublic, isApproved } = body;
 
+    const { id } = await params;
+    
     // Vérifier que l'image existe et appartient à l'église de l'utilisateur
     let existingImage;
     try {
       existingImage = await prisma.musicianImage.findFirst({
         where: {
-          id: params.id,
+          id: id,
           churchId: user.churchId
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️ Table MusicianImage non disponible:', error.message);
       return NextResponse.json(
         { error: 'Table des images non disponible. Vérifiez que le schéma est à jour.' },
@@ -64,7 +66,7 @@ export async function PATCH(
 
     // Mettre à jour l'image
     const updatedImage = await prisma.musicianImage.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(isActive !== undefined && { isActive }),
         ...(isPublic !== undefined && { isPublic }),
@@ -89,7 +91,7 @@ export async function PATCH(
 // DELETE - Supprimer une image
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -108,20 +110,22 @@ export async function DELETE(
 
     // Vérifier les permissions
     const allowedRoles = [UserRole.MULTIMEDIA, UserRole.ADMIN];
-    if (!allowedRoles.includes(user.role as UserRole)) {
+    if (user.role !== UserRole.ADMIN && user.role !== UserRole.MULTIMEDIA) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
+    const { id } = await params;
+    
     // Vérifier que l'image existe et appartient à l'église de l'utilisateur
     let existingImage;
     try {
       existingImage = await prisma.musicianImage.findFirst({
         where: {
-          id: params.id,
+          id: id,
           churchId: user.churchId
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️ Table MusicianImage non disponible:', error.message);
       return NextResponse.json(
         { error: 'Table des images non disponible. Vérifiez que le schéma est à jour.' },
@@ -152,7 +156,7 @@ export async function DELETE(
 
     // Supprimer l'enregistrement de la base de données
     await prisma.musicianImage.delete({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     console.log(`✅ Image supprimée: ${existingImage.title} par ${user.firstName} ${user.lastName}`);

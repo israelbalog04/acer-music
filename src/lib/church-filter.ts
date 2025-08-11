@@ -122,14 +122,14 @@ export class ChurchPrisma {
   async findSchedules(where?: any) {
     return prisma.schedule.findMany({
       where: { ...where, churchId: this.churchId },
-      include: { user: true, song: true, members: { include: { user: true } } }
+      include: { createdBy: true, eventSongs: { include: { song: true } }, teamMembers: { include: { user: true } } }
     })
   }
 
   async findSchedule(where: any) {
     return prisma.schedule.findFirst({
       where: { ...where, churchId: this.churchId },
-      include: { user: true, song: true, members: { include: { user: true } } }
+      include: { createdBy: true, eventSongs: { include: { song: true } }, teamMembers: { include: { user: true } } }
     })
   }
 

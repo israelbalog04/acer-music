@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { UserRole } from '@prisma/client';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -73,7 +73,7 @@ interface TeamAssignment {
   directorName?: string;
 }
 
-export default function TeamAssignmentPage() {
+function TeamAssignmentPageContent() {
   const { userRole, churchName } = useUserData();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -306,7 +306,7 @@ export default function TeamAssignmentPage() {
 
   const availableMembersForEvent = selectedEvent 
     ? availableUsers.filter(user => {
-        const userAvailability = user.availabilities.find(
+        const userAvailability = (user as any).availabilities?.find(
           (av: any) => av.scheduleId === selectedEvent.id
         );
         return userAvailability?.isAvailable;
@@ -315,7 +315,7 @@ export default function TeamAssignmentPage() {
 
   const unavailableMembersForEvent = selectedEvent 
     ? availableUsers.filter(user => {
-        const userAvailability = user.availabilities.find(
+        const userAvailability = (user as any).availabilities?.find(
           (av: any) => av.scheduleId === selectedEvent.id
         );
         return userAvailability && !userAvailability.isAvailable;
@@ -324,7 +324,7 @@ export default function TeamAssignmentPage() {
 
   const membersWithoutAvailability = selectedEvent 
     ? availableUsers.filter(user => {
-        const userAvailability = user.availabilities.find(
+        const userAvailability = (user as any).availabilities?.find(
           (av: any) => av.scheduleId === selectedEvent.id
         );
         return !userAvailability;
@@ -450,13 +450,13 @@ export default function TeamAssignmentPage() {
                                {/* Indicateur de disponibilités */}
                                {(() => {
                                  const eventUsers = availableUsers.filter(user => {
-                                   const userAvailability = user.availabilities.find(
+                                   const userAvailability = (user as any).availabilities?.find(
                                      (av: any) => av.scheduleId === event.id
                                    );
                                    return userAvailability;
                                  });
                                  const availableCount = eventUsers.filter(user => {
-                                   const userAvailability = user.availabilities.find(
+                                   const userAvailability = (user as any).availabilities?.find(
                                      (av: any) => av.scheduleId === event.id
                                    );
                                    return userAvailability?.isAvailable;
@@ -536,7 +536,7 @@ export default function TeamAssignmentPage() {
                                  <div className="font-medium text-green-900">{user.firstName} {user.lastName}</div>
                                  <div className="text-sm text-green-700">{user.instruments.join(', ')}</div>
                                  {(() => {
-                                   const availability = user.availabilities.find((av: any) => av.scheduleId === selectedEvent.id);
+                                   const availability = (user as any).availabilities?.find((av: any) => av.scheduleId === selectedEvent.id);
                                    const notes = availability?.notes;
                                    
                                    // Gérer le parsing des timeSlots de manière sécurisée
@@ -588,7 +588,7 @@ export default function TeamAssignmentPage() {
                                  <div className="font-medium text-red-900">{user.firstName} {user.lastName}</div>
                                  <div className="text-sm text-red-700">{user.instruments.join(', ')}</div>
                                  {(() => {
-                                   const availability = user.availabilities.find((av: any) => av.scheduleId === selectedEvent.id);
+                                   const availability = (user as any).availabilities?.find((av: any) => av.scheduleId === selectedEvent.id);
                                    const notes = availability?.notes;
                                    
                                    return (
@@ -763,5 +763,27 @@ export default function TeamAssignmentPage() {
         </div>
       </div>
     </RoleGuard>
+  );
+}
+
+export default function TeamAssignmentPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+              <div className="h-8 w-8 bg-gray-200 rounded animate-pulse mr-3"></div>
+              Affectation des Équipes
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Chargement...
+            </p>
+          </div>
+        </div>
+      </div>
+    }>
+      <TeamAssignmentPageContent />
+    </Suspense>
   );
 }

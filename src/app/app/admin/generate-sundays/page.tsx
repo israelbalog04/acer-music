@@ -119,9 +119,9 @@ export default function GenerateSundaysPage() {
 
         {/* Configuration */}
         <Card>
-          <CardHeader>
+          <div className="p-6 border-b">
             <h3 className="text-lg font-semibold text-gray-900">Configuration</h3>
-          </CardHeader>
+          </div>
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -179,11 +179,11 @@ export default function GenerateSundaysPage() {
         {/* Preview des dimanches */}
         {preview.length > 0 && (
           <Card>
-            <CardHeader>
+            <div className="p-6 border-b">
               <h3 className="text-lg font-semibold text-gray-900">
                 Preview - Dimanches à générer
               </h3>
-            </CardHeader>
+            </div>
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {preview.map((sunday, index) => (

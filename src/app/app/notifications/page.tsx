@@ -309,7 +309,7 @@ export default function NotificationsPage() {
 
       {/* Filters */}
       <Card>
-        <CardHeader>
+        <div className="p-6 border-b">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -361,7 +361,7 @@ export default function NotificationsPage() {
               </select>
             </div>
           </div>
-        </CardHeader>
+        </div>
       </Card>
 
       {/* Bulk Actions */}
@@ -435,13 +435,12 @@ export default function NotificationsPage() {
 
           {/* Notifications */}
           {filteredNotifications.map((notification, index) => (
-            <Card
-              key={notification.id}
-              className={`transition-all duration-200 hover:shadow-md ${
-                !notification.isRead ? 'ring-2 ring-purple-200' : ''
-              } ${getPriorityColor(notification.priority)}`}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
+            <div key={notification.id} style={{ animationDelay: `${index * 50}ms` }}>
+              <Card
+                className={`transition-all duration-200 hover:shadow-md ${
+                  !notification.isRead ? 'ring-2 ring-purple-200' : ''
+                } ${getPriorityColor(notification.priority)}`}
+              >
               <div className="p-4">
                 <div className="flex items-start gap-4">
                   {/* Checkbox */}
@@ -533,7 +532,8 @@ export default function NotificationsPage() {
                   </div>
                 </div>
               </div>
-            </Card>
+              </Card>
+            </div>
           ))}
         </div>
       )}

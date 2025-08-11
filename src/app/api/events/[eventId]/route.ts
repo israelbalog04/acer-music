@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 // GET /api/events/[eventId] - Récupérer un événement spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,9 +15,11 @@ export async function GET(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { eventId } = await params;
+    
     const event = await prisma.schedule.findFirst({
       where: {
-        id: params.eventId,
+        id: eventId,
         churchId: session.user.churchId
       },
       include: {
@@ -106,7 +108,7 @@ export async function GET(
 // PUT /api/events/[eventId] - Modifier un événement
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -115,14 +117,16 @@ export async function PUT(
     }
 
     // Vérifier les permissions
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
+
+    const { eventId } = await params;
 
     // Vérifier que l'événement existe et appartient à l'église
     const existingEvent = await prisma.schedule.findFirst({
       where: {
-        id: params.eventId,
+        id: eventId,
         churchId: session.user.churchId
       }
     });
@@ -143,7 +147,7 @@ export async function PUT(
     } = body;
 
     const updatedEvent = await prisma.schedule.update({
-      where: { id: params.eventId },
+      where: { id: eventId },
       data: {
         title,
         description,
@@ -212,7 +216,7 @@ export async function PUT(
 // DELETE /api/events/[eventId] - Supprimer un événement
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -221,14 +225,16 @@ export async function DELETE(
     }
 
     // Vérifier les permissions (seuls Admin et Chef de Louange)
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
+
+    const { eventId } = await params;
 
     // Vérifier que l'événement existe et appartient à l'église
     const existingEvent = await prisma.schedule.findFirst({
       where: {
-        id: params.eventId,
+        id: eventId,
         churchId: session.user.churchId
       }
     });
@@ -239,7 +245,7 @@ export async function DELETE(
 
     // Supprimer l'événement (cascade supprimera automatiquement les sessions, membres, etc.)
     await prisma.schedule.delete({
-      where: { id: params.eventId }
+      where: { id: eventId }
     });
 
     return NextResponse.json({ message: 'Événement supprimé avec succès' });

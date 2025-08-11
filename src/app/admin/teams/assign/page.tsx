@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+
+export const dynamic = 'force-dynamic';
 import { UserRole } from '@prisma/client';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -72,7 +74,7 @@ interface TeamAssignment {
   directorName?: string;
 }
 
-export default function TeamAssignmentPage() {
+function TeamAssignmentPageContent() {
   const { userRole, churchName } = useUserData();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -286,12 +288,7 @@ export default function TeamAssignmentPage() {
     : null;
 
   const availableMembersForEvent = selectedEvent 
-    ? availableUsers.filter(user => {
-        const userAvailability = user.availabilities.find(
-          (av: any) => av.scheduleId === selectedEvent.id
-        );
-        return userAvailability?.isAvailable;
-      })
+    ? availableUsers.filter(user => user.isAvailable)
     : [];
 
   return (
@@ -580,5 +577,17 @@ export default function TeamAssignmentPage() {
         </div>
       </div>
     </RoleGuard>
+  );
+}
+
+export default function TeamAssignmentPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <TeamAssignmentPageContent />
+    </Suspense>
   );
 }

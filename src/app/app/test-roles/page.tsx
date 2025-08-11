@@ -12,7 +12,9 @@ export default function TestRolesPage() {
     [UserRole.ADMIN]: 'Administrateur',
     [UserRole.CHEF_LOUANGE]: 'Chef de Louange',
     [UserRole.MUSICIEN]: 'Musicien',
-    [UserRole.TECHNICIEN]: 'Technicien'
+    [UserRole.TECHNICIEN]: 'Technicien',
+    [UserRole.MULTIMEDIA]: 'Multimédia',
+    [UserRole.SUPER_ADMIN]: 'Super Administrateur'
   };
 
   return (
@@ -35,19 +37,19 @@ export default function TestRolesPage() {
           
           <RoleGuard allowedRoles={[UserRole.ADMIN]}>
             <Card className="border-red-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-red-800">Gestion des Utilisateurs</h3>
                 <p className="text-sm text-red-600">Accessible uniquement aux administrateurs</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
           <RoleGuard allowedRoles={[UserRole.ADMIN]}>
             <Card className="border-red-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-red-800">Statistiques Globales</h3>
                 <p className="text-sm text-red-600">Analytics et rapports complets</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
         </div>
@@ -58,19 +60,19 @@ export default function TestRolesPage() {
           
           <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.CHEF_LOUANGE]}>
             <Card className="border-green-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-green-800">Création d'Événements</h3>
                 <p className="text-sm text-green-600">Planning et organisation des services</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
           <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.CHEF_LOUANGE]}>
             <Card className="border-green-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-green-800">Gestion du Répertoire</h3>
                 <p className="text-sm text-green-600">Ajouter et organiser les chansons</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
         </div>
@@ -81,19 +83,19 @@ export default function TestRolesPage() {
           
           <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.CHEF_LOUANGE, UserRole.MUSICIEN, UserRole.TECHNICIEN]}>
             <Card className="border-blue-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-blue-800">Mes Enregistrements</h3>
                 <p className="text-sm text-blue-600">Upload et gestion personnelle</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
           <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.CHEF_LOUANGE, UserRole.MUSICIEN, UserRole.TECHNICIEN]}>
             <Card className="border-blue-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-blue-800">Mes Disponibilités</h3>
                 <p className="text-sm text-blue-600">Donner ses dispos pour les services</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
         </div>
@@ -104,28 +106,28 @@ export default function TestRolesPage() {
           
           <RoleGuard requiredPermission="users.create">
             <Card className="border-purple-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-purple-800">Créer Utilisateur</h3>
                 <p className="text-sm text-purple-600">Permission : users.create</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
           <RoleGuard requiredPermission="recordings.approve">
             <Card className="border-purple-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-purple-800">Approuver Enregistrements</h3>
                 <p className="text-sm text-purple-600">Permission : recordings.approve</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
           <RoleGuard requiredPermission="schedules.create">
             <Card className="border-purple-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-purple-800">Créer Événements</h3>
                 <p className="text-sm text-purple-600">Permission : schedules.create</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
 
@@ -134,10 +136,10 @@ export default function TestRolesPage() {
             resourceUserId={userId || ''}
           >
             <Card className="border-purple-200">
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="font-medium text-purple-800">Modifier Mes Enregistrements</h3>
                 <p className="text-sm text-purple-600">Permission : recordings.update.own</p>
-              </CardHeader>
+              </div>
             </Card>
           </RoleGuard>
         </div>

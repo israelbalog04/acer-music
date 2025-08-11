@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
         let canDelete = false;
 
         // Admin et Chef de Louange peuvent tout modifier
-        if ([UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+        if (((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE))) {
           canEdit = true;
           canDelete = true;
         } 
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
     // Vérifier les permissions pour créer des séquences
     let canCreateSequence = false;
 
-    if ([UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE))) {
       canCreateSequence = true;
     } else if (scope === 'EVENT' && scheduleId) {
       // Vérifier si l'utilisateur est DM de cet événement

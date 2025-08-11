@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        role: role as UserRole,
+        role: role,
       },
       include: {
         church: {

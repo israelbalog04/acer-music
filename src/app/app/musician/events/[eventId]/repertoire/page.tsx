@@ -226,11 +226,11 @@ export default function MusicianEventRepertoirePage() {
 
         {/* Répertoire détaillé */}
         <Card>
-          <CardHeader>
+          <div className="p-6 border-b">
             <h2 className="text-xl font-semibold text-gray-900">
               Répertoire à préparer ({event.songs.length} morceaux)
             </h2>
-          </CardHeader>
+          </div>
           <div className="p-6">
             {event.songs.length === 0 ? (
               <div className="text-center py-8">

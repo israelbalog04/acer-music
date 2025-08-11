@@ -3,8 +3,15 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { 
+  uploadToSupabase, 
+  getSupabasePublicUrl, 
+  deleteFromSupabase, 
+  generateFileName,
+  type StorageBucket 
+} from './supabase-storage';
 
-// Configuration S3
+// Configuration des différents systèmes de stockage
 const s3Client = process.env.AWS_ACCESS_KEY_ID ? new S3Client({
   region: process.env.AWS_REGION || 'eu-west-3',
   credentials: {
@@ -14,7 +21,11 @@ const s3Client = process.env.AWS_ACCESS_KEY_ID ? new S3Client({
 }) : null;
 
 const S3_BUCKET = process.env.AWS_S3_BUCKET || 'acer-music-files';
-const USE_S3 = process.env.NODE_ENV === 'production' && s3Client;
+
+// Déterminer le type de stockage à utiliser
+const STORAGE_TYPE = process.env.STORAGE_TYPE || 'local'; // 'local', 'supabase', 's3'
+const USE_S3 = STORAGE_TYPE === 's3' && s3Client;
+const USE_SUPABASE = STORAGE_TYPE === 'supabase';
 
 export interface FileUploadResult {
   url: string;
@@ -40,20 +51,70 @@ export class StorageService {
   static async uploadFile(options: FileUploadOptions): Promise<FileUploadResult> {
     const { folder, originalName, buffer, mimeType, churchId } = options;
     
-    // Générer un nom de fichier unique
-    const fileId = uuidv4();
-    const fileExtension = originalName.split('.').pop() || '';
-    const fileName = `${fileId}.${fileExtension}`;
-    
-    // Créer le chemin avec l'ID de l'église pour la séparation des données
-    const filePath = churchId 
-      ? `${folder}/${churchId}/${fileName}`
-      : `${folder}/${fileName}`;
-
-    if (USE_S3) {
+    if (USE_SUPABASE) {
+      return await this.uploadToSupabase(folder as StorageBucket, originalName, buffer, mimeType, churchId);
+    } else if (USE_S3) {
+      // Générer un nom de fichier unique pour S3
+      const fileId = uuidv4();
+      const fileExtension = originalName.split('.').pop() || '';
+      const fileName = `${fileId}.${fileExtension}`;
+      const filePath = churchId ? `${folder}/${churchId}/${fileName}` : `${folder}/${fileName}`;
+      
       return await this.uploadToS3(filePath, buffer, mimeType, fileName);
     } else {
+      // Stockage local
+      const fileId = uuidv4();
+      const fileExtension = originalName.split('.').pop() || '';
+      const fileName = `${fileId}.${fileExtension}`;
+      
       return await this.uploadToLocal(folder, fileName, buffer, churchId);
+    }
+  }
+
+  /**
+   * Upload vers Supabase Storage
+   */
+  private static async uploadToSupabase(
+    bucket: StorageBucket,
+    originalName: string,
+    buffer: Buffer,
+    mimeType: string,
+    churchId?: string
+  ): Promise<FileUploadResult> {
+    try {
+      // Générer un nom de fichier unique
+      const fileName = generateFileName(originalName, churchId);
+      
+      // Créer le chemin avec séparation par église
+      const filePath = churchId ? `${churchId}/${fileName}` : fileName;
+      
+      // Upload vers Supabase
+      const data = await uploadToSupabase(bucket, filePath, buffer, {
+        contentType: mimeType,
+        cacheControl: '3600'
+      });
+
+      // Générer l'URL selon le type de bucket
+      const bucketConfig = {
+        avatars: { public: true },
+        multimedia: { public: true },
+        recordings: { public: false },
+        sequences: { public: false }
+      };
+
+      const url = bucketConfig[bucket]?.public 
+        ? getSupabasePublicUrl(bucket, filePath)
+        : `/api/storage/${bucket}/${filePath}`; // Route privée à créer
+
+      return {
+        url,
+        key: filePath,
+        fileName
+      };
+      
+    } catch (error) {
+      console.error('Erreur upload Supabase:', error);
+      throw new Error(`Échec upload Supabase: ${error}`);
     }
   }
 

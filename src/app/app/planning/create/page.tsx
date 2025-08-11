@@ -214,12 +214,12 @@ export default function PlanningCreatePage() {
             {/* Informations Principales */}
             <div className="lg:col-span-2 space-y-6">
               <Card className="p-6">
-                <CardHeader>
+                <div className="p-6 border-b">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                     <DocumentTextIcon className="h-5 w-5 mr-2" />
                     Informations Générales
                   </h3>
-                </CardHeader>
+                </div>
                 
                 <div className="space-y-4">
                   {/* Titre */}
@@ -365,12 +365,12 @@ export default function PlanningCreatePage() {
             <div className="space-y-6">
               {/* Musiciens */}
               <Card className="p-6">
-                <CardHeader>
+                <div className="p-6 border-b">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                     <UsersIcon className="h-5 w-5 mr-2" />
                     Équipe <span className="text-red-500">*</span>
                   </h3>
-                </CardHeader>
+                </div>
                 
                 <div className="space-y-2">
                   {loadingData ? (
@@ -428,12 +428,12 @@ export default function PlanningCreatePage() {
 
               {/* Répertoire */}
               <Card className="p-6">
-                <CardHeader>
+                <div className="p-6 border-b">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                     <MusicalNoteIcon className="h-5 w-5 mr-2" />
                     Répertoire
                   </h3>
-                </CardHeader>
+                </div>
                 
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {loadingData ? (

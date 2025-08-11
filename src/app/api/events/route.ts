@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier les permissions (Admin ou Chef de Louange)
-    if (![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -163,10 +163,17 @@ export async function POST(request: NextRequest) {
           scheduleId: event.id
         }));
 
-        await prisma.teamMember.createMany({
-          data: teamMembers,
-          skipDuplicates: true
-        });
+        for (const member of teamMembers) {
+          try {
+            await prisma.teamMember.create({
+              data: member
+            });
+          } catch (error) {
+            // Ignorer les doublons
+            if ((error as any)?.code === 'P2002') continue;
+            throw error;
+          }
+        }
       }
 
       // Ajouter les directeurs musicaux

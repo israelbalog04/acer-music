@@ -21,14 +21,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
     }
 
-    // Vérifier les permissions - tous les rôles peuvent voir les images
-    const allowedRoles = [UserRole.MULTIMEDIA, UserRole.ADMIN, UserRole.CHEF_LOUANGE, UserRole.MUSICIEN, UserRole.TECHNICIEN];
-    if (!allowedRoles.includes(user.role as UserRole)) {
+    // Vérifier les permissions - tous les rôles peuvent voir les images sauf SUPER_ADMIN  
+    if (!user.role || user.role === 'SUPER_ADMIN') {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
     // Récupérer les images selon le rôle
-    let images = [];
+    let images: any = [];
     try {
       if (user.role === UserRole.ADMIN) {
         // Admin voit toutes les images de son église
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest) {
           orderBy: { createdAt: 'desc' }
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️ Table MusicianImage non disponible:', error.message);
       // Retourner un tableau vide si la table n'existe pas encore
       images = [];

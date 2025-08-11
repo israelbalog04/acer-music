@@ -35,6 +35,25 @@ async function createAdmin() {
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(adminData.password, 12)
 
+    // Créer ou récupérer une église par défaut
+    let church = await prisma.church.findFirst({
+      where: { name: 'ACER Paris' }
+    })
+
+    if (!church) {
+      church = await prisma.church.create({
+        data: {
+          name: 'ACER Paris',
+          address: '123 Rue de la Paix, Paris',
+          city: 'Paris',
+          phone: '+33 1 23 45 67 89',
+          email: 'contact@acer-paris.fr',
+          website: 'https://acer-paris.fr',
+          isActive: true,
+        }
+      })
+    }
+
     // Créer l'administrateur
     const admin = await prisma.user.create({
       data: {
@@ -45,7 +64,8 @@ async function createAdmin() {
         password: hashedPassword,
         role: adminData.role,
         instruments: adminData.instruments,
-        avatar: adminData.avatar
+        avatar: adminData.avatar,
+        churchId: church.id
       }
     })
 
@@ -91,6 +111,25 @@ async function createCustomAdmin(email: string, firstName: string, lastName: str
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 12)
 
+    // Créer ou récupérer une église par défaut
+    let church = await prisma.church.findFirst({
+      where: { name: 'ACER Paris' }
+    })
+
+    if (!church) {
+      church = await prisma.church.create({
+        data: {
+          name: 'ACER Paris',
+          address: '123 Rue de la Paix, Paris',
+          city: 'Paris',
+          phone: '+33 1 23 45 67 89',
+          email: 'contact@acer-paris.fr',
+          website: 'https://acer-paris.fr',
+          isActive: true,
+        }
+      })
+    }
+
     // Créer l'administrateur
     const admin = await prisma.user.create({
       data: {
@@ -101,7 +140,8 @@ async function createCustomAdmin(email: string, firstName: string, lastName: str
         password: hashedPassword,
         role: 'ADMIN',
         instruments: JSON.stringify(['Direction']),
-        avatar: null
+        avatar: null,
+        churchId: church.id
       }
     })
 

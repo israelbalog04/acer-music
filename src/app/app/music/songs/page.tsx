@@ -120,7 +120,7 @@ export default function SongsPage() {
     new Set(songs.flatMap(song => song.tags))
   ).sort();
 
-  const canAddSongs = ['ADMIN', 'CHEF_LOUANGE'].includes(userRole);
+  const canAddSongs = userRole && ['ADMIN', 'CHEF_LOUANGE'].includes(userRole);
 
   return (
     <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.CHEF_LOUANGE, UserRole.MUSICIEN, UserRole.TECHNICIEN]}>

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
           id: 'welcome-1',
           message: 'Bienvenue sur votre dashboard !',
           timestamp: 'Maintenant',
-          type: 'success' as const
+          type: 'info' as const
         },
         {
           id: 'welcome-2',

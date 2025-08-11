@@ -91,7 +91,7 @@ export async function getEventsWithDirectorStatus(): Promise<Array<{
     const events = await prisma.schedule.findMany({
       where: {
         churchId: session.user.churchId,
-        startTime: {
+        date: {
           gte: new Date() // Événements futurs uniquement
         }
       },
@@ -116,8 +116,8 @@ export async function getEventsWithDirectorStatus(): Promise<Array<{
     return events.map(event => ({
       id: event.id,
       title: event.title,
-      startTime: event.startTime,
-      endTime: event.endTime,
+      startTime: event.startTime ? new Date(`${event.date.toISOString().split('T')[0]}T${event.startTime}`) : event.date,
+      endTime: event.endTime ? new Date(`${event.date.toISOString().split('T')[0]}T${event.endTime}`) : event.date,
       isDirector: event.directors.some(d => d.userId === session.user.id),
       directors: event.directors
     }));

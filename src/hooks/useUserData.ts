@@ -46,7 +46,7 @@ export function useUserData() {
     userEmail: session?.user?.email,
     userName: session?.user?.name,
     userRole: session?.user?.role,
-    userInstruments: session?.user?.instruments ? getInstruments(session.user.instruments) : [],
+    userInstruments: session?.user?.instruments ? (typeof session.user.instruments === 'string' ? getInstruments(session.user.instruments) : session.user.instruments) : [],
     userAvatar: session?.user?.avatar,
     
     // Church info
@@ -55,10 +55,10 @@ export function useUserData() {
     churchCity: session?.user?.churchCity,
     
     // Computed values
-    initials: getInitials(session?.user?.name),
-    firstName: getFirstName(session?.user?.name),
-    lastName: getLastName(session?.user?.name),
-    primaryInstrument: session?.user?.instruments ? getInstruments(session.user.instruments)[0] : 'Musicien',
+    initials: getInitials(session?.user?.name || undefined),
+    firstName: getFirstName(session?.user?.name || undefined),
+    lastName: getLastName(session?.user?.name || undefined),
+    primaryInstrument: session?.user?.instruments ? (typeof session.user.instruments === 'string' ? getInstruments(session.user.instruments)[0] : session.user.instruments[0]) || 'Musicien' : 'Musicien',
     
     // Utility functions
     getInitials,

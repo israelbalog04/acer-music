@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       query += ` AND isRead = 0`;
     }
     query += ` ORDER BY createdAt DESC LIMIT ?`;
-    params.push(limit);
+    params.push(limit.toString());
 
     const notifications = await prisma.$queryRawUnsafe(query, ...params);
 

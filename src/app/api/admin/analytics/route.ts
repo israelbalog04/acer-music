@@ -51,13 +51,13 @@ export async function GET(request: NextRequest) {
       prisma.recording.count({
         where: {
           churchId: user.churchId,
-          isApproved: true
+          status: 'APPROVED'
         }
       }),
       prisma.recording.count({
         where: {
           churchId: user.churchId,
-          isApproved: false
+          status: 'IN_REVIEW'
         }
       })
     ]);
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       prisma.schedule.count({
         where: {
           churchId: user.churchId,
-          eventDate: { gte: new Date() }
+          date: { gte: new Date() }
         }
       })
     ]);
