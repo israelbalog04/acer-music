@@ -34,10 +34,11 @@
     "create-super-admin": "node scripts/create-super-admin.js",
     "test-super-admin": "node scripts/test-super-admin.js",
     "debug-prod": "node scripts/debug-production-connection.js",
+    "debug-auth": "node scripts/debug-production-auth.js",
     "force-env": "node scripts/force-env-update.js",
     "test-db": "node scripts/test-db-connection.js",
     "postinstall": "prisma generate",
-    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
+    "vercel-postbuild": "prisma migrate deploy && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
