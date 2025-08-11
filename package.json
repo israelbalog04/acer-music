@@ -33,6 +33,9 @@
     "test-churches": "node scripts/test-churches-api.js",
     "create-super-admin": "node scripts/create-super-admin.js",
     "test-super-admin": "node scripts/test-super-admin.js",
+    "debug-prod": "node scripts/debug-production-connection.js",
+    "force-env": "node scripts/force-env-update.js",
+    "test-db": "node scripts/test-db-connection.js",
     "postinstall": "prisma generate",
     "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
   },
