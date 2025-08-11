@@ -45,7 +45,11 @@ jobs:
           echo "🗄️  Base de données synchronisée"
 
       - name: Build de l'application
-        run: npm run build
+        run: npm run vercel-build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Upload des artefacts de build
         uses: actions/upload-artifact@v4
@@ -81,11 +85,14 @@ jobs:
           npm ci
 
       - name: Build de l'application
-        run: npm run build
+        run: npm run vercel-build
         env:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: ${{ secrets.STAGING_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Déploiement sur Vercel (Staging)
         uses: amondnet/vercel-action@v25
@@ -118,11 +125,14 @@ jobs:
           npm ci
 
       - name: Build de l'application
-        run: npm run build
+        run: npm run vercel-build
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: ${{ secrets.PRODUCTION_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Déploiement sur Vercel (Production)
         uses: amondnet/vercel-action@v25
