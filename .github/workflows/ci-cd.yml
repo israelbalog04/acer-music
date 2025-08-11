@@ -39,10 +39,12 @@ jobs:
         run: |
           npm run db:generate
           npm run db:push
+          npm run db:seed
           # Tests de base de données simplifiés pour CI
           echo "✅ Base de données configurée avec succès"
           echo "📊 Schéma Prisma généré"
           echo "🗄️  Base de données synchronisée"
+          echo "🌱 Données initiales créées"
 
       - name: Build de l'application
         run: npm run vercel-build
