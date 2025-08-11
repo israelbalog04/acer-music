@@ -5,35 +5,59 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Début du seeding...')
 
-  // Créer une église de test
-  const church = await prisma.church.create({
-    data: {
-      name: 'ACER Paris',
-      address: '123 Rue de la Paix, Paris',
-      city: 'Paris',
-      phone: '+33 1 23 45 67 89',
-      email: 'contact@acer-paris.fr',
-      website: 'https://acer-paris.fr',
-      isActive: true,
-    },
-  })
+  // Créer ou récupérer l'église de test
+  let church = await prisma.church.findFirst({
+    where: { name: 'ACER Paris' }
+  });
 
-  // Créer un utilisateur de test
-  const user = await prisma.user.create({
-    data: {
-      email: 'test@acer.com',
-      firstName: 'Test',
-      lastName: 'User',
-      password: '$2a$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1m', // "password"
-      role: 'MUSICIEN',
-      instruments: JSON.stringify(['Piano', 'Guitare']),
-      churchId: church.id,
-    },
-  })
+  if (!church) {
+    church = await prisma.church.create({
+      data: {
+        name: 'ACER Paris',
+        address: '123 Rue de la Paix, Paris',
+        city: 'Paris',
+        phone: '+33 1 23 45 67 89',
+        email: 'contact@acer-paris.fr',
+        website: 'https://acer-paris.fr',
+        isActive: true,
+      },
+    });
+    console.log('✅ Église ACER Paris créée');
+  } else {
+    console.log('✅ Église ACER Paris existe déjà');
+  }
 
-  // Créer quelques chants
-  const songs = await Promise.all([
-    prisma.song.create({
+  // Créer ou récupérer l'utilisateur de test
+  let user = await prisma.user.findFirst({
+    where: { email: 'test@acer.com' }
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: 'test@acer.com',
+        firstName: 'Test',
+        lastName: 'User',
+        password: '$2a$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1m', // "password"
+        role: 'MUSICIEN',
+        instruments: JSON.stringify(['Piano', 'Guitare']),
+        churchId: church.id,
+      },
+    });
+    console.log('✅ Utilisateur test créé');
+  } else {
+    console.log('✅ Utilisateur test existe déjà');
+  }
+
+  // Créer quelques chants (seulement s'ils n'existent pas)
+  const songs = [];
+
+  // Amazing Grace
+  let song = await prisma.song.findFirst({
+    where: { title: 'Amazing Grace', churchId: church.id }
+  });
+  if (!song) {
+    song = await prisma.song.create({
       data: {
         title: 'Amazing Grace',
         artist: 'John Newton',
@@ -46,8 +70,19 @@ async function main() {
         isActive: true,
         churchId: church.id,
       },
-    }),
-    prisma.song.create({
+    });
+    console.log('✅ Chanson "Amazing Grace" créée');
+  } else {
+    console.log('✅ Chanson "Amazing Grace" existe déjà');
+  }
+  songs.push(song);
+
+  // How Great Thou Art
+  song = await prisma.song.findFirst({
+    where: { title: 'How Great Thou Art', churchId: church.id }
+  });
+  if (!song) {
+    song = await prisma.song.create({
       data: {
         title: 'How Great Thou Art',
         artist: 'Carl Boberg',
@@ -60,8 +95,19 @@ async function main() {
         isActive: true,
         churchId: church.id,
       },
-    }),
-    prisma.song.create({
+    });
+    console.log('✅ Chanson "How Great Thou Art" créée');
+  } else {
+    console.log('✅ Chanson "How Great Thou Art" existe déjà');
+  }
+  songs.push(song);
+
+  // It Is Well
+  song = await prisma.song.findFirst({
+    where: { title: 'It Is Well', churchId: church.id }
+  });
+  if (!song) {
+    song = await prisma.song.create({
       data: {
         title: 'It Is Well',
         artist: 'Horatio Spafford',
@@ -74,42 +120,77 @@ async function main() {
         isActive: true,
         churchId: church.id,
       },
-    }),
-  ])
+    });
+    console.log('✅ Chanson "It Is Well" créée');
+  } else {
+    console.log('✅ Chanson "It Is Well" existe déjà');
+  }
+  songs.push(song);
 
-  // Créer une équipe
-  const team = await prisma.team.create({
-    data: {
-      name: 'Équipe Musicale Principale',
-      description: 'Équipe principale pour les services du dimanche',
-      color: '#3244c7',
-      isActive: true,
-      churchId: church.id,
-    },
-  })
+  // Créer ou récupérer l'équipe
+  let team = await prisma.team.findFirst({
+    where: { name: 'Équipe Musicale Principale', churchId: church.id }
+  });
 
-  // Ajouter l'utilisateur à l'équipe
-  await prisma.teamMember.create({
-    data: {
-      userId: user.id,
-      teamId: team.id,
-    },
-  })
+  if (!team) {
+    team = await prisma.team.create({
+      data: {
+        name: 'Équipe Musicale Principale',
+        description: 'Équipe principale pour les services du dimanche',
+        color: '#3244c7',
+        isActive: true,
+        churchId: church.id,
+      },
+    });
+    console.log('✅ Équipe créée');
+  } else {
+    console.log('✅ Équipe existe déjà');
+  }
 
-  // Créer un planning
-  const schedule = await prisma.schedule.create({
-    data: {
+  // Ajouter l'utilisateur à l'équipe (seulement s'il n'est pas déjà membre)
+  const existingMember = await prisma.teamMember.findFirst({
+    where: { userId: user.id, teamId: team.id }
+  });
+
+  if (!existingMember) {
+    await prisma.teamMember.create({
+      data: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+    console.log('✅ Utilisateur ajouté à l\'équipe');
+  } else {
+    console.log('✅ Utilisateur déjà membre de l\'équipe');
+  }
+
+  // Créer ou récupérer le planning
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  let schedule = await prisma.schedule.findFirst({
+    where: { 
       title: 'Répétition Générale',
-      description: 'Répétition pour le service du dimanche',
-      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Demain
-      startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Demain
-      endTime: new Date(Date.now() + 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(), // Demain + 2h
-      type: 'REPETITION',
-      location: 'Salle de répétition',
-      status: 'PLANNED',
-      churchId: church.id,
-    },
-  })
+      churchId: church.id
+    }
+  });
+
+  if (!schedule) {
+    schedule = await prisma.schedule.create({
+      data: {
+        title: 'Répétition Générale',
+        description: 'Répétition pour le service du dimanche',
+        date: tomorrow,
+        startTime: tomorrow.toISOString(),
+        endTime: new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000).toISOString(), // + 2h
+        type: 'REPETITION',
+        location: 'Salle de répétition',
+        status: 'PLANNED',
+        churchId: church.id,
+      },
+    });
+    console.log('✅ Planning créé');
+  } else {
+    console.log('✅ Planning existe déjà');
+  }
 
   console.log('✅ Seeding terminé !')
   console.log(`👤 Utilisateur créé: ${user.email}`)
