@@ -62,22 +62,21 @@ async function createSuperAdmin() {
     const superAdmin = await prisma.user.create({
       data: {
         email: superAdminEmail,
-        name: superAdminName,
+        firstName: superAdminName.split(' ')[0] || 'Super',
+        lastName: superAdminName.split(' ').slice(1).join(' ') || 'Admin',
         password: hashedPassword,
         role: 'SUPER_ADMIN',
+        instruments: JSON.stringify([]), // Pas d'instruments pour un admin
         churchId: church.id,
         isApproved: true,
-        isActive: true,
-        emailVerified: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        emailVerified: new Date()
       }
     });
 
     console.log('✅ Super Administrateur créé avec succès!');
     console.log(`   - ID: ${superAdmin.id}`);
     console.log(`   - Email: ${superAdmin.email}`);
-    console.log(`   - Nom: ${superAdmin.name}`);
+    console.log(`   - Nom: ${superAdmin.firstName} ${superAdmin.lastName}`);
     console.log(`   - Rôle: ${superAdmin.role}`);
     console.log(`   - Église: ${church.name}`);
     console.log(`   - Approuvé: ${superAdmin.isApproved ? 'Oui' : 'Non'}`);
