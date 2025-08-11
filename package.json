@@ -25,7 +25,8 @@
     "setup-prod-db": "node scripts/setup-production-db.js",
     "check-db": "node scripts/check-db-status.js",
     "debug-build": "node scripts/debug-build.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
