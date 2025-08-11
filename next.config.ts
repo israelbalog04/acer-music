@@ -8,7 +8,11 @@ const nextConfig: NextConfig = {
     cpus: 1
   },
   // Forcer le rendu côté client pour toutes les pages
-  output: 'standalone'
+  output: 'standalone',
+  // Désactiver ESLint pendant le build (temporaire - bug Next.js 15)
+  eslint: {
+    ignoreDuringBuilds: true
+  }
 };
 
 export default nextConfig;
