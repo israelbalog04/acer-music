@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
 async function createSuperAdmin() {
-  console.log('\n=== 👑 CRÉATION DU SUPER ADMINISTRATEUR ===');
+  console.log('\n=== 👑 VÉRIFICATION DES VARIABLES SUPER ADMIN ===');
   console.log('📅', new Date().toISOString());
   
   // Vérification des variables d'environnement
@@ -11,19 +11,27 @@ async function createSuperAdmin() {
   const superAdminName = process.env.SUPER_ADMIN_NAME || 'Super Admin';
   
   console.log('\n📋 Variables d\'environnement:');
-  console.log('SUPER_ADMIN_EMAIL:', superAdminEmail ? '✅ Définie' : '❌ Manquante');
+  console.log('SUPER_ADMIN_EMAIL:', superAdminEmail ? `✅ ${superAdminEmail}` : '❌ Manquante');
   console.log('SUPER_ADMIN_PASSWORD:', superAdminPassword ? '✅ Définie' : '❌ Manquante');
   console.log('SUPER_ADMIN_NAME:', superAdminName);
   
   if (!superAdminEmail || !superAdminPassword) {
-    console.log('\n❌ ÉCHEC: Variables d\'environnement manquantes!');
+    console.log('\n❌ Variables d\'environnement manquantes!');
     console.log('💡 Configurez ces variables dans Vercel:');
     console.log('   - SUPER_ADMIN_EMAIL=votre-email@example.com');
     console.log('   - SUPER_ADMIN_PASSWORD=votre-mot-de-passe-securise');
     console.log('   - SUPER_ADMIN_NAME=Nom du Super Admin (optionnel)');
-    console.log('\n⚠️  SUPER ADMIN NON CRÉÉ - VARIABLES MANQUANTES');
+    console.log('\n⚠️  Variables récupérées mais création désactivée');
     return;
   }
+  
+  console.log('\n✅ Toutes les variables sont présentes');
+  console.log('📝 Informations récupérées:');
+  console.log(`   - Email: ${superAdminEmail}`);
+  console.log(`   - Nom: ${superAdminName}`);
+  console.log('   - Mot de passe: [CACHÉ]');
+  console.log('\n⚠️  Création du compte désactivée - variables récupérées uniquement');
+  return;
 
   const prisma = new PrismaClient();
 
