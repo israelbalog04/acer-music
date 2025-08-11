@@ -5,6 +5,19 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Début du seeding...')
 
+  // Créer une église de test
+  const church = await prisma.church.create({
+    data: {
+      name: 'ACER Paris',
+      address: '123 Rue de la Paix, Paris',
+      city: 'Paris',
+      phone: '+33 1 23 45 67 89',
+      email: 'contact@acer-paris.fr',
+      website: 'https://acer-paris.fr',
+      isActive: true,
+    },
+  })
+
   // Créer un utilisateur de test
   const user = await prisma.user.create({
     data: {
@@ -14,6 +27,7 @@ async function main() {
       password: '$2a$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1m', // "password"
       role: 'MUSICIEN',
       instruments: JSON.stringify(['Piano', 'Guitare']),
+      churchId: church.id,
     },
   })
 
@@ -30,6 +44,7 @@ async function main() {
         chords: 'G C D G',
         tags: JSON.stringify(['gospel', 'classique']),
         isActive: true,
+        churchId: church.id,
       },
     }),
     prisma.song.create({
@@ -43,6 +58,7 @@ async function main() {
         chords: 'C F G C',
         tags: JSON.stringify(['louange', 'adoration']),
         isActive: true,
+        churchId: church.id,
       },
     }),
     prisma.song.create({
@@ -56,6 +72,7 @@ async function main() {
         chords: 'D G A D',
         tags: JSON.stringify(['gospel', 'consolation']),
         isActive: true,
+        churchId: church.id,
       },
     }),
   ])
@@ -67,6 +84,7 @@ async function main() {
       description: 'Équipe principale pour les services du dimanche',
       color: '#3244c7',
       isActive: true,
+      churchId: church.id,
     },
   })
 
@@ -83,13 +101,13 @@ async function main() {
     data: {
       title: 'Répétition Générale',
       description: 'Répétition pour le service du dimanche',
-      startTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Demain
-      endTime: new Date(Date.now() + 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // Demain + 2h
+      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Demain
+      startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Demain
+      endTime: new Date(Date.now() + 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(), // Demain + 2h
       type: 'REPETITION',
       location: 'Salle de répétition',
       status: 'PLANNED',
-      userId: user.id,
-      songId: songs[0].id,
+      churchId: church.id,
     },
   })
 

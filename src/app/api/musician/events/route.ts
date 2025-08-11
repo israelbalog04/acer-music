@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
           email: d.user.email
         })),
         songs: assignment.schedule.eventSongs.map(es => ({
-          id: es.id,
+          eventSongId: es.id,
           ...es.song,
           eventOrder: es.order,
           eventKey: es.key,

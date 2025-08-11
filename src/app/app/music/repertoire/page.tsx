@@ -50,7 +50,7 @@ export default function RepertoirePage() {
           // Extraire les catégories uniques
           const allTags = data.songs.flatMap((song: any) => song.tags || []);
           const uniqueTags = Array.from(new Set(allTags));
-          setCategories(uniqueTags);
+          setCategories(uniqueTags.filter((tag): tag is string => typeof tag === 'string'));
         }
       } catch (error) {
         console.error('Erreur:', error);

@@ -191,11 +191,11 @@ export default function EventRepertoirePage() {
 
         {/* Morceaux de l'événement */}
         <Card>
-          <CardHeader>
+          <div className="p-6 border-b">
             <h2 className="text-xl font-semibold text-gray-900">
               Morceaux sélectionnés ({eventSongs.length})
             </h2>
-          </CardHeader>
+          </div>
           <div className="p-6">
             {eventSongs.length === 0 ? (
               <div className="text-center py-8">

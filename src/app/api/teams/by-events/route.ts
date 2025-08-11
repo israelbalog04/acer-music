@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
     const eventsWithTeams = events.map(event => {
       // Calculer le total des membres uniques
       const allMemberIds = new Set();
-      const allMembers = [];
+      const allMembers: any[] = [];
       
       // Ajouter les directeurs
       event.directors.forEach(dir => {
@@ -208,7 +208,7 @@ export async function GET(request: NextRequest) {
           directors: event.directors.map(dir => ({
             id: dir.id,
             user: dir.user,
-            isPrimary: dir.isPrimary || false,
+            isPrimary: (dir as any).isPrimary || false,
             assignedBy: dir.assignedBy,
             assignedAt: dir.assignedAt,
             notes: dir.notes
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
             directors: session.directors.map(dir => ({
               id: dir.id,
               user: dir.user,
-              isPrimary: dir.isPrimary || false,
+              isPrimary: (dir as any).isPrimary || false,
               assignedAt: dir.assignedAt,
               notes: dir.notes
             })),

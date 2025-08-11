@@ -44,6 +44,11 @@ export const authOptions: NextAuthOptions = {
             throw new Error('USER_NOT_APPROVED');
           }
 
+          if (!user.password) {
+            console.log('❌ User has no password');
+            return null;
+          }
+
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
             user.password
@@ -108,7 +113,7 @@ export const authOptions: NextAuthOptions = {
         session.user.churchId = token.churchId;
         session.user.churchName = token.churchName;
         session.user.churchCity = token.churchCity;
-        session.user.isApproved = token.isApproved;
+        session.user.isApproved = Boolean(token.isApproved);
       }
       return session;
     }

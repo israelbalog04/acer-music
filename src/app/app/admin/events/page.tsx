@@ -156,7 +156,8 @@ export default function AdminEventsPage() {
           endTime: '12:00',
           type: 'SERVICE',
           duration: '1',
-          description: ''
+          description: '',
+          cultStructure: ''
         });
         setShowBulkForm(false);
         fetchEvents();

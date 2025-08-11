@@ -56,7 +56,7 @@ export async function notifyAllMusicians(
     console.log(`✅ ${notifications.length} notifications envoyées aux musiciens`);
     return { success: true, count: notifications.length };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur lors de l\'envoi des notifications:', error);
     return { success: false, error: error.message };
   }
@@ -94,7 +94,7 @@ export async function notifyUsers(
     console.log(`✅ ${notifications.length} notifications envoyées`);
     return { success: true, count: notifications.length };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur lors de l\'envoi des notifications:', error);
     return { success: false, error: error.message };
   }
@@ -130,7 +130,7 @@ export async function markAllAsRead(userId: string, churchId: string) {
     });
 
     return { success: true, count: result.count };
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur lors du marquage des notifications:', error);
     return { success: false, error: error.message };
   }
@@ -150,7 +150,7 @@ export async function getUnreadCount(userId: string, churchId: string): Promise<
     });
 
     return count;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur lors du comptage des notifications:', error);
     return 0;
   }

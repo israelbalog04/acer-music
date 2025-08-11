@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { StorageService } from '@/lib/storage';
 
 // POST /api/users/avatar - Upload avatar
 export async function POST(request: NextRequest) {
@@ -37,22 +35,20 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Créer le dossier uploads s'il n'existe pas
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'avatars');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
-    // Générer un nom de fichier unique
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${session.user.id}_${Date.now()}.${fileExtension}`;
-    const filePath = join(uploadsDir, fileName);
-    const publicPath = `/uploads/avatars/${fileName}`;
-
-    // Écrire le fichier
+    // Préparer le fichier pour upload
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
+
+    // Upload vers Supabase Storage
+    const uploadResult = await StorageService.uploadFile({
+      folder: 'avatars',
+      originalName: file.name,
+      buffer,
+      mimeType: file.type,
+      churchId: session.user.churchId
+    });
+
+    const publicPath = uploadResult.url;
 
     // Mettre à jour la base de données
     const updatedUser = await prisma.user.update({
@@ -69,6 +65,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'Avatar mis à jour avec succès',
       avatar: publicPath,
+      fileName: uploadResult.fileName,
       user: updatedUser
     });
 

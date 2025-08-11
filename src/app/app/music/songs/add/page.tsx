@@ -33,7 +33,7 @@ export default function AddSongPage() {
     lyrics: '',
     chords: '',
     notes: '',
-    tags: []
+    tags: [] as string[]
   });
 
   const [currentTag, setCurrentTag] = useState('');
@@ -44,7 +44,7 @@ export default function AddSongPage() {
   };
 
   const addTag = () => {
-    if (currentTag.trim() && !formData.tags.includes(currentTag.trim())) {
+    if (currentTag.trim() && !(formData.tags as string[]).includes(currentTag.trim())) {
       setFormData(prev => ({
         ...prev,
         tags: [...prev.tags, currentTag.trim()]

@@ -29,8 +29,9 @@ async function migrateToEventDirectors() {
         data: {
           title: 'Culte du Dimanche - Test DM',
           description: 'Service dominical avec équipe musicale',
-          startTime: new Date('2024-01-14T10:00:00'),
-          endTime: new Date('2024-01-14T12:00:00'),
+          date: new Date('2024-01-14'),
+          startTime: new Date('2024-01-14T10:00:00').toISOString(),
+          endTime: new Date('2024-01-14T12:00:00').toISOString(),
           type: 'SERVICE',
           location: 'Sanctuaire Principal',
           status: 'PLANNED',

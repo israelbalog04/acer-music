@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier les permissions - tous les musiciens peuvent soumettre
-    const canUpload = ['ADMIN', 'CHEF_LOUANGE', 'MUSICIEN', 'TECHNICIEN'].includes(session.user.role);
+    const canUpload = session.user.role && ['ADMIN', 'CHEF_LOUANGE', 'MUSICIEN', 'TECHNICIEN'].includes(session.user.role);
     if (!canUpload) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }

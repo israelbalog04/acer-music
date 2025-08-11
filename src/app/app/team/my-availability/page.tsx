@@ -340,11 +340,11 @@ export default function MyAvailabilityPage() {
           {/* Réponses rapides pour les dimanches */}
           <div>
             <Card>
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                   ✝️ Dimanches à venir ({sundays.length})
                 </h3>
-              </CardHeader>
+              </div>
 
               {loading ? (
                 <div className="p-6 text-center">
@@ -394,9 +394,9 @@ export default function MyAvailabilityPage() {
           {/* Mes réponses */}
           <div>
             <Card>
-              <CardHeader>
+              <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold text-gray-900">Mes Réponses ({availabilities.length})</h3>
-              </CardHeader>
+              </div>
 
               {availabilities.length === 0 ? (
                 <div className="p-6 text-center">

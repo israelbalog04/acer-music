@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 // PUT /api/notifications/[notificationId] - Marquer comme lue
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,13 +14,14 @@ export async function PUT(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { notificationId } = await params;
     const body = await request.json();
     const { isRead } = body;
 
     // Vérifier que la notification appartient bien à l'utilisateur
     const notification = await prisma.notification.findFirst({
       where: {
-        id: params.notificationId,
+        id: notificationId,
         userId: session.user.id,
         churchId: session.user.churchId
       }
@@ -33,7 +34,7 @@ export async function PUT(
     }
 
     const updatedNotification = await prisma.notification.update({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
       data: {
         isRead: isRead,
         readAt: isRead ? new Date() : null
@@ -62,7 +63,7 @@ export async function PUT(
 // DELETE /api/notifications/[notificationId] - Supprimer une notification
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -70,10 +71,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { notificationId } = await params;
+    
     // Vérifier que la notification appartient bien à l'utilisateur
     const notification = await prisma.notification.findFirst({
       where: {
-        id: params.notificationId,
+        id: notificationId,
         userId: session.user.id,
         churchId: session.user.churchId
       }
@@ -86,7 +89,7 @@ export async function DELETE(
     }
 
     await prisma.notification.delete({
-      where: { id: params.notificationId }
+      where: { id: notificationId }
     });
 
     return NextResponse.json({ message: 'Notification supprimée' });

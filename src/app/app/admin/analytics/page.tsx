@@ -165,10 +165,10 @@ export default function AdminAnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Activité Récente */}
           <Card className="p-6">
-            <CardHeader>
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Activité Récente</h3>
               <p className="text-sm text-gray-600">Dernières actions sur la plateforme</p>
-            </CardHeader>
+            </div>
             <div className="mt-4 space-y-4">
               {recentActivity.map((activity, index) => {
                 const { icon: Icon, color } = getActivityIcon(activity.type);
@@ -196,10 +196,10 @@ export default function AdminAnalyticsPage() {
 
           {/* Top Chansons */}
           <Card className="p-6">
-            <CardHeader>
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Chansons Populaires</h3>
               <p className="text-sm text-gray-600">Les plus écoutées ce mois</p>
-            </CardHeader>
+            </div>
             <div className="mt-4 space-y-3">
               {topSongs.map((song, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -225,10 +225,10 @@ export default function AdminAnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Musiciens Programmés */}
           <Card className="p-6">
-            <CardHeader>
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Musiciens les Plus Programmés</h3>
               <p className="text-sm text-gray-600">Basé sur les affectations d'équipes</p>
-            </CardHeader>
+            </div>
             <div className="mt-4 space-y-3">
               {topAssignedMusicians.map((musician, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -254,10 +254,10 @@ export default function AdminAnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Contributeurs */}
           <Card className="p-6">
-            <CardHeader>
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Top Contributeurs</h3>
               <p className="text-sm text-gray-600">Uploads de photos/vidéos</p>
-            </CardHeader>
+            </div>
             <div className="mt-4 space-y-3">
               {topContributors.map((contributor, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -281,10 +281,10 @@ export default function AdminAnalyticsPage() {
 
           {/* Graphique de Performance */}
           <Card className="p-6">
-            <CardHeader>
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Performance Mensuelle</h3>
               <p className="text-sm text-gray-600">Évolution des uploads</p>
-            </CardHeader>
+            </div>
             <div className="mt-4 h-48 bg-gray-50 rounded-lg flex items-center justify-center">
               <div className="text-center">
                 <ChartBarIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />

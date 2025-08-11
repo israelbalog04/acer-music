@@ -176,7 +176,7 @@ export default function AdminRecordingsPage() {
                 <Button
                   key={option.key}
                   size="sm"
-                  variant={filter === option.key ? 'default' : 'outline'}
+                  variant={filter === option.key ? 'primary' : 'outline'}
                   onClick={() => setFilter(option.key as any)}
                 >
                   {option.label}

@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 // GET /api/sequences/[sequenceId] - Récupérer une séquence spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,9 +15,10 @@ export async function GET(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { sequenceId } = await params;
     const sequence = await prisma.sequence.findFirst({
       where: {
-        id: params.sequenceId,
+        id: sequenceId,
         churchId: session.user.churchId,
         isActive: true
       },
@@ -72,7 +73,7 @@ export async function GET(
     let canEdit = false;
     let canDelete = false;
 
-    if ([UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE))) {
       canEdit = true;
       canDelete = true;
     } else if (sequence.createdById === session.user.id) {
@@ -114,7 +115,7 @@ export async function GET(
 // PUT /api/sequences/[sequenceId] - Modifier une séquence
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -122,10 +123,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { sequenceId } = await params;
+
     // Récupérer la séquence existante
     const existingSequence = await prisma.sequence.findFirst({
       where: {
-        id: params.sequenceId,
+        id: sequenceId,
         churchId: session.user.churchId
       }
     });
@@ -137,7 +140,7 @@ export async function PUT(
     // Vérifier les permissions
     let canEdit = false;
 
-    if ([UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE))) {
       canEdit = true;
     } else if (existingSequence.createdById === session.user.id) {
       canEdit = true;
@@ -177,7 +180,7 @@ export async function PUT(
     } = body;
 
     const updatedSequence = await prisma.sequence.update({
-      where: { id: params.sequenceId },
+      where: { id: sequenceId },
       data: {
         title,
         description,
@@ -248,7 +251,7 @@ export async function PUT(
 // DELETE /api/sequences/[sequenceId] - Supprimer une séquence
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -256,10 +259,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    const { sequenceId } = await params;
+
     // Récupérer la séquence existante
     const existingSequence = await prisma.sequence.findFirst({
       where: {
-        id: params.sequenceId,
+        id: sequenceId,
         churchId: session.user.churchId
       }
     });
@@ -271,7 +276,7 @@ export async function DELETE(
     // Vérifier les permissions
     let canDelete = false;
 
-    if ([UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(session.user.role as UserRole)) {
+    if (((session.user.role === UserRole.ADMIN) || (session.user.role === UserRole.CHEF_LOUANGE))) {
       canDelete = true;
     } else if (existingSequence.createdById === session.user.id) {
       canDelete = true;
@@ -292,7 +297,7 @@ export async function DELETE(
 
     // Suppression logique plutôt que physique (recommandé pour l'audit)
     await prisma.sequence.update({
-      where: { id: params.sequenceId },
+      where: { id: sequenceId },
       data: {
         isActive: false
       }

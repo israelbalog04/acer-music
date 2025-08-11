@@ -23,7 +23,7 @@ async function addDirecteursMusicaux() {
           lastName: `Musical ${church.city}`,
           phone: church.phone,
           password: hashedPassword,
-          role: 'DIRECTEUR_MUSICAL',
+          role: 'CHEF_LOUANGE',
           churchId: church.id,
           instruments: JSON.stringify(['Piano', 'Direction', 'Arrangement'])
         }
@@ -116,7 +116,7 @@ async function addDirecteursMusicaux() {
       console.log(`\n🏛️  ${church.name}:`)
       console.log(`   📧 Email: dm@acer-${church.city.toLowerCase()}.com`)
       console.log(`   🔑 Mot de passe: dm123`)
-      console.log(`   🎼 Rôle: DIRECTEUR_MUSICAL`)
+      console.log(`   🎼 Rôle: CHEF_LOUANGE`)
     }
 
     console.log('\n⚠️  Les DM peuvent maintenant :')

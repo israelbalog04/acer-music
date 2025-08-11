@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       where: { email: session.user.email }
     });
 
-    if (!user || ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(user.role as UserRole)) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       where: { email: session.user.email }
     });
 
-    if (!user || ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(user.role as UserRole)) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(event, { status: 201 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors de la création de l\'événement:', error);
     console.error('Stack trace:', error.stack);
     return NextResponse.json(

@@ -29,7 +29,7 @@ interface DashboardStats {
     trend: 'up' | 'down' | 'neutral';
   };
   icon: React.ReactElement;
-  color: string;
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
 }
 
 interface UpcomingService {

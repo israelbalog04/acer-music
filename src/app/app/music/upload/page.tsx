@@ -221,14 +221,14 @@ export default function UploadPage() {
           </div>
           <span className="text-sm font-medium">Choisir le chant</span>
         </div>
-        <div className={`w-8 h-0.5 ${uploadStep === 'details' || uploadStep === 'upload' ? 'bg-[#3244c7]' : 'bg-gray-300'}`}></div>
+        <div className={`w-8 h-0.5 ${['details', 'upload', 'success'].includes(uploadStep) ? 'bg-[#3244c7]' : 'bg-gray-300'}`}></div>
         <div className={`flex items-center space-x-2 ${
-          uploadStep === 'details' ? 'text-[#3244c7]' : uploadStep === 'upload' ? 'text-green-600' : 'text-gray-400'
+          uploadStep === 'details' ? 'text-[#3244c7]' : ['upload', 'success'].includes(uploadStep) ? 'text-green-600' : 'text-gray-400'
         }`}>
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white ${
-            uploadStep === 'details' ? 'bg-[#3244c7]' : uploadStep === 'upload' ? 'bg-green-600' : 'bg-gray-300'
+            uploadStep === 'details' ? 'bg-[#3244c7]' : ['upload', 'success'].includes(uploadStep) ? 'bg-green-600' : 'bg-gray-300'
           }`}>
-            {uploadStep === 'upload' ? <CheckCircleIcon className="h-5 w-5" /> : '2'}
+            {['upload', 'success'].includes(uploadStep) ? <CheckCircleIcon className="h-5 w-5" /> : '2'}
           </div>
           <span className="text-sm font-medium">Détails & Upload</span>
         </div>

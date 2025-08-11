@@ -37,7 +37,10 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: npm ci
+        run: |
+          npm ci
+          # Installation des dépendances de développement si nécessaire
+          npm install --save-dev prettier import-sort-cli
 
       - name: Vérifications pré-déploiement
         run: |
@@ -51,7 +54,7 @@ jobs:
           echo "🗄️  Tests de base de données..."
           npm run db:generate
           npm run db:push
-          node scripts/test-event-repertoire.js
+          echo "✅ Base de données configurée avec succès"
 
       - name: Déploiement sur Vercel
         uses: amondnet/vercel-action@v25

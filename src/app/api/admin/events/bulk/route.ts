@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { UserRole } from '@prisma/client';
+import { UserRole, ScheduleStatus } from '@prisma/client';
 
 // POST - Créer des événements en lot (tous les dimanches)
 export async function POST(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       where: { email: session.user.email }
     });
 
-    if (!user || ![UserRole.ADMIN, UserRole.CHEF_LOUANGE].includes(user.role as UserRole)) {
+    if (!user || !(user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
             type: type,
             description: cultDescription,
             isActive: true,
-            status: 'PLANNED',
+            status: ScheduleStatus.PLANNED,
             churchId: user.churchId,
             createdById: user.id
           });
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
           type: type,
           description: description || '',
           isActive: true,
-          status: 'PLANNED',
+          status: ScheduleStatus.PLANNED,
           churchId: user.churchId,
           createdById: user.id
         });
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
           data: event
         });
         createdCount++;
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 'P2002') {
           // Événement déjà existant, on continue
           console.log(`⚠️  Événement déjà existant pour ${event.date.toLocaleDateString('fr-FR')}`);
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
       message: `${createdCount} événements créés avec succès`
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors de la création des événements en lot:', error);
     console.error('Stack trace:', error.stack);
     return NextResponse.json(
