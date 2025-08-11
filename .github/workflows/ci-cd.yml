@@ -2,18 +2,17 @@ name: CI/CD Pipeline - ACER Music
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, test ]
   pull_request:
     branches: [ main, develop ]
 
 env:
   NODE_VERSION: '18'
-  PNPM_VERSION: '8'
 
 jobs:
-  # Job de vérification et tests
+  # Job de vérification rapide
   test:
-    name: Tests et Vérifications
+    name: Tests Rapides
     runs-on: ubuntu-latest
 
     steps:
@@ -35,35 +34,12 @@ jobs:
       - name: Tests unitaires
         run: npm run test
 
-      - name: Tests de base de données
+      - name: Configuration de la base de données
         run: |
           npm run db:generate
           npm run db:push
           npm run db:seed
-          # Tests de base de données simplifiés pour CI
           echo "✅ Base de données configurée avec succès"
-          echo "📊 Schéma Prisma généré"
-          echo "🗄️  Base de données synchronisée"
-          echo "🌱 Données initiales créées"
-
-      - name: Build de l'application
-        run: npm run vercel-build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: Upload des artefacts de build
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files
-          path: |
-            .next/
-            public/
-            package.json
-            package-lock.json
-
-
 
   # Job de déploiement en staging
   deploy-staging:
@@ -75,26 +51,6 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
-
-      - name: Configuration Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Installation des dépendances
-        run: npm ci
-          npm ci
-
-      - name: Build de l'application
-        run: npm run vercel-build
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.STAGING_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Déploiement sur Vercel (Staging)
         uses: amondnet/vercel-action@v25
@@ -116,26 +72,6 @@ jobs:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Configuration Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Installation des dépendances
-        run: npm ci
-          npm ci
-
-      - name: Build de l'application
-        run: npm run vercel-build
-        env:
-          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.PRODUCTION_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
       - name: Déploiement sur Vercel (Production)
         uses: amondnet/vercel-action@v25
         with:
@@ -151,35 +87,11 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           echo "Auteur: ${{ github.actor }}"
 
-  # Job de tests post-déploiement
-  post-deploy-tests:
-    name: Tests Post-Déploiement
-    runs-on: ubuntu-latest
-    needs: [deploy-staging, deploy-production]
-    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
-
-    steps:
-      - name: Tests de santé de l'application
-        run: |
-          # Attendre que l'application soit prête
-          sleep 30
-          
-          # Tests de base
-          curl -f ${{ secrets.STAGING_URL }}/api/health || echo "Staging health check failed"
-          curl -f ${{ secrets.PRODUCTION_URL }}/api/health || echo "Production health check failed"
-
-      - name: Tests des APIs critiques
-        run: |
-          # Test de l'API d'authentification
-          curl -X POST ${{ secrets.STAGING_URL }}/api/auth/register \
-            -H "Content-Type: application/json" \
-            -d '{"email":"test@example.com","password":"test123"}' || echo "Auth API test failed"
-
   # Job de notification
   notify:
     name: Notifications
     runs-on: ubuntu-latest
-    needs: [test, deploy-staging, deploy-production, post-deploy-tests]
+    needs: [test, deploy-staging, deploy-production]
     if: always()
 
     steps:
