@@ -30,8 +30,9 @@
     "test-bucket-simple": "node scripts/test-bucket-simple.js",
     "create-buckets": "node scripts/create-supabase-buckets.js",
     "setup-policies": "node scripts/setup-storage-policies.js",
+    "test-churches": "node scripts/test-churches-api.js",
     "postinstall": "prisma generate",
-    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed"
+    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed && node scripts/create-default-church.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
