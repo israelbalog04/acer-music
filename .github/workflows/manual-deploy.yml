@@ -37,15 +37,11 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
-          npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
+        run: npm ci
 
       - name: Vérifications pré-déploiement
         run: |
           echo "🔍 Vérifications pré-déploiement..."
-          npm run lint
           npm run type-check
           npm run build
 

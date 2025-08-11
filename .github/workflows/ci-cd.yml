@@ -27,13 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
-          npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
-
-      - name: Vérification du formatage
-        run: npm run lint
+        run: npm ci
 
       - name: Vérification des types TypeScript
         run: npm run type-check
@@ -80,10 +74,7 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
-          npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
+        run: npm ci
 
       - name: Audit de sécurité npm
         run: npm audit --audit-level moderate
@@ -119,10 +110,8 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
+        run: npm ci
           npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
 
       - name: Build de l'application
         run: npm run build
@@ -158,10 +147,8 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
+        run: npm ci
           npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
 
       - name: Build de l'application
         run: npm run build

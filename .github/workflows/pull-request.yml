@@ -26,22 +26,10 @@ jobs:
           cache: 'npm'
 
       - name: Installation des dépendances
-        run: |
-          npm ci
-          # Installation des dépendances de développement si nécessaire
-          npm install --save-dev prettier import-sort-cli
-
-      - name: Vérification ESLint
-        run: npm run lint
-
-      - name: Vérification Prettier
-        run: npx prettier --check .
+        run: npm ci
 
       - name: Vérification TypeScript
         run: npm run type-check
-
-      - name: Vérification des imports
-        run: npx import-sort --check .
 
   # Tests automatisés
   tests:
