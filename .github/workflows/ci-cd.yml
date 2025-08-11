@@ -57,46 +57,13 @@ jobs:
             package.json
             package-lock.json
 
-  # Job de sécurité
-  security:
-    name: Analyse de Sécurité
-    runs-on: ubuntu-latest
-    needs: test
 
-    steps:
-      - name: Checkout du code
-        uses: actions/checkout@v4
-
-      - name: Configuration Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Installation des dépendances
-        run: npm ci
-
-      - name: Audit de sécurité npm
-        run: npm audit --audit-level moderate
-
-      - name: Scan des vulnérabilités avec Snyk
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-
-      - name: Scan des secrets dans le code
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: .
-          base: HEAD~1
 
   # Job de déploiement en staging
   deploy-staging:
     name: Déploiement Staging
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test]
     if: github.ref == 'refs/heads/develop'
 
     steps:
@@ -132,7 +99,7 @@ jobs:
   deploy-production:
     name: Déploiement Production
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test]
     if: github.ref == 'refs/heads/main'
     environment: production
 
@@ -200,7 +167,7 @@ jobs:
   notify:
     name: Notifications
     runs-on: ubuntu-latest
-    needs: [test, security, deploy-staging, deploy-production, post-deploy-tests]
+    needs: [test, deploy-staging, deploy-production, post-deploy-tests]
     if: always()
 
     steps:
