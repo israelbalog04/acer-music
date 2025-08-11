@@ -31,8 +31,10 @@
     "create-buckets": "node scripts/create-supabase-buckets.js",
     "setup-policies": "node scripts/setup-storage-policies.js",
     "test-churches": "node scripts/test-churches-api.js",
+    "create-super-admin": "node scripts/create-super-admin.js",
+    "test-super-admin": "node scripts/test-super-admin.js",
     "postinstall": "prisma generate",
-    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed && node scripts/create-default-church.js"
+    "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
