@@ -25,13 +25,7 @@ async function createSuperAdmin() {
     return;
   }
   
-  console.log('\n✅ Toutes les variables sont présentes');
-  console.log('📝 Informations récupérées:');
-  console.log(`   - Email: ${superAdminEmail}`);
-  console.log(`   - Nom: ${superAdminName}`);
-  console.log('   - Mot de passe: [CACHÉ]');
-  console.log('\n⚠️  Création du compte désactivée - variables récupérées uniquement');
-  return;
+  console.log('\n✅ Variables récupérées, création du compte...');
 
   const prisma = new PrismaClient();
 
