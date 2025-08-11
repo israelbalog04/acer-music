@@ -21,7 +21,8 @@
     "add-dm": "tsx scripts/add-directeurs-musicaux.ts",
     "migrate-dm": "tsx scripts/migrate-to-event-directors.ts",
     "test-ux": "node scripts/test-ux-improvements.js",
-    "add-test-churches": "node scripts/add-test-churches.js"
+    "add-test-churches": "node scripts/add-test-churches.js",
+    "setup-prod-db": "node scripts/setup-production-db.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
