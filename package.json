@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "echo 'Tests unitaires à implémenter'",
-    "test:integration": "echo 'Tests d\\'intégration à implémenter'",
+    "test:integration": "echo \"Tests d'intégration à implémenter\"",
     "test:coverage": "echo 'Couverture de tests à implémenter'",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
