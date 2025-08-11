@@ -26,6 +26,10 @@
     "check-db": "node scripts/check-db-status.js",
     "debug-build": "node scripts/debug-build.js",
     "test-supabase": "node scripts/test-supabase-connection.js",
+    "test-bucket": "node scripts/test-supabase-bucket.js",
+    "test-bucket-simple": "node scripts/test-bucket-simple.js",
+    "create-buckets": "node scripts/create-supabase-buckets.js",
+    "setup-policies": "node scripts/setup-storage-policies.js",
     "postinstall": "prisma generate",
     "vercel-postbuild": "prisma db push --accept-data-loss && npm run db:seed"
   },
