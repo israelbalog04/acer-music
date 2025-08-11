@@ -14,18 +14,14 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: process.env.NODE_ENV === 'production' 
+        ? `${process.env.DATABASE_URL}?sslmode=require&connect_timeout=60`
+        : process.env.DATABASE_URL,
     },
   },
   ...(process.env.NODE_ENV === 'production' && {
-    connectionLimit: 1,
     transactionOptions: {
       timeout: 10000,
-    },
-    datasources: {
-      db: {
-        url: `${process.env.DATABASE_URL}?sslmode=require&connect_timeout=60`,
-      },
     },
   }),
 });
