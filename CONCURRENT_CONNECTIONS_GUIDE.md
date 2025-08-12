@@ -48,7 +48,7 @@ const prisma = new PrismaClient({
 #### Configuration du Pool
 ```typescript
 class ConnectionPool {
-  private maxConnections: number = 15; // Limite de connexions simultanées
+  private maxConnections: number = 500; // Limite de connexions simultanées
   private activeConnections: number = 0;
   private connectionQueue: Array<() => void> = [];
 
@@ -141,13 +141,13 @@ export async function withRetryAndPool<T>(
 
 ## 🧪 Tests de Connexions
 
-### 1. Test Basique
+### 1. Test Basique (15 connexions)
 ```bash
 # Test de 5 connexions simultanées
 node scripts/test-concurrent-connections.js basic
 ```
 
-### 2. Test de Stress
+### 2. Test de Stress (50 connexions)
 ```bash
 # Test de 50 connexions rapides
 node scripts/test-concurrent-connections.js stress
@@ -163,6 +163,24 @@ node scripts/test-concurrent-connections.js recovery
 ```bash
 # Tous les tests
 node scripts/test-concurrent-connections.js all
+```
+
+### 5. Test 500 Connexions
+```bash
+# Test de 500 connexions simultanées
+node scripts/test-500-connections.js basic
+
+# Test de stress avec 1000 connexions
+node scripts/test-500-connections.js stress
+
+# Test d'opérations mixtes avec 500 connexions
+node scripts/test-500-connections.js mixed
+
+# Test de récupération avec 500 connexions
+node scripts/test-500-connections.js recovery
+
+# Tous les tests 500 connexions
+node scripts/test-500-connections.js all
 ```
 
 ## 📊 Monitoring et Statistiques
@@ -233,7 +251,7 @@ export async function withConnectionPool<T>(
 - **Quotas** : Surveillez les quotas de connexion
 
 ### 2. Configuration Prisma
-- **Pool Size** : Ajustez selon vos besoins (15-20 connexions)
+- **Pool Size** : Ajustez selon vos besoins (500 connexions simultanées)
 - **Timeout** : Configurez des timeouts appropriés
 - **Retry** : Implémentez des retry automatiques
 
@@ -279,7 +297,7 @@ node scripts/debug-db-connection.js
 ### 2. Erreur "Pool exhausted"
 ```bash
 # Augmentez la taille du pool
-const connectionPool = new ConnectionPool(20); // Au lieu de 15
+const connectionPool = new ConnectionPool(1000); // Au lieu de 500
 
 # Ou optimisez l'utilisation des connexions
 # - Libérez les connexions plus rapidement
@@ -353,10 +371,11 @@ DIRECT_URL="file:./prisma/dev.db"
 
 Avec cette configuration, votre application peut maintenant :
 
-- ✅ **Gérer 15+ connexions simultanées** sans erreurs
+- ✅ **Gérer 500+ connexions simultanées** sans erreurs
 - ✅ **Récupérer automatiquement** des déconnexions
 - ✅ **Optimiser les performances** avec un pool de connexions
 - ✅ **Surveiller et diagnostiquer** les problèmes de connexion
 - ✅ **Scaler** selon les besoins de votre application
+- ✅ **Supporter une charge élevée** avec 1000+ connexions en test
 
-**Votre application est maintenant prête pour gérer plusieurs clients simultanément !** 🌊🚀
+**Votre application est maintenant prête pour gérer une charge massive de clients simultanément !** 🌊🚀

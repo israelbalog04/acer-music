@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 
 // PUT /api/notifications/[notificationId] - Marquer comme lue
 export async function PUT(

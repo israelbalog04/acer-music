@@ -36,7 +36,7 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClientWithPool();
 
 // Log des requêtes en développement
 if (process.env.NODE_ENV === 'development') {
-  prisma.$on('query', (e) => {
+  prisma.$on('query', (e: any) => {
     console.log('🔍 Query:', e.query);
     console.log('⏱️  Duration:', e.duration + 'ms');
     console.log('🌊 Connection Pool Active');
@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Gestion des erreurs de connexion
-prisma.$on('error', (e) => {
+prisma.$on('error', (e: any) => {
   console.error('❌ Prisma Error:', e.message);
   
   if (e.message.includes('Can\'t reach database server')) {
@@ -104,8 +104,12 @@ class ConnectionPool {
   }
 }
 
-// Instance du pool de connexions
-const connectionPool = new ConnectionPool(15); // 15 connexions simultanées
+// Instance du pool de connexions optimisé pour Supabase pooler
+const maxConnections = process.env.NODE_ENV === 'production' 
+  ? parseInt(process.env.DB_POOL_SIZE || '20')  // 20 pour Supabase pooler
+  : 10; // 10 en dev
+
+const connectionPool = new ConnectionPool(maxConnections);
 
 // Fonction wrapper avec gestion du pool
 export async function withConnectionPool<T>(
@@ -180,10 +184,12 @@ export const pooledPrisma = {
   // User operations avec pool
   user: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.user.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.user.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.user.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.user.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.user.update(args)),
     delete: (args: any) => withRetryAndPool(() => prisma.user.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.user.deleteMany(args)),
     count: (args: any) => withRetryAndPool(() => prisma.user.count(args)),
   },
   
@@ -220,11 +226,14 @@ export const pooledPrisma = {
   // Schedule operations avec pool
   schedule: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.schedule.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.schedule.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.schedule.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.schedule.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.schedule.update(args)),
     delete: (args: any) => withRetryAndPool(() => prisma.schedule.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.schedule.deleteMany(args)),
     count: (args: any) => withRetryAndPool(() => prisma.schedule.count(args)),
+    groupBy: (args: any) => withRetryAndPool(() => prisma.schedule.groupBy(args)),
   },
   
   // Team operations avec pool
@@ -237,13 +246,117 @@ export const pooledPrisma = {
     count: (args: any) => withRetryAndPool(() => prisma.team.count(args)),
   },
   
+  // EventTeamMember operations avec pool
+  eventTeamMember: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.eventTeamMember.count(args)),
+  },
+  
+  // EventDirector operations avec pool
+  eventDirector: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.eventDirector.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.eventDirector.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.eventDirector.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.eventDirector.create(args)),
+    createMany: (args: any) => withRetryAndPool(() => prisma.eventDirector.createMany(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.eventDirector.update(args)),
+    updateMany: (args: any) => withRetryAndPool(() => prisma.eventDirector.updateMany(args)),
+    upsert: (args: any) => withRetryAndPool(() => prisma.eventDirector.upsert(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.eventDirector.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.eventDirector.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.eventDirector.count(args)),
+  },
+  
+  // EventSong operations avec pool
+  eventSong: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.eventSong.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.eventSong.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.eventSong.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.eventSong.create(args)),
+    createMany: (args: any) => withRetryAndPool(() => prisma.eventSong.createMany(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.eventSong.update(args)),
+    updateMany: (args: any) => withRetryAndPool(() => prisma.eventSong.updateMany(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.eventSong.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.eventSong.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.eventSong.count(args)),
+    aggregate: (args: any) => withRetryAndPool(() => prisma.eventSong.aggregate(args)),
+  },
+  
+  // EventSession operations avec pool
+  eventSession: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.eventSession.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.eventSession.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.eventSession.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.eventSession.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.eventSession.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.eventSession.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.eventSession.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.eventSession.count(args)),
+  },
+  
+  // SessionMember operations avec pool
+  sessionMember: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.sessionMember.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.sessionMember.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.sessionMember.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.sessionMember.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.sessionMember.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.sessionMember.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.sessionMember.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.sessionMember.count(args)),
+  },
+  
+  // SessionDirector operations avec pool
+  sessionDirector: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.sessionDirector.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.sessionDirector.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.sessionDirector.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.sessionDirector.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.sessionDirector.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.sessionDirector.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.sessionDirector.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.sessionDirector.count(args)),
+  },
+  
+  // TeamMember operations avec pool
+  teamMember: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.teamMember.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.teamMember.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.teamMember.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.teamMember.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.teamMember.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.teamMember.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.teamMember.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.teamMember.count(args)),
+  },
+  
+  // SequenceDownload operations avec pool
+  sequenceDownload: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.sequenceDownload.count(args)),
+  },
+  
   // Availability operations avec pool
   availability: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.availability.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.availability.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.availability.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.availability.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.availability.update(args)),
     delete: (args: any) => withRetryAndPool(() => prisma.availability.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.availability.deleteMany(args)),
     count: (args: any) => withRetryAndPool(() => prisma.availability.count(args)),
   },
   
@@ -301,7 +414,7 @@ export async function testConcurrentConnections(count: number = 10) {
   
   for (let i = 0; i < count; i++) {
     promises.push(
-      pooledPrisma.user.count().then(result => {
+      pooledPrisma.user.count({}).then(result => {
         console.log(`✅ Connexion ${i + 1} réussie: ${result} utilisateurs`);
         return result;
       }).catch(error => {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -39,18 +39,23 @@ export async function GET(request: NextRequest) {
         availabilityType: 'EVENT',
         scheduleId: { not: null }
       },
-      include: {
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            startTime: true,
-            endTime: true,
-            date: true
-          }
-        }
-      },
       orderBy: { createdAt: 'desc' }
+    });
+
+    // Récupérer les événements associés
+    const scheduleIds = eventAvailabilities
+      .map(a => a.scheduleId)
+      .filter(Boolean) as string[];
+    
+    const schedules = await prisma.schedule.findMany({
+      where: { id: { in: scheduleIds } },
+      select: {
+        id: true,
+        title: true,
+        startTime: true,
+        endTime: true,
+        date: true
+      }
     });
 
     // Formater les données pour le frontend
@@ -63,15 +68,21 @@ export async function GET(request: NextRequest) {
       notes: av.notes || ''
     }));
 
-    const formattedEvents = eventAvailabilities.map(av => ({
-      id: av.id,
-      eventId: av.scheduleId,
-      eventTitle: av.schedule?.title || 'Événement inconnu',
-      eventDate: av.schedule?.date || av.specificDate,
-      isAvailable: av.isAvailable,
-      timeSlots: av.timeSlots ? JSON.parse(av.timeSlots) : [],
-      notes: av.notes || ''
-    }));
+    // Créer un map pour un accès rapide
+    const scheduleMap = new Map(schedules.map(s => [s.id, s]));
+
+    const formattedEvents = eventAvailabilities.map(av => {
+      const schedule = av.scheduleId ? scheduleMap.get(av.scheduleId) : null;
+      return {
+        id: av.id,
+        eventId: av.scheduleId,
+        eventTitle: schedule?.title || 'Événement inconnu',
+        eventDate: schedule?.date || av.specificDate,
+        isAvailable: av.isAvailable,
+        timeSlots: av.timeSlots ? JSON.parse(av.timeSlots) : [],
+        notes: av.notes || ''
+      };
+    });
 
     return NextResponse.json({
       weekly: formattedWeekly,

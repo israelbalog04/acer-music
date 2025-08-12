@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
@@ -44,8 +44,19 @@ export async function POST(request: NextRequest) {
 
     // Vérifier que l'utilisateur existe et appartient à la même église
     const userToUpdate = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { church: true }
+      where: { id: userId }
+    });
+
+    if (!userToUpdate) {
+      return NextResponse.json(
+        { error: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    // Récupérer l'église pour les notifications
+    const church = await prisma.church.findUnique({
+      where: { id: userToUpdate.churchId }
     });
 
     if (!userToUpdate) {
@@ -91,7 +102,7 @@ export async function POST(request: NextRequest) {
     await prisma.notification.create({
       data: {
         title: 'Rôle mis à jour',
-        message: `Votre rôle a été changé en "${role}" par l'administrateur de ${userToUpdate.church.name}.`,
+        message: `Votre rôle a été changé en "${role}" par l'administrateur de ${church?.name || 'l\'église'}.`,
         type: 'INFO',
         priority: 'MEDIUM',
         userId: userId,
@@ -109,8 +120,8 @@ export async function POST(request: NextRequest) {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         role: updatedUser.role,
-        churchName: updatedUser.church.name,
-        churchCity: updatedUser.church.city,
+        churchName: church?.name || '',
+        churchCity: church?.city || '',
       }
     });
 

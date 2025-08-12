@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { UserRole } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -126,57 +126,49 @@ export async function GET(request: NextRequest) {
       where: {
         churchId: user.churchId
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true,
-            instruments: true
-          }
-        },
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            date: true,
-            type: true,
-            startTime: true,
-            endTime: true
-          }
-        }
-      },
       orderBy: [
-        { schedule: { date: 'asc' } },
-        { user: { firstName: 'asc' } }
+        { createdAt: 'desc' }
       ]
+    });
+
+    // Récupérer les utilisateurs associés
+    const userIds = teamAssignments.map(a => a.userId);
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        instruments: true
+      }
+    });
+
+    // Récupérer les événements associés
+    const scheduleIds = teamAssignments.map(a => a.scheduleId);
+    const schedules = await prisma.schedule.findMany({
+      where: { id: { in: scheduleIds } },
+      select: {
+        id: true,
+        title: true,
+        date: true,
+        type: true,
+        startTime: true,
+        endTime: true
+      }
     });
 
     // Récupérer les directeurs d'événements
     const eventDirectors = await prisma.eventDirector.findMany({
       where: {
         churchId: user.churchId
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true
-          }
-        },
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            date: true
-          }
-        }
       }
     });
+
+    // Créer des maps pour un accès rapide
+    const userMap = new Map(users.map(u => [u.id, u]));
+    const scheduleMap = new Map(schedules.map(s => [s.id, s]));
 
     // Formater les données
     const formattedAssignments = teamAssignments.map(assignment => ({
@@ -186,8 +178,8 @@ export async function GET(request: NextRequest) {
       role: assignment.role,
       instruments: assignment.instruments ? JSON.parse(assignment.instruments) : [],
       createdAt: assignment.createdAt,
-      user: assignment.user,
-      schedule: assignment.schedule
+      user: userMap.get(assignment.userId),
+      schedule: scheduleMap.get(assignment.scheduleId)
     }));
 
     const formattedDirectors = eventDirectors.map(director => ({
@@ -195,8 +187,8 @@ export async function GET(request: NextRequest) {
       userId: director.userId,
       scheduleId: director.scheduleId,
       createdAt: director.createdAt,
-      user: director.user,
-      schedule: director.schedule
+      user: userMap.get(director.userId),
+      schedule: scheduleMap.get(director.scheduleId)
     }));
 
     return NextResponse.json({
