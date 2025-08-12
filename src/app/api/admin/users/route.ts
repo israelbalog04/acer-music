@@ -18,13 +18,32 @@ export async function GET(request: NextRequest) {
       select: { id: true, role: true, churchId: true }
     });
 
-    if (!user || user.role !== UserRole.ADMIN) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 });
     }
 
-    // Récupérer tous les utilisateurs de l'église
+    // Construire les filtres selon le rôle de l'utilisateur
+    let whereClause: any = { churchId: user.churchId };
+    
+    // Les ADMIN ne peuvent pas voir les SUPER_ADMIN
+    if (user.role === UserRole.ADMIN) {
+      whereClause.role = {
+        not: UserRole.SUPER_ADMIN
+      };
+    }
+    
+    // Les CHEF_LOUANGE ne peuvent pas voir les ADMIN ni les SUPER_ADMIN
+    if (user.role === UserRole.CHEF_LOUANGE) {
+      whereClause.role = {
+        not: {
+          in: [UserRole.ADMIN, UserRole.SUPER_ADMIN]
+        }
+      };
+    }
+
+    // Récupérer les utilisateurs selon les permissions
     const users = await prisma.user.findMany({
-      where: { churchId: user.churchId },
+      where: whereClause,
               select: {
           id: true,
           firstName: true,
@@ -35,7 +54,10 @@ export async function GET(request: NextRequest) {
           instruments: true,
           avatar: true,
           createdAt: true,
-          updatedAt: true
+          updatedAt: true,
+          isApproved: true,
+          approvedAt: true,
+          approvedBy: true
         },
       orderBy: [
         { role: 'asc' },

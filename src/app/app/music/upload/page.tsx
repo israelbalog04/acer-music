@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -20,6 +20,52 @@ import {
 export default function UploadPage() {
   const [uploadStep, setUploadStep] = useState<'select' | 'details' | 'upload' | 'success'>('select');
   const [selectedSong, setSelectedSong] = useState<any>(null);
+  const [availableSongs, setAvailableSongs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Récupérer les chansons depuis l'API
+  const fetchSongs = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/songs');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableSongs(data.songs || []);
+      } else {
+        setError('Erreur lors du chargement des chansons');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      setError('Erreur de connexion');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Charger les chansons au montage du composant
+  useEffect(() => {
+    fetchSongs();
+  }, []);
+
+  // Vérifier les paramètres URL pour présélectionner une chanson
+  useEffect(() => {
+    if (availableSongs.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const songId = urlParams.get('songId');
+      const songTitle = urlParams.get('songTitle');
+      
+      if (songId && songTitle) {
+        // Chercher la chanson dans les données récupérées
+        const song = availableSongs.find(s => s.id === songId || s.title === songTitle);
+        if (song) {
+          setSelectedSong(song);
+          setUploadStep('details');
+        }
+      }
+    }
+  }, [availableSongs]);
+
   const [uploadData, setUploadData] = useState({
     instrument: '',
     version: '',
@@ -31,50 +77,6 @@ export default function UploadPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Données simulées
-  const availableSongs = [
-    {
-      id: 1,
-      title: 'Amazing Grace',
-      artist: 'John Newton',
-      key: 'G',
-      tempo: 72,
-      hasMyRecording: true,
-      myInstruments: ['Guitare'],
-      totalRecordings: 4
-    },
-    {
-      id: 2,
-      title: 'How Great Thou Art',
-      artist: 'Carl Boberg',
-      key: 'C',
-      tempo: 88,
-      hasMyRecording: false,
-      myInstruments: [],
-      totalRecordings: 3
-    },
-    {
-      id: 3,
-      title: 'Blessed Be Your Name',
-      artist: 'Matt Redman',
-      key: 'A',
-      tempo: 132,
-      hasMyRecording: true,
-      myInstruments: ['Guitare'],
-      totalRecordings: 3
-    },
-    {
-      id: 4,
-      title: 'In Christ Alone',
-      artist: 'Keith Getty',
-      key: 'D',
-      tempo: 94,
-      hasMyRecording: false,
-      myInstruments: [],
-      totalRecordings: 0
-    }
-  ];
 
   const instruments = [
     'Piano',
@@ -90,6 +92,8 @@ export default function UploadPage() {
     'Flûte',
     'Autre'
   ];
+
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -251,41 +255,69 @@ export default function UploadPage() {
                 />
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {availableSongs.map((song) => (
-                  <div
-                    key={song.id}
-                    onClick={() => setSelectedSong(song)}
-                    className={`
-                      p-4 border-2 rounded-lg cursor-pointer transition-all
-                      ${selectedSong?.id === song.id 
-                        ? 'border-[#3244c7] bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{song.title}</h4>
-                        <p className="text-sm text-gray-600">{song.artist}</p>
-                        <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                          <span>Tonalité: {song.key}</span>
-                          <span>Tempo: {song.tempo} BPM</span>
-                          <span>{song.totalRecordings} enregistrement{song.totalRecordings > 1 ? 's' : ''}</span>
-                        </div>
-                        {song.hasMyRecording && (
-                          <div className="mt-2">
-                            <span className="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                              Vous avez déjà enregistré : {song.myInstruments.join(', ')}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      {selectedSong?.id === song.id && (
-                        <CheckCircleIcon className="h-5 w-5 text-[#3244c7]" />
-                      )}
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3244c7]"></div>
+                    <span className="ml-3 text-gray-600">Chargement des chansons...</span>
+                  </div>
+                ) : error ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <ExclamationTriangleIcon className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                      <p className="text-red-600">{error}</p>
+                      <Button 
+                        onClick={fetchSongs}
+                        className="mt-2"
+                        variant="outline"
+                      >
+                        Réessayer
+                      </Button>
                     </div>
                   </div>
-                ))}
+                ) : availableSongs.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <MusicalNoteIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-500">Aucune chanson disponible</p>
+                    </div>
+                  </div>
+                ) : (
+                  availableSongs.map((song) => (
+                    <div
+                      key={song.id}
+                      onClick={() => setSelectedSong(song)}
+                      className={`
+                        p-4 border-2 rounded-lg cursor-pointer transition-all
+                        ${selectedSong?.id === song.id 
+                          ? 'border-[#3244c7] bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                        }
+                      `}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{song.title}</h4>
+                          <p className="text-sm text-gray-600">{song.artist || 'Artiste inconnu'}</p>
+                          <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            {song.key && <span>Tonalité: {song.key}</span>}
+                            {song.bpm && <span>Tempo: {song.bpm} BPM</span>}
+                            <span>{song.recordingsCount || 0} enregistrement{(song.recordingsCount || 0) > 1 ? 's' : ''}</span>
+                          </div>
+                          {song.youtubeUrl && (
+                            <div className="mt-2">
+                              <span className="inline-flex items-center px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                🎬 Vidéo YouTube disponible
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {selectedSong?.id === song.id && (
+                          <CheckCircleIcon className="h-5 w-5 text-[#3244c7]" />
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </Card>
@@ -536,6 +568,8 @@ export default function UploadPage() {
           </Button>
         </div>
       )}
+
+
     </div>
   );
 }

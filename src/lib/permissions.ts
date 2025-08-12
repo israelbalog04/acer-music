@@ -241,15 +241,13 @@ export const getNavigationForRole = (role: UserRole) => {
         ...baseNavigation,
         // Gestion Utilisateurs
         { name: 'Utilisateurs', href: '/app/admin/users', icon: 'UsersIcon', section: 'admin' },
-        { name: 'Gestion des Profils', href: '/app/admin/profiles', icon: 'UserIcon', section: 'admin' },
-        { name: 'Gestion des Événements', href: '/app/admin/events', icon: 'CalendarIcon', section: 'admin' },
+                { name: 'Gestion des Événements', href: '/app/admin/events', icon: 'CalendarIcon', section: 'admin' },
         { name: 'Validation Enregistrements', href: '/app/admin/recordings', icon: 'MicrophoneIcon', section: 'admin' },
         { name: 'Statistiques', href: '/app/admin/analytics', icon: 'ChartBarIcon', section: 'admin' },
-        { name: 'Paramètres', href: '/app/admin/settings', icon: 'Cog6ToothIcon', section: 'admin' },
         // Musique
         { name: 'Répertoire', href: '/app/music/repertoire', icon: 'MusicalNoteIcon', section: 'music' },
         { name: 'Séquences', href: '/app/music/sequences', icon: 'RectangleStackIcon', section: 'music' },
-        { name: 'Tous les Enregistrements', href: '/app/music/all-recordings', icon: 'RectangleStackIcon', section: 'music' },
+        { name: 'Enregistrements', href: '/app/music/recordings-manage', icon: 'RectangleStackIcon', section: 'music' },
         { name: 'Upload', href: '/app/music/upload', icon: 'CloudArrowUpIcon', section: 'music' },
         { name: 'Photos des Musiciens', href: '/app/music/photos', icon: 'PhotoIcon', section: 'music' },
         // Planning & Équipe
@@ -257,9 +255,7 @@ export const getNavigationForRole = (role: UserRole) => {
         { name: 'Directeurs Musicaux', href: '/app/planning/directors', icon: 'StarIcon', section: 'team' },
         { name: 'Équipes par Événement', href: '/app/team/events', icon: 'UserGroupIcon', section: 'team' },
         { name: 'Membres', href: '/app/team/members', icon: 'UsersIcon', section: 'team' },
-        { name: 'Disponibilités Équipe', href: '/app/team/availability', icon: 'ClockIcon', section: 'team' },
-        { name: 'Disponibilités Membres', href: '/app/admin/availability', icon: 'UsersIcon', section: 'admin' },
-        { name: 'Debug Disponibilités', href: '/app/admin/availability-debug', icon: 'BugAntIcon', section: 'admin' },
+        { name: 'Disponibilités Équipe', href: '/app/planning/availability', icon: 'ClockIcon', section: 'team' },
         { name: 'Affectation Équipes', href: '/app/admin/teams/assign', icon: 'UsersIcon', section: 'admin' },
         // Compte
         { name: 'Mon Profil', href: '/app/account/profile', icon: 'UserIcon', section: 'account' },
@@ -311,7 +307,7 @@ export const getNavigationForRole = (role: UserRole) => {
         // Musique (consultation et upload personnel)
         { name: 'Répertoire', href: '/app/music/repertoire', icon: 'MusicalNoteIcon', section: 'music' },
         { name: 'Séquences', href: '/app/music/sequences', icon: 'RectangleStackIcon', section: 'music' },
-        { name: 'Mes Enregistrements', href: '/app/music/my-recordings', icon: 'RectangleStackIcon', section: 'music' },
+        { name: 'Enregistrements', href: '/app/music/recordings-manage', icon: 'RectangleStackIcon', section: 'music' },
         { name: 'Upload', href: '/app/music/upload', icon: 'CloudArrowUpIcon', section: 'music' },
         { name: 'Photos des Musiciens', href: '/app/music/photos', icon: 'PhotoIcon', section: 'music' },
         // Planning (consultation seulement)

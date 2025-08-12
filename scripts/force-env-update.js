@@ -6,10 +6,11 @@ function forceEnvUpdate() {
   
   // Variables d'environnement de production
   const productionEnv = {
-    DATABASE_URL: 'postgresql://postgres:1QY5JNhPLYsEnCAA@db.kvjntbmainapryjjjouo.supabase.co:5432/postgres',
-    DIRECT_URL: 'postgresql://postgres:1QY5JNhPLYsEnCAA@db.kvjntbmainapryjjjouo.supabase.co:5432/postgres',
-    NEXT_PUBLIC_SUPABASE_URL: 'https://kvjntbmainapryjjjouo.supabase.co',
-    SUPABASE_SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2am50Ym1haW5hcHJ5ampqb3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDkxMDE2MSwiZXhwIjoyMDcwNDg2MTYxfQ.tLqXmCcgwjZNa2TKBC8IMyKPq9mNznwgWDB8K_Fi5Fc'
+    DATABASE_URL: 'postgresql://postgres:7cybzSYO0zZEoaUu@db.butlptmveyaluxlnwizr.supabase.co:5432/postgres',
+    DIRECT_URL: 'postgresql://postgres:7cybzSYO0zZEoaUu@db.butlptmveyaluxlnwizr.supabase.co:5432/postgres',
+    NEXT_PUBLIC_SUPABASE_URL: 'https://butlptmveyaluxlnwizr.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1dGxwdG12ZXlhbHV4bG53aXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTQ5MzUsImV4cCI6MjA3MDQ5MDkzNX0.w9L6CPWuocE9aeuDj0zes6_kePyDKkUD3M1aTXfgADA',
+    SUPABASE_SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1dGxwdG12ZXlhbHV4bG53aXpyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDkxNDkzNSwiZXhwIjoyMDcwNDkwOTM1fQ.bRdVnxaLfcBdOpTMByYPjMZlo29kGKycRdDRNVQY3qM'
   };
 
   console.log('\n📋 Variables d\'environnement de production:');

@@ -21,14 +21,38 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
     }
 
-    if (user.role !== UserRole.ADMIN) {
+    if (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
     }
 
-    // Récupérer toutes les disponibilités pour l'église de l'admin
+    // Construire les filtres pour exclure certains rôles selon qui fait la demande
+    let userRoleFilter: any = {};
+    
+    // Les ADMIN ne peuvent pas voir les SUPER_ADMIN
+    if (user.role === UserRole.ADMIN) {
+      userRoleFilter = {
+        role: {
+          not: UserRole.SUPER_ADMIN
+        }
+      };
+    }
+    
+    // Les CHEF_LOUANGE ne peuvent pas voir les ADMIN ni les SUPER_ADMIN
+    if (user.role === UserRole.CHEF_LOUANGE) {
+      userRoleFilter = {
+        role: {
+          not: {
+            in: [UserRole.ADMIN, UserRole.SUPER_ADMIN]
+          }
+        }
+      };
+    }
+
+    // Récupérer les disponibilités selon les permissions
     const availabilities = await prisma.availability.findMany({
       where: {
-        churchId: user.churchId
+        churchId: user.churchId,
+        user: userRoleFilter
       },
       include: {
         user: {

@@ -29,49 +29,58 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
     maxTotalMembers: 12,
     instruments: [
       {
-        instrument: 'Piano',
-        roles: ['Piano Principal', 'Pianiste', 'Clavier'],
+        instrument: 'Piano Principal',
+        roles: ['Piano Principal', 'Pianiste 1', 'P1', 'Piano 1'],
         required: true,
         priority: 'critical',
         minCount: 1,
-        maxCount: 2,
-        description: 'Instrument de base indispensable'
-      },
-      {
-        instrument: 'Guitare',
-        roles: ['Guitare Lead', 'Guitare Électrique', 'Guitare Acoustique', 'Guitariste'],
-        required: true,
-        priority: 'critical',
-        minCount: 1,
-        maxCount: 2,
-        description: 'Support harmonique principal'
-      },
-      {
-        instrument: 'Chant',
-        roles: ['Chant Lead', 'Chanteur Principal', 'Chanteur', 'Lead Vocal', 'Choriste'],
-        required: true,
-        priority: 'critical',
-        minCount: 1,
-        maxCount: 4,
-        description: 'Direction vocale de la louange'
+        maxCount: 1,
+        description: 'Piano principal (P1) - Indispensable'
       },
       {
         instrument: 'Basse',
         roles: ['Basse', 'Bassiste', 'Guitare Basse'],
         required: true,
-        priority: 'high',
+        priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Fondation rythmique'
+        description: 'Basse - Indispensable'
       },
       {
         instrument: 'Batterie',
         roles: ['Batterie', 'Batteur', 'Percussions'],
         required: true,
-        priority: 'high',
+        priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Structure rythmique'
+        description: 'Batterie - Indispensable'
+      },
+      {
+        instrument: 'Guitare',
+        roles: ['Guitare Lead', 'Guitare Électrique', 'Guitare Acoustique', 'Guitariste'],
+        required: true,
+        priority: 'high',
+        minCount: 1,
+        maxCount: 2,
+        description: 'Guitare - Important'
+      },
+      {
+        instrument: 'Piano Secondaire',
+        roles: ['Piano Secondaire', 'Pianiste 2', 'P2', 'Piano 2', 'Clavier'],
+        required: false,
+        priority: 'high',
+        minCount: 0,
+        maxCount: 1,
+        description: 'Piano secondaire (P2) - Important'
+      },
+      {
+        instrument: 'Chant',
+        roles: ['Chant Lead', 'Chanteur Principal', 'Chanteur', 'Lead Vocal', 'Choriste'],
+        required: true,
+        priority: 'medium',
+        minCount: 1,
+        maxCount: 4,
+        description: 'Direction vocale de la louange'
       },
       {
         instrument: 'Violon',
@@ -101,49 +110,58 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
     maxTotalMembers: 8,
     instruments: [
       {
-        instrument: 'Piano',
-        roles: ['Piano Principal', 'Pianiste', 'Clavier'],
+        instrument: 'Piano Principal',
+        roles: ['Piano Principal', 'Pianiste 1', 'P1', 'Piano 1'],
         required: true,
         priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Direction musicale'
+        description: 'Piano principal (P1) - Indispensable'
+      },
+      {
+        instrument: 'Basse',
+        roles: ['Basse', 'Bassiste', 'Guitare Basse'],
+        required: true,
+        priority: 'critical',
+        minCount: 1,
+        maxCount: 1,
+        description: 'Basse - Indispensable'
+      },
+      {
+        instrument: 'Batterie',
+        roles: ['Batterie', 'Batteur', 'Percussions'],
+        required: true,
+        priority: 'critical',
+        minCount: 1,
+        maxCount: 1,
+        description: 'Batterie - Indispensable'
       },
       {
         instrument: 'Guitare',
         roles: ['Guitare Lead', 'Guitare Électrique', 'Guitare Acoustique', 'Guitariste'],
         required: true,
-        priority: 'critical',
+        priority: 'high',
         minCount: 1,
         maxCount: 1,
-        description: 'Accompagnement principal'
+        description: 'Guitare - Important'
+      },
+      {
+        instrument: 'Piano Secondaire',
+        roles: ['Piano Secondaire', 'Pianiste 2', 'P2', 'Piano 2', 'Clavier'],
+        required: false,
+        priority: 'high',
+        minCount: 0,
+        maxCount: 1,
+        description: 'Piano secondaire (P2) - Important'
       },
       {
         instrument: 'Chant',
         roles: ['Chant Lead', 'Chanteur Principal', 'Chanteur', 'Lead Vocal'],
         required: true,
-        priority: 'high',
+        priority: 'medium',
         minCount: 1,
         maxCount: 2,
         description: 'Direction vocale'
-      },
-      {
-        instrument: 'Basse',
-        roles: ['Basse', 'Bassiste', 'Guitare Basse'],
-        required: false,
-        priority: 'medium',
-        minCount: 0,
-        maxCount: 1,
-        description: 'Complémentaire selon besoin'
-      },
-      {
-        instrument: 'Batterie',
-        roles: ['Batterie', 'Batteur', 'Percussions'],
-        required: false,
-        priority: 'medium',
-        minCount: 0,
-        maxCount: 1,
-        description: 'Selon le type de répétition'
       }
     ]
   },
@@ -155,31 +173,13 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
     maxTotalMembers: 15,
     instruments: [
       {
-        instrument: 'Piano',
-        roles: ['Piano Principal', 'Pianiste', 'Clavier'],
+        instrument: 'Piano Principal',
+        roles: ['Piano Principal', 'Pianiste 1', 'P1', 'Piano 1'],
         required: true,
         priority: 'critical',
         minCount: 1,
-        maxCount: 2,
-        description: 'Soliste et accompagnateur'
-      },
-      {
-        instrument: 'Guitare',
-        roles: ['Guitare Lead', 'Guitare Électrique', 'Guitare Acoustique', 'Guitariste'],
-        required: true,
-        priority: 'critical',
-        minCount: 1,
-        maxCount: 3,
-        description: 'Lead et accompagnement'
-      },
-      {
-        instrument: 'Chant',
-        roles: ['Chant Lead', 'Chanteur Principal', 'Chanteur', 'Lead Vocal', 'Choriste'],
-        required: true,
-        priority: 'critical',
-        minCount: 2,
-        maxCount: 6,
-        description: 'Solistes et chœur'
+        maxCount: 1,
+        description: 'Piano principal (P1) - Indispensable'
       },
       {
         instrument: 'Basse',
@@ -188,7 +188,7 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
         priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Indispensable pour concert'
+        description: 'Basse - Indispensable pour concert'
       },
       {
         instrument: 'Batterie',
@@ -197,7 +197,34 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
         priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Rythme professionnel requis'
+        description: 'Batterie - Rythme professionnel requis'
+      },
+      {
+        instrument: 'Guitare',
+        roles: ['Guitare Lead', 'Guitare Électrique', 'Guitare Acoustique', 'Guitariste'],
+        required: true,
+        priority: 'high',
+        minCount: 1,
+        maxCount: 3,
+        description: 'Guitare - Lead et accompagnement'
+      },
+      {
+        instrument: 'Piano Secondaire',
+        roles: ['Piano Secondaire', 'Pianiste 2', 'P2', 'Piano 2', 'Clavier'],
+        required: false,
+        priority: 'high',
+        minCount: 0,
+        maxCount: 1,
+        description: 'Piano secondaire (P2) - Important'
+      },
+      {
+        instrument: 'Chant',
+        roles: ['Chant Lead', 'Chanteur Principal', 'Chanteur', 'Lead Vocal', 'Choriste'],
+        required: true,
+        priority: 'medium',
+        minCount: 2,
+        maxCount: 6,
+        description: 'Solistes et chœur'
       },
       {
         instrument: 'Violon',
@@ -227,13 +254,13 @@ export const EVENT_REQUIREMENTS: EventRequirements = {
     maxTotalMembers: 6,
     instruments: [
       {
-        instrument: 'Piano',
-        roles: ['Piano Principal', 'Pianiste', 'Clavier'],
+        instrument: 'Piano Principal',
+        roles: ['Piano Principal', 'Pianiste 1', 'P1', 'Piano 1'],
         required: true,
-        priority: 'high',
+        priority: 'critical',
         minCount: 1,
         maxCount: 1,
-        description: 'Formateur principal'
+        description: 'Piano principal (P1) - Formateur principal'
       },
       {
         instrument: 'Guitare',
