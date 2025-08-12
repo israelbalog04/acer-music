@@ -27,10 +27,9 @@ export async function PUT(
     const { status, reviewNotes } = body;
 
     // Vérifier que l'enregistrement existe
-    const existingRecording = await prisma.recording.findFirst({
+    const existingRecording = await prisma.recording.findUnique({
       where: {
-        id: recordingId,
-        churchId: session.user.churchId
+        id: recordingId
       },
       include: {
         user: {
@@ -49,6 +48,11 @@ export async function PUT(
     });
 
     if (!existingRecording) {
+      return NextResponse.json({ error: 'Enregistrement non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier que l'enregistrement appartient à l'église de l'utilisateur
+    if (existingRecording.churchId !== session.user.churchId) {
       return NextResponse.json({ error: 'Enregistrement non trouvé' }, { status: 404 });
     }
 
@@ -100,9 +104,9 @@ export async function PUT(
       status: updatedRecording.status,
       reviewNotes: updatedRecording.reviewNotes,
       reviewedAt: updatedRecording.reviewedAt,
-      reviewedBy: updatedRecording.reviewedBy,
-      song: updatedRecording.song,
-      user: updatedRecording.user
+      reviewedById: updatedRecording.reviewedById,
+      song: (updatedRecording as any).song,
+      user: (updatedRecording as any).user
     });
 
   } catch (error) {
@@ -128,14 +132,18 @@ export async function DELETE(
     const { recordingId } = await params;
     
     // Vérifier que l'enregistrement existe
-    const existingRecording = await prisma.recording.findFirst({
+    const existingRecording = await prisma.recording.findUnique({
       where: {
-        id: recordingId,
-        churchId: session.user.churchId
+        id: recordingId
       }
     });
 
     if (!existingRecording) {
+      return NextResponse.json({ error: 'Enregistrement non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier que l'enregistrement appartient à l'église de l'utilisateur
+    if (existingRecording.churchId !== session.user.churchId) {
       return NextResponse.json({ error: 'Enregistrement non trouvé' }, { status: 404 });
     }
 

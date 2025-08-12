@@ -85,30 +85,27 @@ export async function POST(request: NextRequest) {
     let imageId;
     try {
       imageId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      const insertQuery = `
-        INSERT INTO musician_images (id, title, description, fileName, fileUrl, fileSize, fileType, tags, location, eventDate, isPublic, isActive, isApproved, uploadedById, eventId, churchId, createdAt, updatedAt)
-        VALUES (
-          '${imageId}',
-          '${title}',
-          ${description ? `'${description}'` : 'NULL'},
-          '${image.name}',
-          '/uploads/multimedia/${fileName}',
-          ${image.size},
-          '${image.type}',
-          ${tags ? `'${tags}'` : 'NULL'},
-          ${location ? `'${location}'` : 'NULL'},
-          ${eventDate ? `datetime('${eventDate}')` : 'NULL'},
-          ${isPublic ? 1 : 0},
-          1,
-          ${user.role === 'ADMIN' || user.role === 'MULTIMEDIA' ? 1 : 0},
-          '${user.id}',
-          ${eventId ? `'${eventId}'` : 'NULL'},
-          '${user.churchId}',
-          datetime('now'),
-          datetime('now')
-        )
-      `;
-      await prisma.$executeRawUnsafe(insertQuery);
+      
+      await prisma.musicianImage.create({
+        data: {
+          id: imageId,
+          title: title,
+          description: description || null,
+          fileName: image.name,
+          fileUrl: `/uploads/multimedia/${fileName}`,
+          fileSize: image.size,
+          fileType: image.type,
+          tags: tags || null,
+          location: location || null,
+          eventDate: eventDate ? new Date(eventDate) : null,
+          isPublic: isPublic,
+          isActive: true,
+          isApproved: user.role === 'ADMIN' || user.role === 'MULTIMEDIA',
+          uploadedById: user.id,
+          eventId: eventId || null,
+          churchId: user.churchId
+        }
+      });
     } catch (error) {
       console.error('❌ Erreur lors de la création en base:', error);
       // Supprimer le fichier uploadé si la création en base échoue
@@ -144,25 +141,22 @@ export async function POST(request: NextRequest) {
       for (const musician of musicians) {
         try {
           const notificationId = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-          const notificationQuery = `
-            INSERT INTO notifications (id, title, message, type, priority, userId, createdById, actionType, actionId, actionUrl, churchId, createdAt, updatedAt)
-            VALUES (
-              '${notificationId}',
-              'Nouvelles photos disponibles',
-              '${user.firstName} ${user.lastName} a déposé de nouvelles photos : "${title}"',
-              'INFO',
-              'MEDIUM',
-              '${musician.id}',
-              '${user.id}',
-              'multimedia_upload',
-              '${imageId}',
-              '/app/music/photos',
-              '${user.churchId}',
-              datetime('now'),
-              datetime('now')
-            )
-          `;
-          await prisma.$executeRawUnsafe(notificationQuery);
+          
+          await prisma.notification.create({
+            data: {
+              id: notificationId,
+              title: 'Nouvelles photos disponibles',
+              message: `${user.firstName} ${user.lastName} a déposé de nouvelles photos : "${title}"`,
+              type: 'INFO',
+              priority: 'MEDIUM',
+              userId: musician.id,
+              createdById: user.id,
+              actionType: 'multimedia_upload',
+              actionId: imageId,
+              actionUrl: '/app/music/photos',
+              churchId: user.churchId
+            }
+          });
         } catch (notifError) {
           console.warn('⚠️ Erreur lors de la création d\'une notification:', notifError);
         }

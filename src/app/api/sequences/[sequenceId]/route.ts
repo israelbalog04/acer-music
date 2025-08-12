@@ -16,11 +16,9 @@ export async function GET(
     }
 
     const { sequenceId } = await params;
-    const sequence = await prisma.sequence.findFirst({
+    const sequence = await prisma.sequence.findUnique({
       where: {
-        id: sequenceId,
-        churchId: session.user.churchId,
-        isActive: true
+        id: sequenceId
       },
       include: {
         song: {
@@ -65,7 +63,7 @@ export async function GET(
       }
     });
 
-    if (!sequence) {
+    if (!sequence || sequence.churchId !== session.user.churchId || !sequence.isActive) {
       return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
     }
 
@@ -97,7 +95,7 @@ export async function GET(
       ...sequence,
       instruments: sequence.instruments ? JSON.parse(sequence.instruments) : [],
       tags: sequence.tags ? JSON.parse(sequence.tags) : [],
-      downloadCount: sequence.downloads.length,
+      downloadCount: (sequence as any).downloads?.length || 0,
       canEdit,
       canDelete
     };
@@ -126,14 +124,13 @@ export async function PUT(
     const { sequenceId } = await params;
 
     // Récupérer la séquence existante
-    const existingSequence = await prisma.sequence.findFirst({
+    const existingSequence = await prisma.sequence.findUnique({
       where: {
-        id: sequenceId,
-        churchId: session.user.churchId
+        id: sequenceId
       }
     });
 
-    if (!existingSequence) {
+    if (!existingSequence || existingSequence.churchId !== session.user.churchId) {
       return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
     }
 
@@ -231,9 +228,9 @@ export async function PUT(
 
     const responseSequence = {
       ...updatedSequence,
-      instruments: updatedSequence.instruments ? JSON.parse(updatedSequence.instruments) : [],
-      tags: updatedSequence.tags ? JSON.parse(updatedSequence.tags) : [],
-      downloadCount: updatedSequence.downloads.length,
+      instruments: (updatedSequence as any).instruments ? JSON.parse((updatedSequence as any).instruments) : [],
+      tags: (updatedSequence as any).tags ? JSON.parse((updatedSequence as any).tags) : [],
+      downloadCount: (updatedSequence as any).downloads?.length || 0,
       canEdit: true,
       canDelete: true
     };
@@ -262,14 +259,13 @@ export async function DELETE(
     const { sequenceId } = await params;
 
     // Récupérer la séquence existante
-    const existingSequence = await prisma.sequence.findFirst({
+    const existingSequence = await prisma.sequence.findUnique({
       where: {
-        id: sequenceId,
-        churchId: session.user.churchId
+        id: sequenceId
       }
     });
 
-    if (!existingSequence) {
+    if (!existingSequence || existingSequence.churchId !== session.user.churchId) {
       return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
     }
 

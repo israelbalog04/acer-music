@@ -17,15 +17,18 @@ export async function POST(
     const { sequenceId } = await params;
     
     // Vérifier que la séquence existe et appartient à l'église
-    const sequence = await prisma.sequence.findFirst({
+    const sequence = await prisma.sequence.findUnique({
       where: {
-        id: sequenceId,
-        churchId: session.user.churchId,
-        isActive: true
+        id: sequenceId
       }
     });
 
     if (!sequence) {
+      return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
+    }
+
+    // Vérifier que la séquence appartient à l'église et est active
+    if (sequence.churchId !== session.user.churchId || !sequence.isActive) {
       return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
     }
 
@@ -82,15 +85,18 @@ export async function GET(
     const { sequenceId } = await params;
     
     // Vérifier que la séquence existe
-    const sequence = await prisma.sequence.findFirst({
+    const sequence = await prisma.sequence.findUnique({
       where: {
-        id: sequenceId,
-        churchId: session.user.churchId,
-        isActive: true
+        id: sequenceId
       }
     });
 
     if (!sequence) {
+      return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
+    }
+
+    // Vérifier que la séquence appartient à l'église et est active
+    if (sequence.churchId !== session.user.churchId || !sequence.isActive) {
       return NextResponse.json({ error: 'Séquence non trouvée' }, { status: 404 });
     }
 

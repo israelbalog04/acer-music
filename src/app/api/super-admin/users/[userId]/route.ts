@@ -131,7 +131,7 @@ export async function PUT(
         isApproved: updatedUser.isApproved,
         approvedAt: updatedUser.approvedAt,
         approvedBy: updatedUser.approvedBy,
-        church: updatedUser.church
+        church: (updatedUser as any).church
       }
     });
 

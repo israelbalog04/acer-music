@@ -41,10 +41,9 @@ export async function PATCH(
     // Vérifier que l'image existe et appartient à l'église de l'utilisateur
     let existingImage;
     try {
-      existingImage = await prisma.musicianImage.findFirst({
+      existingImage = await prisma.musicianImage.findUnique({
         where: {
-          id: id,
-          churchId: user.churchId
+          id: id
         }
       });
     } catch (error: any) {
@@ -56,6 +55,11 @@ export async function PATCH(
     }
 
     if (!existingImage) {
+      return NextResponse.json({ error: 'Image non trouvée' }, { status: 404 });
+    }
+
+    // Vérifier que l'image appartient à l'église de l'utilisateur
+    if (existingImage.churchId !== user.churchId) {
       return NextResponse.json({ error: 'Image non trouvée' }, { status: 404 });
     }
 
@@ -119,10 +123,9 @@ export async function DELETE(
     // Vérifier que l'image existe et appartient à l'église de l'utilisateur
     let existingImage;
     try {
-      existingImage = await prisma.musicianImage.findFirst({
+      existingImage = await prisma.musicianImage.findUnique({
         where: {
-          id: id,
-          churchId: user.churchId
+          id: id
         }
       });
     } catch (error: any) {
@@ -134,6 +137,11 @@ export async function DELETE(
     }
 
     if (!existingImage) {
+      return NextResponse.json({ error: 'Image non trouvée' }, { status: 404 });
+    }
+
+    // Vérifier que l'image appartient à l'église de l'utilisateur
+    if (existingImage.churchId !== user.churchId) {
       return NextResponse.json({ error: 'Image non trouvée' }, { status: 404 });
     }
 

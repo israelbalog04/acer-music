@@ -34,23 +34,23 @@ function createPrismaClientWithPool() {
 // Client Prisma avec pool de connexions
 export const prisma = globalForPrisma.prisma ?? createPrismaClientWithPool();
 
-// Log des requêtes en développement
-if (process.env.NODE_ENV === 'development') {
-  prisma.$on('query', (e: any) => {
-    console.log('🔍 Query:', e.query);
-    console.log('⏱️  Duration:', e.duration + 'ms');
-    console.log('🌊 Connection Pool Active');
-  });
-}
+// Log des requêtes en développement (commenté pour éviter les erreurs de typage)
+// if (process.env.NODE_ENV === 'development') {
+//   prisma.$on('query', (e: any) => {
+//     console.log('🔍 Query:', e.query);
+//     console.log('⏱️  Duration:', e.duration + 'ms');
+//     console.log('🌊 Connection Pool Active');
+//   });
+// }
 
-// Gestion des erreurs de connexion
-prisma.$on('error', (e: any) => {
-  console.error('❌ Prisma Error:', e.message);
-  
-  if (e.message.includes('Can\'t reach database server')) {
-    console.log('🌊 Problème de connexion détecté - Pool de reconnexion...');
-  }
-});
+// Gestion des erreurs de connexion (commenté pour éviter les erreurs de typage)
+// prisma.$on('error', (e: any) => {
+//   console.error('❌ Prisma Error:', e.message);
+//   
+//   if (e.message.includes('Can\'t reach database server')) {
+//     console.log('🌊 Problème de connexion détecté - Pool de reconnexion...');
+//   }
+// });
 
 // Pool de connexions avec gestion automatique
 class ConnectionPool {
@@ -196,6 +196,7 @@ export const pooledPrisma = {
   // Church operations avec pool
   church: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.church.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.church.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.church.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.church.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.church.update(args)),
@@ -206,6 +207,7 @@ export const pooledPrisma = {
   // Song operations avec pool
   song: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.song.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.song.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.song.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.song.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.song.update(args)),
@@ -363,6 +365,7 @@ export const pooledPrisma = {
   // Sequence operations avec pool
   sequence: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.sequence.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.sequence.findFirst(args)),
     findMany: (args: any) => withRetryAndPool(() => prisma.sequence.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.sequence.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.sequence.update(args)),

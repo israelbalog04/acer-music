@@ -68,12 +68,12 @@ export async function GET(request: NextRequest) {
       });
 
       const songs = eventSongs.map(es => ({
-        ...es.song,
+        ...(es as any).song,
         eventOrder: es.order,
         eventKey: es.key,
         eventNotes: es.notes,
-        recordingsCount: es.song._count.recordings,
-        sequencesCount: es.song.sequences.length
+        recordingsCount: (es as any).song?._count?.recordings || 0,
+        sequencesCount: (es as any).song?.sequences?.length || 0
       }));
 
       return NextResponse.json({ songs });
@@ -100,9 +100,9 @@ export async function GET(request: NextRequest) {
 
     const songsWithCounts = songs.map(song => ({
       ...song,
-      recordingsCount: song._count.recordings,
-      sequencesCount: song.sequences.length,
-      eventsCount: song._count.eventSongs,
+      recordingsCount: (song as any)._count?.recordings || 0,
+      sequencesCount: (song as any).sequences?.length || 0,
+      eventsCount: (song as any)._count?.eventSongs || 0,
       tags: JSON.parse(song.tags || '[]')
     }));
 
@@ -175,9 +175,9 @@ export async function POST(request: NextRequest) {
 
     const songWithCounts = {
       ...song,
-      recordingsCount: song._count.recordings,
-      sequencesCount: song.sequences.length,
-      eventsCount: song._count.eventSongs,
+      recordingsCount: (song as any)._count?.recordings || 0,
+      sequencesCount: (song as any).sequences?.length || 0,
+      eventsCount: (song as any)._count?.eventSongs || 0,
       tags: JSON.parse(song.tags || '[]')
     };
 

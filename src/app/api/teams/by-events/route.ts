@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
       const allMembers: any[] = [];
       
       // Ajouter les directeurs
-      event.directors.forEach(dir => {
+      (event as any).directors?.forEach((dir: any) => {
         allMemberIds.add(dir.userId);
         allMembers.push({
           role: 'Directeur Musical',
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
       });
       
       // Ajouter les membres de l'événement
-      event.eventTeamMembers.forEach(member => {
+      (event as any).eventTeamMembers?.forEach((member: any) => {
         allMemberIds.add(member.userId);
         allMembers.push({
           role: member.role,
@@ -158,15 +158,15 @@ export async function GET(request: NextRequest) {
       });
       
       // Ajouter les membres des sessions
-      event.sessions.forEach(session => {
-        session.members.forEach(member => {
+      (event as any).sessions?.forEach((session: any) => {
+        session.members?.forEach((member: any) => {
           allMemberIds.add(member.userId);
           allMembers.push({
             role: member.role,
             user: member.user
           });
         });
-        session.directors.forEach(dir => {
+        session.directors?.forEach((dir: any) => {
           allMemberIds.add(dir.userId);
           allMembers.push({
             role: 'Directeur de Session',
@@ -191,13 +191,13 @@ export async function GET(request: NextRequest) {
         hasMultipleSessions: event.hasMultipleSessions,
         sessionCount: event.sessionCount,
         notes: event.notes,
-        createdBy: event.createdBy,
+        createdBy: (event as any).createdBy,
         
         // Statistiques
         totalMembers: allMemberIds.size,
-        directorsCount: event.directors.length,
-        membersCount: event.eventTeamMembers.length,
-        sessionsCount: event.sessions.length,
+        directorsCount: (event as any).directors?.length || 0,
+        membersCount: (event as any).eventTeamMembers?.length || 0,
+        sessionsCount: (event as any).sessions?.length || 0,
         
         // Analyse des besoins
         teamAnalysis: teamAnalysis,
@@ -205,17 +205,17 @@ export async function GET(request: NextRequest) {
         // Équipes organisées
         team: {
           // Directeurs musicaux
-          directors: event.directors.map(dir => ({
+          directors: ((event as any).directors || []).map((dir: any) => ({
             id: dir.id,
             user: dir.user,
-            isPrimary: (dir as any).isPrimary || false,
+            isPrimary: dir.isPrimary || false,
             assignedBy: dir.assignedBy,
             assignedAt: dir.assignedAt,
             notes: dir.notes
           })),
           
           // Membres principaux de l'événement
-          members: event.eventTeamMembers.map(member => ({
+          members: ((event as any).eventTeamMembers || []).map((member: any) => ({
             id: member.id,
             user: member.user,
             role: member.role,
@@ -226,7 +226,7 @@ export async function GET(request: NextRequest) {
           })),
           
           // Sessions avec leurs équipes
-          sessions: event.sessions.map(session => ({
+          sessions: ((event as any).sessions || []).map((session: any) => ({
             id: session.id,
             name: session.name,
             startTime: session.startTime,
@@ -236,7 +236,7 @@ export async function GET(request: NextRequest) {
             notes: session.notes,
             
             // Directeurs de session
-            directors: session.directors.map(dir => ({
+            directors: (session.directors || []).map((dir: any) => ({
               id: dir.id,
               user: dir.user,
               isPrimary: (dir as any).isPrimary || false,
@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
             })),
             
             // Membres de session
-            members: session.members.map(member => ({
+            members: (session.members || []).map((member: any) => ({
               id: member.id,
               user: member.user,
               role: member.role,
@@ -260,14 +260,14 @@ export async function GET(request: NextRequest) {
     // Calculer les statistiques globales
     const totalEvents = eventsWithTeams.length;
     const totalUniqueMembers = new Set();
-    const totalSessions = eventsWithTeams.reduce((sum, event) => sum + event.sessionsCount, 0);
+    const totalSessions = eventsWithTeams.reduce((sum: number, event: any) => sum + event.sessionsCount, 0);
     
-    eventsWithTeams.forEach(event => {
-      event.team.directors.forEach(dir => totalUniqueMembers.add(dir.user.id));
-      event.team.members.forEach(member => totalUniqueMembers.add(member.user.id));
-      event.team.sessions.forEach(session => {
-        session.directors.forEach(dir => totalUniqueMembers.add(dir.user.id));
-        session.members.forEach(member => totalUniqueMembers.add(member.user.id));
+    eventsWithTeams.forEach((event: any) => {
+      event.team.directors.forEach((dir: any) => totalUniqueMembers.add(dir.user.id));
+      event.team.members.forEach((member: any) => totalUniqueMembers.add(member.user.id));
+      event.team.sessions.forEach((session: any) => {
+        session.directors.forEach((dir: any) => totalUniqueMembers.add(dir.user.id));
+        session.members.forEach((member: any) => totalUniqueMembers.add(member.user.id));
       });
     });
 

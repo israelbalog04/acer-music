@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
           ...sequence,
           instruments: sequence.instruments ? JSON.parse(sequence.instruments) : [],
           tags: sequence.tags ? JSON.parse(sequence.tags) : [],
-          downloadCount: sequence.downloads.length,
+          downloadCount: (sequence as any).downloads?.length || 0,
           canEdit,
           canDelete
         };

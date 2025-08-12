@@ -68,13 +68,13 @@ export async function GET(request: NextRequest) {
     });
 
     // Formatter les données pour le frontend
-    const events = assignments.map(assignment => ({
+    const events = assignments.map((assignment: any) => ({
       assignmentId: assignment.id,
       role: assignment.role,
       instruments: JSON.parse(assignment.instruments || '[]'),
       notes: assignment.notes,
       assignedAt: assignment.assignedAt,
-      assignedBy: assignment.assignedBy,
+      assignedById: assignment.assignedById,
       event: {
         id: assignment.schedule.id,
         title: assignment.schedule.title,
@@ -88,11 +88,11 @@ export async function GET(request: NextRequest) {
         hasMultipleSessions: assignment.schedule.hasMultipleSessions,
         sessionCount: assignment.schedule.sessionCount,
         sessions: assignment.schedule.sessions,
-        directors: assignment.schedule.directors.map(d => ({
+        directors: assignment.schedule.directors.map((d: any) => ({
           name: `${d.user.firstName} ${d.user.lastName}`,
           email: d.user.email
         })),
-        songs: assignment.schedule.eventSongs.map(es => ({
+        songs: assignment.schedule.eventSongs.map((es: any) => ({
           eventSongId: es.id,
           ...es.song,
           eventOrder: es.order,

@@ -32,14 +32,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier que le morceau existe et appartient à la même église
-    const song = await prisma.song.findFirst({
+    const song = await prisma.song.findUnique({
       where: {
-        id: songId,
-        churchId: session.user.churchId
+        id: songId
       }
     });
 
     if (!song) {
+      return NextResponse.json({ error: 'Morceau non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier que le morceau appartient à l'église de l'utilisateur
+    if (song.churchId !== session.user.churchId) {
       return NextResponse.json({ error: 'Morceau non trouvé' }, { status: 404 });
     }
 
@@ -106,8 +110,8 @@ export async function POST(request: NextRequest) {
       status: recording.status,
       notes: recording.notes,
       createdAt: recording.createdAt,
-      song: recording.song,
-      user: recording.user
+      song: (recording as any).song,
+      user: (recording as any).user
     });
 
   } catch (error) {

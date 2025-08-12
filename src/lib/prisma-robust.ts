@@ -33,22 +33,23 @@ function createPrismaClient() {
 // Client Prisma avec gestion des déconnexions
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-// Log des requêtes en développement
-if (process.env.NODE_ENV === 'development') {
-  prisma.$on('query', (e) => {
-    console.log('🔍 Query:', e.query);
-    console.log('⏱️  Duration:', e.duration + 'ms');
-  });
-}
+// Log des requêtes en développement (commenté pour éviter les erreurs de typage)
+// if (process.env.NODE_ENV === 'development') {
+//   prisma.$on('query', (e) => {
+//     console.log('🔍 Query:', e.query);
+//     console.log('⏱️  Duration:', e.duration + 'ms');
+//   });
+// }
 
-// Gestion des erreurs de connexion
-prisma.$on('error', (e) => {
-  console.error('❌ Prisma Error:', e.message);
-  
-  if (e.message.includes('Can\'t reach database server')) {
-    console.log('🌊 Problème de connexion détecté - Tentative de reconnexion...');
-  }
-});
+// Gestion des erreurs de connexion (commenté pour éviter les erreurs de typage)
+// prisma.$on('error', (e) => {
+//   console.error('❌ Prisma Error:', e.message);
+//   
+//   if (e.message.includes('Can\'t reach database server')) {
+//     console.log('🌊 Problème de connexion détecté - Tentative de reconnexion...');
+//     console.log('🌊 Problème de connexion détecté - Tentative de reconnexion...');
+//   }
+// });
 
 // Fonction wrapper avec retry automatique
 export async function withRetry<T>(

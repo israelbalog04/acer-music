@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       phone: user.phone,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      church: user.church,
+      church: (user as any).church,
       status: 'active' // Par défaut, on peut ajouter un champ status plus tard
     }));
 

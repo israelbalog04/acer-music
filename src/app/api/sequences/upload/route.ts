@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
       fileType: sequence.fileType,
       fileUrl: sequence.fileUrl,
       createdAt: sequence.createdAt,
-      song: sequence.song,
-      createdBy: sequence.createdBy
+      song: (sequence as any).song,
+      createdBy: (sequence as any).createdBy
     });
 
   } catch (error) {

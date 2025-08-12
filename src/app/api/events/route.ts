@@ -132,9 +132,17 @@ export async function POST(request: NextRequest) {
             churchId: session.user.churchId
           }));
 
-          await prisma.sessionMember.createMany({
-            data: sessionMembers
-          });
+          for (const member of sessionMembers) {
+            try {
+              await prisma.sessionMember.create({
+                data: member
+              });
+            } catch (error) {
+              // Ignorer les doublons
+              if ((error as any)?.code === 'P2002') continue;
+              throw error;
+            }
+          }
         }
 
         // Ajouter les directeurs musicaux de cette session
@@ -149,9 +157,17 @@ export async function POST(request: NextRequest) {
             churchId: session.user.churchId
           }));
 
-          await prisma.sessionDirector.createMany({
-            data: sessionDirectors
-          });
+          for (const director of sessionDirectors) {
+            try {
+              await prisma.sessionDirector.create({
+                data: director
+              });
+            } catch (error) {
+              // Ignorer les doublons
+              if ((error as any)?.code === 'P2002') continue;
+              throw error;
+            }
+          }
         }
       }
     } else {
