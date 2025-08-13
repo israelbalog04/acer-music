@@ -409,6 +409,7 @@ export const pooledPrisma = {
     findMany: (args: any) => withRetryAndPool(() => prisma.notification.findMany(args)),
     create: (args: any) => withRetryAndPool(() => prisma.notification.create(args)),
     update: (args: any) => withRetryAndPool(() => prisma.notification.update(args)),
+    updateMany: (args: any) => withRetryAndPool(() => prisma.notification.updateMany(args)),
     delete: (args: any) => withRetryAndPool(() => prisma.notification.delete(args)),
     count: (args: any) => withRetryAndPool(() => prisma.notification.count(args)),
   },
