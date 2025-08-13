@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getDatabaseUrlWithPgBouncer } from '@/lib/db-url';
 
 // Configuration robuste pour Prisma avec retry et gestion des déconnexions
 const globalForPrisma = globalThis as unknown as {
@@ -10,7 +11,7 @@ function createPrismaClient() {
   return new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
+        url: getDatabaseUrlWithPgBouncer()
       }
     },
     log: [

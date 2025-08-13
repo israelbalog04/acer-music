@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getDatabaseUrlWithPgBouncer } from '@/lib/db-url';
 
 // Configuration du pool de connexions pour Supabase
 const globalForPrisma = globalThis as unknown as {
@@ -10,15 +11,11 @@ function createPrismaClientWithPool() {
   return new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
+        url: getDatabaseUrlWithPgBouncer()
       }
     },
     // Configuration du pool de connexions
-    log: [
-      {
-        emit: 'event',
-        level: 'query',
-      },
+    log: process.env.NODE_ENV === 'development' ? [
       {
         emit: 'stdout',
         level: 'error',
@@ -27,12 +24,43 @@ function createPrismaClientWithPool() {
         emit: 'stdout',
         level: 'warn',
       },
+    ] : [
+      {
+        emit: 'stdout',
+        level: 'error',
+      }
     ],
   });
 }
 
 // Client Prisma avec pool de connexions
 export const prisma = globalForPrisma.prisma ?? createPrismaClientWithPool();
+
+// Fonction pour nettoyer et reconnecter en cas d'erreur de prepared statement
+export async function handlePrismaConnection() {
+  try {
+    await prisma.$connect();
+  } catch (error: any) {
+    console.error('❌ Erreur de connexion Prisma:', error.message);
+    
+    // Si c'est une erreur de prepared statement, on force la reconnexion
+    if (error.message?.includes('prepared statement') || error.message?.includes('already exists')) {
+      console.log('🔄 Nettoyage des connexions pour résoudre les prepared statements...');
+      
+      try {
+        await prisma.$disconnect();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
+        await prisma.$connect();
+        console.log('✅ Reconnexion réussie');
+      } catch (reconnectError) {
+        console.error('❌ Échec de la reconnexion:', reconnectError);
+        throw reconnectError;
+      }
+    } else {
+      throw error;
+    }
+  }
+}
 
 // Log des requêtes en développement (commenté pour éviter les erreurs de typage)
 // if (process.env.NODE_ENV === 'development') {
@@ -152,20 +180,22 @@ export async function withRetryAndPool<T>(
         throw lastError;
       }
       
-      // Si c'est une erreur de connexion, on attend avant de réessayer
+      // Si c'est une erreur de connexion ou de prepared statement, on attend avant de réessayer
       if (error instanceof Error && 
           (error.message.includes('Can\'t reach database server') ||
            error.message.includes('pooler') ||
            error.message.includes('connection') ||
-           error.message.includes('Timeout'))) {
+           error.message.includes('Timeout') ||
+           error.message.includes('prepared statement') ||
+           error.message.includes('already exists'))) {
         
         const waitTime = delay * attempt;
         console.log(`⏳ Tentative ${attempt}/${maxRetries} échouée. Attente de ${waitTime}ms...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        // Tentative de reconnexion
+        // Tentative de reconnexion avec gestion des prepared statements
         try {
-          await prisma.$connect();
+          await handlePrismaConnection();
           console.log('✅ Reconnexion réussie');
         } catch (reconnectError) {
           console.log('⚠️  Échec de la reconnexion, continuation...');

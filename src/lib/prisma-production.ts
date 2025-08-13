@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getDatabaseUrlWithPgBouncer } from '@/lib/db-url';
 
 // Configuration spécifique pour la production
 const prismaClientSingleton = () => {
@@ -6,7 +7,7 @@ const prismaClientSingleton = () => {
     log: ['error'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: getDatabaseUrlWithPgBouncer(),
       },
     },
   });
