@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { UserRole } from '@prisma/client';
 
 // GET /api/sequences - Récupérer les séquences
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
           ...sequence,
           instruments: sequence.instruments ? JSON.parse(sequence.instruments) : [],
           tags: sequence.tags ? JSON.parse(sequence.tags) : [],
-          downloadCount: sequence.downloads.length,
+          downloadCount: (sequence as any).downloads?.length || 0,
           canEdit,
           canDelete
         };

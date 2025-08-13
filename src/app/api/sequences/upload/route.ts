@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
       fileType: sequence.fileType,
       fileUrl: sequence.fileUrl,
       createdAt: sequence.createdAt,
-      song: sequence.song,
-      createdBy: sequence.createdBy
+      song: (sequence as any).song,
+      createdBy: (sequence as any).createdBy
     });
 
   } catch (error) {

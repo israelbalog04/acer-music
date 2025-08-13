@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 
 // PUT /api/notifications/[notificationId] - Marquer comme lue
 export async function PUT(
@@ -19,15 +19,20 @@ export async function PUT(
     const { isRead } = body;
 
     // Vérifier que la notification appartient bien à l'utilisateur
-    const notification = await prisma.notification.findFirst({
+    const notification = await prisma.notification.findUnique({
       where: {
-        id: notificationId,
-        userId: session.user.id,
-        churchId: session.user.churchId
+        id: notificationId
       }
     });
 
     if (!notification) {
+      return NextResponse.json({ 
+        error: 'Notification non trouvée' 
+      }, { status: 404 });
+    }
+
+    // Vérifier que la notification appartient à l'utilisateur
+    if ((notification as any).userId !== session.user.id || (notification as any).churchId !== session.user.churchId) {
       return NextResponse.json({ 
         error: 'Notification non trouvée' 
       }, { status: 404 });
@@ -74,15 +79,20 @@ export async function DELETE(
     const { notificationId } = await params;
     
     // Vérifier que la notification appartient bien à l'utilisateur
-    const notification = await prisma.notification.findFirst({
+    const notification = await prisma.notification.findUnique({
       where: {
-        id: notificationId,
-        userId: session.user.id,
-        churchId: session.user.churchId
+        id: notificationId
       }
     });
 
     if (!notification) {
+      return NextResponse.json({ 
+        error: 'Notification non trouvée' 
+      }, { status: 404 });
+    }
+
+    // Vérifier que la notification appartient à l'utilisateur
+    if ((notification as any).userId !== session.user.id || (notification as any).churchId !== session.user.churchId) {
       return NextResponse.json({ 
         error: 'Notification non trouvée' 
       }, { status: 404 });

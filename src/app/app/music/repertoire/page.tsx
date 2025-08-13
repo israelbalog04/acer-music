@@ -16,8 +16,12 @@ import {
   DocumentTextIcon,
   PlayIcon,
   PauseIcon,
-  ShareIcon,
-  MicrophoneIcon
+  MicrophoneIcon,
+  Squares2X2Icon,
+  ListBulletIcon,
+  TagIcon,
+  ClockIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
@@ -37,6 +41,8 @@ export default function RepertoirePage() {
   const [showSequenceModal, setShowSequenceModal] = useState(false);
   const [selectedSongForRecording, setSelectedSongForRecording] = useState<any>(null);
   const [showRecordingModal, setShowRecordingModal] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
 
   const fetchData = async () => {
       try {
@@ -82,6 +88,27 @@ export default function RepertoirePage() {
   const toggleFavorite = async (songId: string) => {
     // Logique pour ajouter/supprimer des favoris
     console.log('Toggle favorite:', songId);
+  };
+
+
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return '';
+    
+    // Gérer différents formats de liens YouTube
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
+      /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) {
+        return `https://www.youtube.com/embed/${match[1]}`;
+      }
+    }
+    
+    return url; // Retourner l'URL originale si aucun pattern ne correspond
   };
 
   const handleAddSong = async (formData: FormData) => {
@@ -152,9 +179,8 @@ export default function RepertoirePage() {
             {(userRole === UserRole.ADMIN || userRole === UserRole.CHEF_LOUANGE || userRole === UserRole.MUSICIEN || userRole === UserRole.TECHNICIEN) && (
               <Button 
                 onClick={() => {
-                  // Ouvrir la modal d'enregistrement avec possibilité de choisir le morceau
-                  setSelectedSongForRecording({ id: '', title: 'Nouveau morceau' });
-                  setShowRecordingModal(true);
+                  // Rediriger vers la page d'upload
+                  window.location.href = '/app/music/upload';
                 }}
                 className="bg-red-600 hover:bg-red-700 text-white"
                 title="Enregistrer une nouvelle version de morceau"
@@ -166,45 +192,66 @@ export default function RepertoirePage() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Enhanced Filters */}
         <Card className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
-                <Input
-                  placeholder="Rechercher un chant..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+          <div className="space-y-4">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+                  <Input
+                    placeholder="Rechercher par titre, artiste ou tag..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 text-sm"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  <option value="tous">Toutes les catégories</option>
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+                <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                    title="Vue grille"
+                  >
+                    <Squares2X2Icon className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-2 text-sm border-l border-gray-300 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                    title="Vue liste"
+                  >
+                    <ListBulletIcon className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex gap-4">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="tous">Toutes les catégories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-              <select
-                value={selectedInstrument}
-                onChange={(e) => setSelectedInstrument(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="tous">Tous les instruments</option>
-                {instruments.map(instrument => (
-                  <option key={instrument} value={instrument}>{instrument}</option>
-                ))}
-              </select>
-              <Button variant="outline">
-                <FunnelIcon className="h-4 w-4 mr-2" />
-                Plus de filtres
-              </Button>
+            {/* Quick filters */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-sm font-medium text-gray-700">Filtres rapides:</span>
+              {categories.slice(0, 5).map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(selectedCategory === category ? 'tous' : category)}
+                  className={`px-3 py-1 rounded-full text-xs transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  }`}
+                >
+                  #{category}
+                </button>
+              ))}
             </div>
           </div>
         </Card>
@@ -231,115 +278,219 @@ export default function RepertoirePage() {
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSongs.map((song) => (
-              <Card key={song.id} className="hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{song.title}</h3>
-                        <button
-                          onClick={() => toggleFavorite(song.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                        >
-                          <HeartIcon className="h-4 w-4" />
-                        </button>
+          <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}`}>
+            {filteredSongs.map((song, index) => (
+              viewMode === 'grid' ? (
+                <div
+                  key={song.id}
+                  className={`animate-fadeInUp animate-delay-${Math.min(index * 100, 700)}`}
+                >
+                  <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{song.title}</h3>
+                            <button
+                              onClick={() => toggleFavorite(song.id)}
+                              className="text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <HeartIcon className="h-4 w-4" />
+                            </button>
+                          </div>
+                          {song.artist && <p className="text-sm text-gray-600 flex items-center"><UserIcon className="h-3 w-3 mr-1" />{song.artist}</p>}
+                          {song.key && <p className="text-xs text-blue-600 font-medium flex items-center"><TagIcon className="h-3 w-3 mr-1" />Tonalité: {song.key}</p>}
+                        </div>
                       </div>
-                      {song.artist && <p className="text-sm text-gray-600">{song.artist}</p>}
-                      {song.key && <p className="text-xs text-blue-600 font-medium">Tonalité: {song.key}</p>}
-                    </div>
-                  </div>
-                  
-                  {song.youtubeUrl && (
-                    <div className="mb-4">
-                      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        <iframe
-                          src={song.youtubeUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {song.tags && song.tags.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1">
-                        {song.tags.map((tag: string, index: number) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span className="flex items-center">
-                        <HeartIcon className="h-3 w-3 mr-1" />
-                        {song.recordingsCount || 0}
-                      </span>
-                      <span className="flex items-center">
-                        <DocumentTextIcon className="h-3 w-3 mr-1" />
-                        {song.sequencesCount || 0}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setSelectedSongForSequences(song);
-                          setShowSequenceModal(true);
-                        }}
-                        className="flex items-center gap-1 text-green-700 border-green-200 hover:bg-green-50 px-3 py-1"
-                      >
-                        <DocumentTextIcon className="h-4 w-4" />
-                        <span className="text-xs font-medium">Séquences</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setSelectedSongForRecording(song);
-                          setShowRecordingModal(true);
-                        }}
-                        className="flex items-center gap-1 text-red-700 border-red-200 hover:bg-red-50 px-3 py-1"
-                      >
-                        <MicrophoneIcon className="h-4 w-4" />
-                        <span className="text-xs font-medium">Enregistrer</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex items-center gap-1 text-blue-700 border-blue-200 hover:bg-blue-50 px-3 py-1"
-                        title="Partager ce chant"
-                      >
-                        <ShareIcon className="h-4 w-4" />
-                        <span className="text-xs font-medium">Partager</span>
-                      </Button>
+                      
                       {song.youtubeUrl && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => window.open(song.youtubeUrl, '_blank')}
-                          className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50 px-3 py-1"
-                        >
-                          <PlayIcon className="h-4 w-4" />
-                          <span className="text-xs font-medium">YouTube</span>
-                        </Button>
+                        <div className="mb-4">
+                          <div className="mb-2">
+                            <span className="text-sm font-medium text-gray-700 flex items-center">
+                              <PlayIcon className="h-4 w-4 mr-1 text-red-600" />
+                              Vidéo YouTube
+                            </span>
+                          </div>
+                          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                            <iframe
+                              src={getYouTubeEmbedUrl(song.youtubeUrl)}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                              title={`Vidéo YouTube pour ${song.title}`}
+                            />
+                          </div>
+                        </div>
                       )}
+
+                      {song.tags && song.tags.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex flex-wrap gap-1">
+                            {song.tags.slice(0, 3).map((tag: string, index: number) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full hover:bg-blue-200 cursor-pointer transition-colors"
+                                onClick={() => setSelectedCategory(tag)}
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                            {song.tags.length > 3 && (
+                              <span className="text-xs text-gray-500 px-2 py-1">+{song.tags.length - 3}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                          <span className="flex items-center">
+                            <MicrophoneIcon className="h-3 w-3 mr-1" />
+                            {song.recordingsCount || 0} enreg.
+                          </span>
+                          <span className="flex items-center">
+                            <DocumentTextIcon className="h-3 w-3 mr-1" />
+                            {song.sequencesCount || 0} séq.
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedSongForSequences(song);
+                              setShowSequenceModal(true);
+                            }}
+                            className="text-green-700 border-green-200 hover:bg-green-50 px-2 py-1 text-xs"
+                          >
+                            <DocumentTextIcon className="h-3 w-3 mr-1" />
+                            Séquences
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              window.location.href = '/app/music/recordings-manage';
+                            }}
+                            className="text-purple-700 border-purple-200 hover:bg-purple-50 px-2 py-1 text-xs"
+                          >
+                            <PlayIcon className="h-3 w-3 mr-1" />
+                            Versions
+                          </Button>
+                          {song.youtubeUrl && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(song.youtubeUrl, '_blank')}
+                              className="text-red-600 border-red-200 hover:bg-red-50 px-2 py-1 text-xs"
+                            >
+                              <PlayIcon className="h-3 w-3 mr-1" />
+                              YouTube
+                            </Button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </Card>
                 </div>
-              </Card>
+              ) : (
+                <div
+                  key={song.id}
+                  className={`animate-fadeInUp animate-delay-${Math.min(index * 50, 500)}`}
+                >
+                  <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.01] group">
+                    <div className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4 flex-1">
+                          <div className="flex-shrink-0">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                              <MusicalNoteIcon className="h-8 w-8 text-white" />
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{song.title}</h3>
+                              <button
+                                onClick={() => toggleFavorite(song.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <HeartIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                            {song.artist && <p className="text-sm text-gray-600 flex items-center mb-1"><UserIcon className="h-3 w-3 mr-1" />{song.artist}</p>}
+                            {song.key && <p className="text-xs text-blue-600 font-medium flex items-center mb-2"><TagIcon className="h-3 w-3 mr-1" />Tonalité: {song.key}</p>}
+                            
+                            {song.tags && song.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {song.tags.slice(0, 5).map((tag: string, index: number) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full hover:bg-blue-200 cursor-pointer transition-colors"
+                                    onClick={() => setSelectedCategory(tag)}
+                                  >
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            
+                            <div className="flex items-center space-x-4 text-xs text-gray-500">
+                              <span className="flex items-center">
+                                <MicrophoneIcon className="h-3 w-3 mr-1" />
+                                {song.recordingsCount || 0} enregistrements
+                              </span>
+                              <span className="flex items-center">
+                                <DocumentTextIcon className="h-3 w-3 mr-1" />
+                                {song.sequencesCount || 0} séquences
+                              </span>
+                              <span className="flex items-center">
+                                <ClockIcon className="h-3 w-3 mr-1" />
+                                Ajouté récemment
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedSongForSequences(song);
+                              setShowSequenceModal(true);
+                            }}
+                            className="text-green-700 border-green-200 hover:bg-green-50"
+                          >
+                            <DocumentTextIcon className="h-4 w-4 mr-1" />
+                            Séquences
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              window.location.href = '/app/music/recordings-manage';
+                            }}
+                            className="text-purple-700 border-purple-200 hover:bg-purple-50"
+                          >
+                            <PlayIcon className="h-4 w-4 mr-1" />
+                            Versions
+                          </Button>
+                          {song.youtubeUrl && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(song.youtubeUrl, '_blank')}
+                              className="text-red-600 border-red-200 hover:bg-red-50"
+                            >
+                              <PlayIcon className="h-4 w-4 mr-1" />
+                              YouTube
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )
             ))}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       eventsThisMonth,
       upcomingEvents,
       eventsByType: eventsByType.reduce((acc, item) => {
-        acc[item.type] = item._count.type;
+        acc[item.type] = (item._count as any)?._all || (item._count as any)?.type || 0;
         return acc;
       }, {} as Record<string, number>)
     };

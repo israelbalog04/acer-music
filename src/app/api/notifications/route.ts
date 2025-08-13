@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -24,17 +24,31 @@ export async function GET(request: NextRequest) {
     const unread = searchParams.get('unread');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    // Construire la requête avec échappement des caractères spéciaux
-    let query = `SELECT * FROM notifications WHERE userId = ?`;
-    const params = [user.id];
+    // Construire la requête avec Prisma
+    const whereClause: any = {
+      userId: user.id,
+      churchId: user.churchId
+    };
     
     if (unread === 'true') {
-      query += ` AND isRead = 0`;
+      whereClause.isRead = false;
     }
-    query += ` ORDER BY createdAt DESC LIMIT ?`;
-    params.push(limit.toString());
 
-    const notifications = await prisma.$queryRawUnsafe(query, ...params);
+    const notifications = await prisma.notification.findMany({
+      where: whereClause,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit,
+      include: {
+        createdBy: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
+    });
 
     return NextResponse.json(notifications);
 
@@ -79,12 +93,16 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Marquer la notification comme lue
-    const updateQuery = `
-      UPDATE notifications 
-      SET isRead = ?, readAt = ?
-      WHERE id = ? AND userId = ?
-    `;
-    await prisma.$executeRawUnsafe(updateQuery, isRead ? 1 : 0, isRead ? new Date().toISOString() : null, notificationId, user.id);
+    await prisma.notification.update({
+      where: {
+        id: notificationId,
+        userId: user.id
+      },
+      data: {
+        isRead: isRead,
+        readAt: isRead ? new Date() : null
+      }
+    });
 
     return NextResponse.json({ success: true });
 

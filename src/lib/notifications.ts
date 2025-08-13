@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 
 interface NotificationData {
   title: string;

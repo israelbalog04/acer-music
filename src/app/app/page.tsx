@@ -195,28 +195,28 @@ export default function DashboardPage() {
 
   const quickActions = [
     {
-      title: 'Nouveau Upload',
-      description: 'Enregistrer une nouvelle version',
-      href: '/app/music/upload',
-      icon: <CloudArrowUpIcon className="h-5 w-5" />,
+      title: 'Planning',
+      description: 'Consulter mes services',
+      href: '/app/team/planning',
+      icon: <CalendarIcon className="h-5 w-5 text-white" />,
+      color: 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800',
+      gradient: 'from-purple-500 to-purple-600'
+    },
+    {
+      title: 'Voir le Repertoire',
+      description: 'Parcourir tous les chants',
+      href: '/app/music/repertoire',
+      icon: <MusicalNoteIcon className="h-5 w-5 text-white" />,
       color: 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800',
       gradient: 'from-primary-500 to-primary-600'
     },
     {
-      title: 'Voir le Répertoire',
-      description: 'Parcourir tous les chants',
-      href: '/app/music/repertoire',
-      icon: <MusicalNoteIcon className="h-5 w-5" />,
-      color: 'bg-gradient-to-r from-success-600 to-success-700 hover:from-success-700 hover:to-success-800',
-      gradient: 'from-success-500 to-success-600'
-    },
-    {
-      title: 'Planning',
-      description: 'Consulter mes services',
-      href: '/app/team/planning',
-      icon: <CalendarIcon className="h-5 w-5" />,
-      color: 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800',
-      gradient: 'from-purple-500 to-purple-600'
+      title: 'Nouveau Upload',
+      description: 'Enregistrer une nouvelle version',
+      href: '/app/music/upload',
+      icon: <CloudArrowUpIcon className="h-5 w-5 text-white" />,
+      color: 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800',
+      gradient: 'from-primary-500 to-primary-600'
     }
   ];
 

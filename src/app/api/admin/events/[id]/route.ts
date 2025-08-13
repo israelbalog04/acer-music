@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
@@ -29,10 +29,9 @@ export async function GET(
     }
 
     // Récupérer l'événement
-    const event = await prisma.schedule.findFirst({
+    const event = await prisma.schedule.findUnique({
       where: {
-        id: id,
-        churchId: user.churchId
+        id: id
       },
       select: {
         id: true,
@@ -46,6 +45,7 @@ export async function GET(
         status: true,
         isActive: true,
         notes: true,
+        churchId: true,
         createdAt: true,
         updatedAt: true
       }
@@ -53,6 +53,11 @@ export async function GET(
 
     if (!event) {
       return NextResponse.json({ error: 'Événement non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier l'accès à l'église
+    if (event.churchId !== user.churchId) {
+      return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
     }
 
     return NextResponse.json(event);
@@ -92,15 +97,19 @@ export async function PATCH(
     const { isActive, title, date, startTime, endTime, type, description } = body;
 
     // Vérifier que l'événement existe et appartient à l'église
-    const existingEvent = await prisma.schedule.findFirst({
+    const existingEvent = await prisma.schedule.findUnique({
       where: {
-        id: id,
-        churchId: user.churchId
+        id: id
       }
     });
 
     if (!existingEvent) {
       return NextResponse.json({ error: 'Événement non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier l'accès à l'église
+    if (existingEvent.churchId !== user.churchId) {
+      return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
     }
 
     // Préparer les données de mise à jour
@@ -163,15 +172,19 @@ export async function DELETE(
     const { id } = await params;
 
     // Vérifier que l'événement existe et appartient à l'église
-    const existingEvent = await prisma.schedule.findFirst({
+    const existingEvent = await prisma.schedule.findUnique({
       where: {
-        id: id,
-        churchId: user.churchId
+        id: id
       }
     });
 
     if (!existingEvent) {
       return NextResponse.json({ error: 'Événement non trouvé' }, { status: 404 });
+    }
+
+    // Vérifier l'accès à l'église
+    if (existingEvent.churchId !== user.churchId) {
+      return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
     }
 
     // Vérifier s'il y a des disponibilités liées à cet événement
