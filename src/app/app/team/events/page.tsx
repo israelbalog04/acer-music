@@ -5,6 +5,8 @@ import { UserRole } from '@prisma/client';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { useUserData } from '@/hooks/useUserData';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
   CalendarIcon,
   UsersIcon,
@@ -20,7 +22,8 @@ import {
   ExclamationTriangleIcon,
   XMarkIcon,
   CheckCircleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import { 
   StarIcon as StarSolidIcon,
@@ -450,6 +453,22 @@ export default function TeamEventPage() {
                           {event.status}
                         </span>
                         {getTeamStatusBadge(event.teamAnalysis)}
+                        
+                        {/* Bouton Chat */}
+                        <Link 
+                          href={`/app/events/${event.id}`} 
+                          onClick={(e) => e.stopPropagation()}
+                          className="ml-auto"
+                        >
+                          <Button
+                            variant="success"
+                            size="sm"
+                            className="hover:scale-105 transition-transform"
+                          >
+                            <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+                            Chat équipe
+                          </Button>
+                        </Link>
                       </div>
                       
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-2">

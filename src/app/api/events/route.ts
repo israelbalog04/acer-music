@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { UserRole } from '@prisma/client';
 
 // GET - Récupérer les événements pour les musiciens
@@ -75,8 +75,16 @@ export async function POST(request: NextRequest) {
       sessions,
       selectedMembers,
       directors,
-      selectedSongs
+      selectedSongs,
+      assignedUsers, // Support for the frontend format
+      songs, // Support for the frontend format
+      startTime,
+      endTime
     } = body;
+
+    // Map frontend data to backend format if needed
+    const finalSelectedMembers = selectedMembers || assignedUsers || [];
+    const finalSelectedSongs = selectedSongs || songs || [];
 
     // Validation des données de base
     if (!title || !date) {
@@ -92,6 +100,8 @@ export async function POST(request: NextRequest) {
         title,
         description,
         date: new Date(date),
+        startTime: startTime || null,
+        endTime: endTime || null,
         type: type || 'REPETITION',
         location,
         status: status || 'PLANNED',
@@ -132,9 +142,17 @@ export async function POST(request: NextRequest) {
             churchId: session.user.churchId
           }));
 
-          await prisma.sessionMember.createMany({
-            data: sessionMembers
-          });
+          for (const member of sessionMembers) {
+            try {
+              await prisma.sessionMember.create({
+                data: member
+              });
+            } catch (error) {
+              // Ignorer les doublons
+              if ((error as any)?.code === 'P2002') continue;
+              throw error;
+            }
+          }
         }
 
         // Ajouter les directeurs musicaux de cette session
@@ -149,23 +167,35 @@ export async function POST(request: NextRequest) {
             churchId: session.user.churchId
           }));
 
-          await prisma.sessionDirector.createMany({
-            data: sessionDirectors
-          });
+          for (const director of sessionDirectors) {
+            try {
+              await prisma.sessionDirector.create({
+                data: director
+              });
+            } catch (error) {
+              // Ignorer les doublons
+              if ((error as any)?.code === 'P2002') continue;
+              throw error;
+            }
+          }
         }
       }
     } else {
       // Événement simple - ajouter les membres et directeurs à l'événement principal
-      if (selectedMembers && selectedMembers.length > 0) {
-        const teamMembers = selectedMembers.map((member: any) => ({
-          userId: member.userId,
-          teamId: member.teamId, // Si vous avez un système d'équipes
-          scheduleId: event.id
+      if (finalSelectedMembers && finalSelectedMembers.length > 0) {
+        // Créer les membres d'équipe d'événement
+        const eventTeamMembers = finalSelectedMembers.map((memberId: string) => ({
+          scheduleId: event.id,
+          userId: memberId,
+          churchId: session.user.churchId,
+          assignedById: session.user.id,
+          role: 'MUSICIEN', // Rôle par défaut
+          isActive: true
         }));
 
-        for (const member of teamMembers) {
+        for (const member of eventTeamMembers) {
           try {
-            await prisma.teamMember.create({
+            await prisma.eventTeamMember.create({
               data: member
             });
           } catch (error) {
@@ -190,6 +220,28 @@ export async function POST(request: NextRequest) {
         await prisma.eventDirector.createMany({
           data: eventDirectors
         });
+      }
+    }
+
+    // Ajouter les chansons à l'événement si spécifiées
+    if (finalSelectedSongs && finalSelectedSongs.length > 0) {
+      const eventSongs = finalSelectedSongs.map((songId: string, index: number) => ({
+        scheduleId: event.id,
+        songId: songId,
+        churchId: session.user.churchId,
+        order: index + 1 // Ordre des chansons
+      }));
+
+      for (const eventSong of eventSongs) {
+        try {
+          await prisma.eventSong.create({
+            data: eventSong
+          });
+        } catch (error) {
+          // Ignorer les doublons
+          if ((error as any)?.code === 'P2002') continue;
+          throw error;
+        }
       }
     }
 
@@ -237,6 +289,32 @@ export async function POST(request: NextRequest) {
                 lastName: true
               }
             }
+          }
+        },
+        eventTeamMembers: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                instruments: true
+              }
+            }
+          }
+        },
+        eventSongs: {
+          include: {
+            song: {
+              select: {
+                title: true,
+                artist: true,
+                key: true,
+                bpm: true
+              }
+            }
+          },
+          orderBy: {
+            order: 'asc'
           }
         }
       }

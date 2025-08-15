@@ -189,7 +189,8 @@ function LoginPageContent() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#3244c7] hover:bg-[#2938b3] text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            className="w-full"
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </Button>

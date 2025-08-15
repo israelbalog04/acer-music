@@ -214,7 +214,7 @@ export default function SuperAdminChurchesPage() {
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:shadow-lg transform hover:scale-105"
+          variant="success"
         >
           <BuildingOfficeIcon className="h-5 w-5 mr-2" />
           Ajouter une Église
@@ -588,7 +588,8 @@ export default function SuperAdminChurchesPage() {
                 <Button
                   onClick={() => handleChurchUpdate(selectedChurch.id, selectedChurch)}
                   disabled={processingChurch === selectedChurch.id}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg transform hover:scale-105"
+                  variant="success"
+                  className="flex-1"
                 >
                   {processingChurch === selectedChurch.id ? (
                     <div className="flex items-center space-x-2">
@@ -605,8 +606,8 @@ export default function SuperAdminChurchesPage() {
                 <Button
                   onClick={() => handleChurchDelete(selectedChurch.id)}
                   disabled={processingChurch === selectedChurch.id || selectedChurch._count.users > 0}
-                  variant="outline"
-                  className="flex-1 text-red-600 border-red-600 hover:bg-red-50 hover:border-red-700 font-medium py-3 rounded-xl transition-all duration-200"
+                  variant="danger"
+                  className="flex-1"
                 >
                   {processingChurch === selectedChurch.id ? (
                     <div className="flex items-center space-x-2">
@@ -774,7 +775,8 @@ export default function SuperAdminChurchesPage() {
                 <Button
                   onClick={handleCreateChurch}
                   disabled={processingChurch === 'new' || !newChurch.name || !newChurch.city}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  variant="success"
+                  className="flex-1"
                 >
                   {processingChurch === 'new' ? (
                     <div className="flex items-center space-x-2">
@@ -790,8 +792,8 @@ export default function SuperAdminChurchesPage() {
                 </Button>
                 <Button
                   onClick={() => setShowCreateModal(false)}
-                  variant="outline"
-                  className="flex-1 text-gray-600 border-gray-600 hover:bg-gray-50 hover:border-gray-700 font-medium py-3 rounded-xl transition-all duration-200"
+                  variant="secondary"
+                  className="flex-1"
                 >
                   <XMarkIcon className="h-4 w-4 mr-2" />
                   Annuler
