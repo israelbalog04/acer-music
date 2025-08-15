@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       where: { email: session.user.email }
     });
 
-    if (!user || !(user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
