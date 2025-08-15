@@ -33,6 +33,26 @@ interface Event {
     firstName: string;
     lastName: string;
   };
+  eventTeamMembers?: Array<{
+    id: string;
+    role?: string;
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      avatar?: string;
+      instruments: string;
+    };
+  }>;
+  directors?: Array<{
+    id: string;
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      avatar?: string;
+    };
+  }>;
 }
 
 export default function EventDetailPage() {
@@ -43,7 +63,7 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true); // Chat ouvert par défaut
 
   useEffect(() => {
     if (eventId) {
@@ -153,11 +173,11 @@ export default function EventDetailPage() {
           </Link>
           <Button
             onClick={() => setShowChat(!showChat)}
-            variant={showChat ? 'primary' : 'outline'}
+            variant={showChat ? 'primary' : 'success'}
             className="ml-auto"
           >
             <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-            {showChat ? 'Masquer le chat' : 'Afficher le chat'}
+            {showChat ? 'Masquer chat équipe' : 'Chat avec l\'équipe'}
           </Button>
         </div>
 
@@ -248,6 +268,68 @@ export default function EventDetailPage() {
                   <h3 className="font-medium text-gray-900 mb-2">Notes :</h3>
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">
                     {event.notes}
+                  </p>
+                </div>
+              )}
+
+              {/* Participants */}
+              {(event.directors && event.directors.length > 0) || (event.eventTeamMembers && event.eventTeamMembers.length > 0) ? (
+                <div className="mt-6 p-4 bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <UsersIcon className="h-5 w-5 mr-2 text-blue-600" />
+                    Équipe assignée ({(event.directors?.length || 0) + (event.eventTeamMembers?.length || 0)} membres)
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    {/* Directeurs */}
+                    {event.directors && event.directors.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-purple-800 mb-2">Directeurs musicaux</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {event.directors.map((director) => (
+                            <div key={director.id} className="flex items-center space-x-2 bg-purple-100 px-3 py-1 rounded-full">
+                              <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                {director.user.firstName.charAt(0)}{director.user.lastName.charAt(0)}
+                              </div>
+                              <span className="text-sm font-medium text-purple-800">
+                                {director.user.firstName} {director.user.lastName}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Membres de l'équipe */}
+                    {event.eventTeamMembers && event.eventTeamMembers.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-800 mb-2">Musiciens</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {event.eventTeamMembers.map((member) => (
+                            <div key={member.id} className="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
+                              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                {member.user.firstName.charAt(0)}{member.user.lastName.charAt(0)}
+                              </div>
+                              <div className="text-sm">
+                                <span className="font-medium text-blue-800">
+                                  {member.user.firstName} {member.user.lastName}
+                                </span>
+                                {member.role && (
+                                  <span className="text-blue-600 ml-1">({member.role})</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 flex items-center">
+                    <UsersIcon className="h-4 w-4 mr-2" />
+                    Aucune équipe assignée à cet événement
                   </p>
                 </div>
               )}

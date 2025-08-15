@@ -18,8 +18,11 @@ import {
   UsersIcon,
   InformationCircleIcon,
   MusicalNoteIcon,
-  XMarkIcon
+  XMarkIcon,
+  ChatBubbleLeftRightIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 interface Event {
   id: string;
@@ -546,6 +549,26 @@ export default function AdminEventsPage() {
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
+                      {/* Bouton Voir détails */}
+                      <Link href={`/app/events/${event.id}`}>
+                        <button
+                          className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          title="Voir détails et chat"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </button>
+                      </Link>
+                      
+                      {/* Bouton Chat direct */}
+                      <Link href={`/app/events/${event.id}`}>
+                        <button
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Chat équipe"
+                        >
+                          <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                        </button>
+                      </Link>
+                      
                       {/* Bouton Gérer l'événement */}
                       <button
                         onClick={() => handleManageEvent(event)}
