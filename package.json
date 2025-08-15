@@ -38,8 +38,10 @@
     "force-env": "node scripts/force-env-update.js",
     "setup-sqlite": "node scripts/setup-sqlite.js",
     "test-db": "node scripts/test-db-connection.js",
+    "migrate-prod": "node scripts/migrate-production.js",
+    "health-check": "node scripts/health-check.js",
     "postinstall": "prisma generate",
-    "vercel-postbuild": "prisma migrate deploy && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
+    "vercel-postbuild": "prisma db push && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",

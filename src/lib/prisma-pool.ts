@@ -414,6 +414,18 @@ export const pooledPrisma = {
     count: (args: any) => withRetryAndPool(() => prisma.notification.count(args)),
   },
   
+  // EventMessage operations avec pool
+  eventMessage: {
+    findUnique: (args: any) => withRetryAndPool(() => prisma.eventMessage.findUnique(args)),
+    findFirst: (args: any) => withRetryAndPool(() => prisma.eventMessage.findFirst(args)),
+    findMany: (args: any) => withRetryAndPool(() => prisma.eventMessage.findMany(args)),
+    create: (args: any) => withRetryAndPool(() => prisma.eventMessage.create(args)),
+    update: (args: any) => withRetryAndPool(() => prisma.eventMessage.update(args)),
+    delete: (args: any) => withRetryAndPool(() => prisma.eventMessage.delete(args)),
+    deleteMany: (args: any) => withRetryAndPool(() => prisma.eventMessage.deleteMany(args)),
+    count: (args: any) => withRetryAndPool(() => prisma.eventMessage.count(args)),
+  },
+  
   // MusicianImage operations avec pool
   musicianImage: {
     findUnique: (args: any) => withRetryAndPool(() => prisma.musicianImage.findUnique(args)),
