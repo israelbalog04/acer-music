@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'success' | 'warning' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   animated?: boolean;
@@ -18,13 +18,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     children,
     ...props 
   }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]';
+    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95';
     
     const variants = {
-      primary: 'bg-[#3244c7] text-white hover:bg-[#2938b3] focus:ring-[#3244c7] shadow-lg shadow-[#3244c7]/25 hover:shadow-xl hover:shadow-[#3244c7]/30',
-      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 border border-gray-200',
-      outline: 'border-2 border-[#3244c7] bg-transparent text-[#3244c7] hover:bg-[#3244c7] hover:text-white focus:ring-[#3244c7]',
-      ghost: 'text-gray-600 hover:text-[#3244c7] hover:bg-gray-50 focus:ring-gray-500'
+      primary: 'bg-gradient-to-r from-[#3244c7] to-blue-600 hover:from-[#2938b3] hover:to-blue-700 text-white focus:ring-[#3244c7] shadow-lg shadow-[#3244c7]/30 hover:shadow-xl',
+      secondary: 'bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 focus:ring-gray-500 shadow-lg hover:shadow-xl',
+      outline: 'border-2 border-[#3244c7] bg-transparent text-[#3244c7] hover:bg-[#3244c7] hover:text-white focus:ring-[#3244c7] hover:shadow-lg',
+      ghost: 'text-gray-600 hover:text-[#3244c7] hover:bg-gray-50 focus:ring-gray-500',
+      success: 'bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white focus:ring-green-500 shadow-lg shadow-green-500/30 hover:shadow-xl',
+      warning: 'bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white focus:ring-orange-500 shadow-lg shadow-orange-500/30 hover:shadow-xl',
+      danger: 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white focus:ring-red-500 shadow-lg shadow-red-500/30 hover:shadow-xl'
     };
 
     const sizes = {
@@ -34,7 +37,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const animatedClasses = animated 
-      ? 'hover:scale-105 active:scale-95 transition-transform duration-100' 
+      ? '' // Animation déjà incluse dans baseClasses
       : '';
 
     const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${animatedClasses} ${className}`;

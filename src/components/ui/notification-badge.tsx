@@ -136,7 +136,7 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
       </button>
 
       {showDropdown && (
-        <div className="fixed sm:absolute top-16 sm:top-auto right-4 sm:right-0 sm:mt-3 w-[calc(100vw-2rem)] sm:w-96 max-w-sm sm:max-w-none bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden notification-dropdown">
+        <div className="absolute top-full right-0 mt-3 w-80 lg:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden notification-dropdown" style={{ transform: 'translateX(calc(-100% + 2.5rem))' }}>
           {/* Header */}
           <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
             <div className="flex items-center justify-between">
