@@ -92,7 +92,7 @@ export default function ChatDebugPage() {
           <h3 className="font-semibold text-blue-900 mb-2">Session utilisateur</h3>
           <p><strong>ID:</strong> {session?.user?.id || 'Non connecté'}</p>
           <p><strong>Email:</strong> {session?.user?.email || 'N/A'}</p>
-          <p><strong>Nom:</strong> {session?.user?.firstName} {session?.user?.lastName}</p>
+          <p><strong>Nom:</strong> {session?.user?.name || 'N/A'}</p>
         </div>
 
         {/* Test du chat */}
