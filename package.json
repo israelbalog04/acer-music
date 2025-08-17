@@ -42,7 +42,7 @@
     "migrate-prod-gdrive": "node scripts/migrate-production-gdrive.js",
     "health-check": "node scripts/health-check.js",
     "postinstall": "prisma generate",
-    "vercel-postbuild": "npx prisma generate && npx prisma db push --force-reset && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
+    "vercel-build": "node scripts/force-migrate.js && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js && next build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
