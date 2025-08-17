@@ -58,6 +58,12 @@ export default function EventChat({ eventId, eventTitle }: EventChatProps) {
     fetchMessages();
   }, [eventId]);
 
+  // Rechargement automatique toutes les 30 secondes
+  useEffect(() => {
+    const interval = setInterval(fetchMessages, 30000);
+    return () => clearInterval(interval);
+  }, [eventId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -73,11 +79,13 @@ export default function EventChat({ eventId, eventTitle }: EventChatProps) {
       if (response.ok) {
         const data = await response.json();
         setMessages(data);
+        console.log('Messages chargés:', data.length);
       } else {
-        console.error('Erreur lors du chargement des messages');
+        const errorData = await response.json();
+        console.error('Erreur API messages:', errorData);
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur fetch messages:', error);
     } finally {
       setLoading(false);
     }
@@ -105,6 +113,12 @@ export default function EventChat({ eventId, eventTitle }: EventChatProps) {
         setMessages(prev => [...prev, message]);
         setNewMessage('');
         setReplyTo(null);
+        // Recharger tous les messages pour s'assurer de la synchronisation
+        await fetchMessages();
+      } else {
+        const errorData = await response.json();
+        console.error('Erreur API:', errorData);
+        alert('Erreur lors de l\'envoi du message');
       }
     } catch (error) {
       console.error('Erreur lors de l\'envoi:', error);
@@ -202,13 +216,22 @@ export default function EventChat({ eventId, eventTitle }: EventChatProps) {
   return (
     <div className="flex flex-col h-full bg-white rounded-xl shadow-lg border border-gray-200">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-[#3244c7]/5 to-blue-50 rounded-t-xl">
-        <h3 className="text-lg font-semibold text-gray-900">
-          💬 Chat - {eventTitle}
-        </h3>
-        <p className="text-sm text-gray-600">
-          {messages.length} message{messages.length !== 1 ? 's' : ''}
-        </p>
+      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-[#3244c7]/5 to-blue-50 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            💬 Chat - {eventTitle}
+          </h3>
+          <p className="text-sm text-gray-600">
+            {messages.length} message{messages.length !== 1 ? 's' : ''} {loading && '(actualisation...)'}
+          </p>
+        </div>
+        <button
+          onClick={fetchMessages}
+          disabled={loading}
+          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50 transition-colors"
+        >
+          {loading ? '🔄' : '↻'} 
+        </button>
       </div>
 
       {/* Messages */}
