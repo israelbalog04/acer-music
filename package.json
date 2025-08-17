@@ -39,6 +39,7 @@
     "setup-sqlite": "node scripts/setup-sqlite.js",
     "test-db": "node scripts/test-db-connection.js",
     "migrate-prod": "node scripts/migrate-production.js",
+    "migrate-prod-gdrive": "node scripts/migrate-production-gdrive.js",
     "health-check": "node scripts/health-check.js",
     "postinstall": "prisma generate",
     "vercel-postbuild": "prisma db push && npm run db:seed && node scripts/create-default-church.js && node scripts/create-super-admin.js"
