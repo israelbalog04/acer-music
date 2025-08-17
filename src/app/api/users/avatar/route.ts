@@ -71,8 +71,21 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erreur upload avatar:', error);
+    
+    // Détails d'erreur pour le debug
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
+      type: error instanceof Error ? error.constructor.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined
+    };
+    
+    console.error('Détails erreur:', errorDetails);
+    
     return NextResponse.json(
-      { error: 'Erreur lors de l\'upload' },
+      { 
+        error: 'Erreur lors de l\'upload',
+        details: process.env.NODE_ENV === 'development' ? errorDetails : undefined
+      },
       { status: 500 }
     );
   }
