@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
@@ -131,7 +131,7 @@ export async function PUT(
         isApproved: updatedUser.isApproved,
         approvedAt: updatedUser.approvedAt,
         approvedBy: updatedUser.approvedBy,
-        church: updatedUser.church
+        church: (updatedUser as any).church
       }
     });
 

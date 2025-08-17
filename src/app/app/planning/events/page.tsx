@@ -12,7 +12,9 @@ import {
   MusicalNoteIcon,
   ClockIcon,
   MapPinIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  ChatBubbleLeftRightIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 
 interface Event {
@@ -106,7 +108,8 @@ export default function EventsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <Card key={event.id} className="hover:shadow-lg transition-shadow">
+              <Card key={event.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer relative group">
+                <Link href={`/app/events/${event.id}`} className="absolute inset-0 z-10"></Link>
                 <div className="p-6">
                   {/* Header de l'événement */}
                   <div className="flex items-start justify-between mb-4">
@@ -170,13 +173,35 @@ export default function EventsPage() {
 
                   {/* Actions */}
                   <div className="flex space-x-2 pt-4 border-t border-gray-200">
-                    <Link href={`/app/planning/${event.id}/repertoire`}>
+                    <Link href={`/app/events/${event.id}`} className="relative z-20">
                       <Button 
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                        variant="outline" 
+                        size="sm"
+                        className="hover:bg-[#3244c7] hover:text-white"
+                      >
+                        <EyeIcon className="h-4 w-4 mr-2" />
+                        Voir détails
+                      </Button>
+                    </Link>
+                    
+                    <Link href={`/app/events/${event.id}`} className="relative z-20">
+                      <Button 
+                        variant="success"
                         size="sm"
                       >
+                        <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+                        Chat
+                      </Button>
+                    </Link>
+                    
+                    <Link href={`/app/planning/${event.id}/repertoire`} className="relative z-20">
+                      <Button 
+                        variant="outline"
+                        size="sm" 
+                        className="hover:bg-purple-600 hover:text-white"
+                      >
                         <MusicalNoteIcon className="h-4 w-4 mr-2" />
-                        Gérer le répertoire
+                        Répertoire
                       </Button>
                     </Link>
                   </div>

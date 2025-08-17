@@ -23,7 +23,11 @@ import {
   MusicalNoteIcon,
   StarIcon,
   CogIcon,
-  CalendarIcon
+  CalendarIcon,
+  CheckIcon,
+  XMarkIcon,
+  ClockIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 
 interface User {
@@ -37,6 +41,13 @@ interface User {
   avatar?: string;
   createdAt: string;
   updatedAt: string;
+  isApproved?: boolean;
+  approvedAt?: string;
+  approvedBy?: string;
+  bio?: string;
+  skillLevel?: string;
+  musicalExperience?: number;
+  canLead?: boolean;
 }
 
 export default function AdminUsersPage() {
@@ -45,7 +56,11 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
+  const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [showUserDetails, setShowUserDetails] = useState<string | null>(null);
+  const [processingUser, setProcessingUser] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'users' | 'approvals'>('users');
+  const [showRoleModal, setShowRoleModal] = useState<{userId: string, currentRole: UserRole} | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -54,14 +69,27 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/users');
+      // Charger les utilisateurs normaux et les profils en attente
+      const [usersRes, profilesRes] = await Promise.all([
+        fetch('/api/admin/users'),
+        fetch('/api/admin/users/profiles')
+      ]);
       
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        console.error('Erreur lors du chargement des utilisateurs');
+      let allUsers: any[] = [];
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        allUsers = [...allUsers, ...usersData];
       }
+      
+      if (profilesRes.ok) {
+        const profilesData = await profilesRes.json();
+        // Ajouter les profils qui ne sont pas déjà dans la liste des utilisateurs
+        const existingIds = allUsers.map(u => u.id);
+        const newProfiles = profilesData.filter((p: any) => !existingIds.includes(p.id));
+        allUsers = [...allUsers, ...newProfiles];
+      }
+      
+      setUsers(allUsers);
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -69,13 +97,44 @@ export default function AdminUsersPage() {
     }
   };
 
-  const toggleUserRole = async (userId: string, currentRole: UserRole) => {
+  const toggleUserRole = (userId: string, currentRole: UserRole) => {
+    setShowRoleModal({userId, currentRole});
+  };
+
+  const updateUserRole = async (newRole: UserRole) => {
+    if (!showRoleModal) return;
+
     try {
-      // Logique pour changer le rôle (à implémenter selon vos besoins)
-      alert('Fonctionnalité de changement de rôle à implémenter');
+      setProcessingUser(showRoleModal.userId);
+      const response = await fetch('/api/admin/users/update-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          userId: showRoleModal.userId, 
+          role: newRole 
+        }),
+      });
+
+      if (response.ok) {
+        // Mettre à jour la liste des utilisateurs
+        setUsers(prev => prev.map(user => 
+          user.id === showRoleModal.userId 
+            ? { ...user, role: newRole }
+            : user
+        ));
+        alert(`Rôle changé avec succès en "${getRoleLabel(newRole)}"`);
+        setShowRoleModal(null);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Erreur lors du changement de rôle');
+      }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la mise à jour');
+      alert('Erreur lors de la mise à jour du rôle');
+    } finally {
+      setProcessingUser(null);
     }
   };
 
@@ -98,6 +157,36 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error('Erreur:', error);
       alert('Erreur lors de la suppression');
+    }
+  };
+
+  const handleApproval = async (userId: string, approved: boolean) => {
+    setProcessingUser(userId);
+    try {
+      const response = await fetch('/api/admin/users/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, approved }),
+      });
+
+      if (response.ok) {
+        // Mettre à jour la liste des utilisateurs
+        setUsers(prev => prev.map(user => 
+          user.id === userId 
+            ? { ...user, isApproved: approved, approvedAt: approved ? new Date().toISOString() : undefined }
+            : user
+        ));
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Erreur lors de l\'approbation');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de l\'approbation');
+    } finally {
+      setProcessingUser(null);
     }
   };
 
@@ -147,11 +236,22 @@ export default function AdminUsersPage() {
     
     const matchesRole = filterRole === 'ALL' || user.role === filterRole;
     
-    return matchesSearch && matchesRole;
+    const matchesStatus = filterStatus === 'ALL' || 
+      (filterStatus === 'APPROVED' && user.isApproved) ||
+      (filterStatus === 'PENDING' && user.isApproved === false) ||
+      (filterStatus === 'NO_APPROVAL' && user.isApproved === undefined);
+    
+    // Pour l'onglet Approbations, montrer tous les utilisateurs avec un statut défini
+    const matchesTab = activeTab === 'users' ? true : 
+      (activeTab === 'approvals');
+    
+    return matchesSearch && matchesRole && matchesStatus && matchesTab;
   });
 
   const stats = {
     total: users.length,
+    approved: users.filter(u => u.isApproved === true).length,
+    pending: users.filter(u => u.isApproved === false).length,
     byRole: {
       admin: users.filter(u => u.role === UserRole.ADMIN).length,
       chef: users.filter(u => u.role === UserRole.CHEF_LOUANGE).length,
@@ -171,13 +271,41 @@ export default function AdminUsersPage() {
               Gestion des Utilisateurs
             </h1>
             <p className="text-gray-600 mt-2">
-              Gérez les utilisateurs de {churchName}
+              Gérez les utilisateurs et approbations de {churchName}
             </p>
           </div>
           <Button className="bg-blue-600 hover:bg-blue-700">
             <PlusIcon className="h-4 w-4 mr-2" />
             Nouvel Utilisateur
           </Button>
+        </div>
+
+        {/* Onglets */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'users'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <UsersIcon className="h-5 w-5 inline mr-2" />
+              Tous les utilisateurs
+            </button>
+            <button
+              onClick={() => setActiveTab('approvals')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'approvals'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ShieldCheckIcon className="h-5 w-5 inline mr-2" />
+              Approbations {stats.pending > 0 && `(${stats.pending})`}
+            </button>
+          </nav>
         </div>
 
         {/* Statistiques */}
@@ -197,10 +325,10 @@ export default function AdminUsersPage() {
           <Card>
             <div className="p-4">
               <div className="flex items-center">
-                <StarIcon className="h-8 w-8 text-purple-600" />
+                <CheckCircleIcon className="h-8 w-8 text-green-600" />
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Chefs de Louange</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.byRole.chef}</p>
+                  <p className="text-sm font-medium text-gray-500">Approuvés</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
                 </div>
               </div>
             </div>
@@ -209,10 +337,10 @@ export default function AdminUsersPage() {
           <Card>
             <div className="p-4">
               <div className="flex items-center">
-                <CogIcon className="h-8 w-8 text-orange-600" />
+                <ClockIcon className="h-8 w-8 text-orange-600" />
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Techniciens</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.byRole.technicien}</p>
+                  <p className="text-sm font-medium text-gray-500">En attente</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
                 </div>
               </div>
             </div>
@@ -259,7 +387,17 @@ export default function AdminUsersPage() {
                   <option value={UserRole.TECHNICIEN}>Techniciens</option>
                 </select>
                 
-                
+                {activeTab === 'approvals' && (
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="ALL">Tous les statuts</option>
+                    <option value="PENDING">En attente</option>
+                    <option value="APPROVED">Approuvés</option>
+                  </select>
+                )}
               </div>
               
               <div className="flex items-center space-x-2">
@@ -320,7 +458,6 @@ export default function AdminUsersPage() {
                             <span className={`px-2 py-1 text-xs rounded-full ${getRoleColor(user.role)}`}>
                               {getRoleLabel(user.role)}
                             </span>
-                            
                           </div>
                           
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -348,11 +485,44 @@ export default function AdminUsersPage() {
                               </span>
                             </div>
                           )}
+
+                          {/* Statut d'approbation */}
+                          {user.isApproved !== undefined && (
+                            <div className="flex items-center mt-1">
+                              {user.isApproved ? (
+                                <span className="flex items-center text-sm text-green-600">
+                                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                  Approuvé {user.approvedAt && `le ${formatDate(user.approvedAt)}`}
+                                </span>
+                              ) : (
+                                <span className="flex items-center text-sm text-orange-600">
+                                  <ClockIcon className="h-4 w-4 mr-1" />
+                                  En attente d'approbation
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                       
                       {/* Actions */}
                       <div className="flex items-center space-x-2">
+                        {/* Bouton Activer/Désactiver (sauf pour ADMIN et SUPER_ADMIN) */}
+                        {user.role !== UserRole.ADMIN && user.role !== 'SUPER_ADMIN' && (
+                          <button
+                            onClick={() => handleApproval(user.id, !user.isApproved)}
+                            disabled={processingUser === user.id}
+                            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors disabled:opacity-50 ${
+                              user.isApproved 
+                                ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                : 'bg-green-100 text-green-800 hover:bg-green-200'
+                            }`}
+                            title={user.isApproved ? "Désactiver le compte" : "Activer le compte"}
+                          >
+                            {user.isApproved ? 'Désactiver' : 'Activer'}
+                          </button>
+                        )}
+                        
                         <button
                           onClick={() => setShowUserDetails(showUserDetails === user.id ? null : user.id)}
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -360,26 +530,31 @@ export default function AdminUsersPage() {
                         >
                           <EyeIcon className="h-4 w-4" />
                         </button>
-                                                 <button
-                           onClick={() => toggleUserRole(user.id, user.role)}
-                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                           title="Changer le rôle"
-                         >
-                           <StarIcon className="h-4 w-4" />
-                         </button>
-                        <button
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Modifier"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteUser(user.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Supprimer"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
+                        
+                        {user.isApproved !== false && (
+                          <>
+                            <button
+                              onClick={() => toggleUserRole(user.id, user.role)}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Changer le rôle"
+                            >
+                              <StarIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Modifier"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteUser(user.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Supprimer"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                     
@@ -393,9 +568,16 @@ export default function AdminUsersPage() {
                               <p><strong>ID :</strong> {user.id}</p>
                               <p><strong>Email :</strong> {user.email}</p>
                               {user.phone && <p><strong>Téléphone :</strong> {user.phone}</p>}
-                                                             <p><strong>Rôle :</strong> {getRoleLabel(user.role)}</p>
-                               <p><strong>Inscrit le :</strong> {formatDate(user.createdAt)}</p>
-                               <p><strong>Dernière mise à jour :</strong> {formatDate(user.updatedAt)}</p>
+                              <p><strong>Rôle :</strong> {getRoleLabel(user.role)}</p>
+                              <p><strong>Inscrit le :</strong> {formatDate(user.createdAt)}</p>
+                              {user.updatedAt && <p><strong>Dernière mise à jour :</strong> {formatDate(user.updatedAt)}</p>}
+                              {user.isApproved !== undefined && (
+                                <p><strong>Statut :</strong> {user.isApproved ? 'Approuvé' : 'En attente'}</p>
+                              )}
+                              {user.bio && <p><strong>Bio :</strong> {user.bio}</p>}
+                              {user.skillLevel && <p><strong>Niveau :</strong> {user.skillLevel}</p>}
+                              {user.musicalExperience && <p><strong>Expérience :</strong> {user.musicalExperience} ans</p>}
+                              {user.canLead && <p><strong>Peut diriger :</strong> Oui</p>}
                             </div>
                           </div>
                           <div>
@@ -422,6 +604,51 @@ export default function AdminUsersPage() {
                 </Card>
               );
             })}
+          </div>
+        )}
+
+        {/* Modal de changement de rôle */}
+        {showRoleModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Changer le rôle de l'utilisateur
+              </h3>
+              
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">
+                  Rôle actuel: <span className="font-medium">{getRoleLabel(showRoleModal.currentRole)}</span>
+                </p>
+              </div>
+
+              <div className="space-y-2 mb-6">
+                <p className="text-sm font-medium text-gray-700">Nouveau rôle:</p>
+                {[
+                  { value: UserRole.ADMIN, label: 'Administrateur', color: 'bg-red-100 text-red-800 hover:bg-red-200' },
+                  { value: UserRole.CHEF_LOUANGE, label: 'Chef de Louange', color: 'bg-purple-100 text-purple-800 hover:bg-purple-200' },
+                  { value: UserRole.MUSICIEN, label: 'Musicien', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
+                  { value: UserRole.TECHNICIEN, label: 'Technicien', color: 'bg-orange-100 text-orange-800 hover:bg-orange-200' }
+                ].filter(role => role.value !== showRoleModal.currentRole).map(role => (
+                  <button
+                    key={role.value}
+                    onClick={() => updateUserRole(role.value)}
+                    disabled={processingUser === showRoleModal.userId}
+                    className={`w-full p-3 text-left rounded-lg transition-colors disabled:opacity-50 ${role.color}`}
+                  >
+                    {role.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowRoleModal(null)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

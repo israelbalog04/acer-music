@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { UserRole } from "@prisma/client";
 
 const registerSchema = z.object({
@@ -74,14 +74,15 @@ export async function POST(request: NextRequest) {
         instruments: JSON.stringify(validatedData.instruments),
         isApproved: isApproved, // Auto-approuvé si admin
         churchId: validatedData.churchId,
-      },
-      include: {
-        church: {
-          select: {
-            name: true,
-            city: true
-          }
-        }
+      }
+    });
+
+    // Récupérer l'église pour les données de réponse
+    const churchDetails = await prisma.church.findUnique({
+      where: { id: validatedData.churchId },
+      select: {
+        name: true,
+        city: true
       }
     });
 
@@ -126,8 +127,8 @@ export async function POST(request: NextRequest) {
         instruments: user.instruments,
         churchId: user.churchId,
         isApproved: user.isApproved,
-        churchName: user.church.name,
-        churchCity: user.church.city,
+        churchName: churchDetails?.name || '',
+        churchCity: churchDetails?.city || '',
         createdAt: user.createdAt
       }
     });

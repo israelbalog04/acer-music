@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UserRole, ScheduleStatus } from '@prisma/client';
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       where: { email: session.user.email }
     });
 
-    if (!user || !(user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CHEF_LOUANGE)) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 

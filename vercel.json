@@ -6,5 +6,15 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "env": {
+    "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true",
+    "DATABASE_URL": "@database_url"
+  },
+  "crons": [
+    {
+      "path": "/api/health-check",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }

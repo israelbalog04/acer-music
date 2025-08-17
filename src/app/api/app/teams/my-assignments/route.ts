@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { UserRole } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
@@ -31,21 +31,23 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         churchId: user.churchId
       },
-      include: {
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            date: true,
-            type: true,
-            startTime: true,
-            endTime: true
-          }
-        }
-      },
       orderBy: [
-        { schedule: { date: 'asc' } }
+        { createdAt: 'desc' }
       ]
+    });
+
+    // Récupérer les événements associés
+    const teamScheduleIds = teamAssignments.map(a => a.scheduleId);
+    const teamSchedules = await prisma.schedule.findMany({
+      where: { id: { in: teamScheduleIds } },
+      select: {
+        id: true,
+        title: true,
+        date: true,
+        type: true,
+        startTime: true,
+        endTime: true
+      }
     });
 
     // Récupérer les affectations de directeur d'événement
@@ -54,19 +56,28 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         churchId: user.churchId
       },
-      include: {
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            date: true
-          }
-        }
-      },
       orderBy: [
-        { schedule: { date: 'asc' } }
+        { createdAt: 'desc' }
       ]
     });
+
+    // Récupérer les événements associés aux directeurs
+    const directorScheduleIds = directorAssignments.map(a => a.scheduleId);
+    const directorSchedules = await prisma.schedule.findMany({
+      where: { id: { in: directorScheduleIds } },
+      select: {
+        id: true,
+        title: true,
+        date: true,
+        type: true,
+        startTime: true,
+        endTime: true
+      }
+    });
+
+    // Créer des maps pour un accès rapide
+    const teamScheduleMap = new Map(teamSchedules.map(s => [s.id, s]));
+    const directorScheduleMap = new Map(directorSchedules.map(s => [s.id, s]));
 
     // Formater les données
     const formattedTeamAssignments = teamAssignments.map(assignment => ({
@@ -75,14 +86,14 @@ export async function GET(request: NextRequest) {
       role: assignment.role,
       instruments: assignment.instruments ? JSON.parse(assignment.instruments) : [],
       createdAt: assignment.createdAt,
-      schedule: assignment.schedule
+      schedule: teamScheduleMap.get(assignment.scheduleId)
     }));
 
     const formattedDirectorAssignments = directorAssignments.map(assignment => ({
       id: assignment.id,
       scheduleId: assignment.scheduleId,
       createdAt: assignment.createdAt,
-      schedule: assignment.schedule
+      schedule: directorScheduleMap.get(assignment.scheduleId)
     }));
 
     return NextResponse.json({

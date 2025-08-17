@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Church {
@@ -45,6 +45,7 @@ model Church {
   eventSongs       EventSong[]
   notifications    Notification[]
   musicianImages   MusicianImage[]
+  eventMessages    EventMessage[]
   
   @@map("churches")
 }
@@ -121,6 +122,7 @@ model User {
   notifications              Notification[] @relation("UserNotifications")
   createdNotifications       Notification[] @relation("NotificationCreator")
   musicianImageUploads       MusicianImage[] @relation("MusicianImageUploads")
+  eventMessages              EventMessage[] @relation("EventMessages")
   
   @@map("users")
 }
@@ -292,6 +294,7 @@ model Schedule {
   availabilities Availability[]
   eventSongs  EventSong[]
   musicianImages MusicianImage[]
+  messages    EventMessage[]
   
   @@map("schedules")
 }
@@ -702,6 +705,45 @@ model MusicianImage {
   updatedAt   DateTime @updatedAt
   
   @@map("musician_images")
+}
+
+model EventMessage {
+  id          String   @id @default(cuid())
+  content     String   // Contenu du message
+  messageType MessageType @default(TEXT)
+  
+  // Relations
+  scheduleId  String
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation("EventMessages", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  
+  // Message parent pour les réponses
+  parentId    String?
+  parent      EventMessage? @relation("MessageReplies", fields: [parentId], references: [id])
+  replies     EventMessage[] @relation("MessageReplies")
+  
+  // Métadonnées
+  isEdited    Boolean  @default(false)
+  editedAt    DateTime?
+  isDeleted   Boolean  @default(false)
+  deletedAt   DateTime?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("event_messages")
+}
+
+enum MessageType {
+  TEXT        // Message texte normal
+  SYSTEM      // Message système (assignation, changement, etc.)
+  ANNOUNCEMENT // Annonce importante
 }
 
 enum NotificationType {

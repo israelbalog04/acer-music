@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,20 +82,22 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Top 5 des musiciens les plus programmés (basé sur les assignments)
-    const topAssignedMusicians = await prisma.$queryRaw`
-      SELECT 
-        u.firstName,
-        u.lastName,
-        u.role,
-        COUNT(eta.userId) as assignmentCount
-      FROM users u
-      LEFT JOIN event_team_assignments eta ON u.id = eta.userId
-      WHERE u.churchId = ${user.churchId}
-        AND u.role IN ('MUSICIEN', 'CHEF_LOUANGE', 'TECHNICIEN')
-      GROUP BY u.id, u.firstName, u.lastName, u.role
-      ORDER BY assignmentCount DESC
-      LIMIT 5
-    ` as Array<{
+    const topAssignedMusicians = await prisma.$queryRaw(
+      Prisma.sql`
+        SELECT 
+          u.firstName,
+          u.lastName,
+          u.role,
+          COUNT(eta.userId) as assignmentCount
+        FROM users u
+        LEFT JOIN event_team_assignments eta ON u.id = eta.userId
+        WHERE u.churchId = ${user.churchId}
+          AND u.role IN ('MUSICIEN', 'CHEF_LOUANGE', 'TECHNICIEN')
+        GROUP BY u.id, u.firstName, u.lastName, u.role
+        ORDER BY assignmentCount DESC
+        LIMIT 5
+      `
+    ) as Array<{
       firstName: string;
       lastName: string;
       role: string;
@@ -102,37 +105,41 @@ export async function GET(request: NextRequest) {
     }>;
 
     // Top 5 des chansons les plus utilisées dans les événements
-    const topSongs = await prisma.$queryRaw`
-      SELECT 
-        s.title,
-        s.artist,
-        COUNT(es.songId) as usageCount
-      FROM songs s
-      LEFT JOIN event_songs es ON s.id = es.songId
-      WHERE s.churchId = ${user.churchId}
-      GROUP BY s.id, s.title, s.artist
-      ORDER BY usageCount DESC
-      LIMIT 5
-    ` as Array<{
+    const topSongs = await prisma.$queryRaw(
+      Prisma.sql`
+        SELECT 
+          s.title,
+          s.artist,
+          COUNT(es.songId) as usageCount
+        FROM songs s
+        LEFT JOIN event_songs es ON s.id = es.songId
+        WHERE s.churchId = ${user.churchId}
+        GROUP BY s.id, s.title, s.artist
+        ORDER BY usageCount DESC
+        LIMIT 5
+      `
+    ) as Array<{
       title: string;
       artist: string;
       usageCount: number;
     }>;
 
     // Top 5 des contributeurs (uploads de photos/videos)
-    const topContributors = await prisma.$queryRaw`
-      SELECT 
-        u.firstName,
-        u.lastName,
-        u.role,
-        COUNT(mi.uploadedById) as uploadCount
-      FROM users u
-      LEFT JOIN musician_images mi ON u.id = mi.uploadedById
-      WHERE u.churchId = ${user.churchId}
-      GROUP BY u.id, u.firstName, u.lastName, u.role
-      ORDER BY uploadCount DESC
-      LIMIT 5
-    ` as Array<{
+    const topContributors = await prisma.$queryRaw(
+      Prisma.sql`
+        SELECT 
+          u.firstName,
+          u.lastName,
+          u.role,
+          COUNT(mi.uploadedById) as uploadCount
+        FROM users u
+        LEFT JOIN musician_images mi ON u.id = mi.uploadedById
+        WHERE u.churchId = ${user.churchId}
+        GROUP BY u.id, u.firstName, u.lastName, u.role
+        ORDER BY uploadCount DESC
+        LIMIT 5
+      `
+    ) as Array<{
       firstName: string;
       lastName: string;
       role: string;
@@ -140,39 +147,41 @@ export async function GET(request: NextRequest) {
     }>;
 
     // Activité récente
-    const recentActivity = await prisma.$queryRaw`
-      SELECT 
-        'user' as type,
-        u.firstName || ' ' || u.lastName as message,
-        u.createdAt as timestamp
-      FROM users u
-      WHERE u.churchId = ${user.churchId}
-        AND u.createdAt >= ${dateFrom}
-      
-      UNION ALL
-      
-      SELECT 
-        'recording' as type,
-        r.title || ' par ' || u.firstName || ' ' || u.lastName as message,
-        r.createdAt as timestamp
-      FROM recordings r
-      JOIN users u ON r.uploadedById = u.id
-      WHERE r.churchId = ${user.churchId}
-        AND r.createdAt >= ${dateFrom}
-      
-      UNION ALL
-      
-      SELECT 
-        'event' as type,
-        'Événement: ' || s.eventName as message,
-        s.createdAt as timestamp
-      FROM schedules s
-      WHERE s.churchId = ${user.churchId}
-        AND s.createdAt >= ${dateFrom}
-      
-      ORDER BY timestamp DESC
-      LIMIT 10
-    ` as Array<{
+    const recentActivity = await prisma.$queryRaw(
+      Prisma.sql`
+        SELECT 
+          'user' as type,
+          u.firstName || ' ' || u.lastName as message,
+          u.createdAt as timestamp
+        FROM users u
+        WHERE u.churchId = ${user.churchId}
+          AND u.createdAt >= ${dateFrom}
+        
+        UNION ALL
+        
+        SELECT 
+          'recording' as type,
+          r.title || ' par ' || u.firstName || ' ' || u.lastName as message,
+          r.createdAt as timestamp
+        FROM recordings r
+        JOIN users u ON r.uploadedById = u.id
+        WHERE r.churchId = ${user.churchId}
+          AND r.createdAt >= ${dateFrom}
+        
+        UNION ALL
+        
+        SELECT 
+          'event' as type,
+          'Événement: ' || s.eventName as message,
+          s.createdAt as timestamp
+        FROM schedules s
+        WHERE s.churchId = ${user.churchId}
+          AND s.createdAt >= ${dateFrom}
+        
+        ORDER BY timestamp DESC
+        LIMIT 10
+      `
+    ) as Array<{
       type: string;
       message: string;
       timestamp: Date;

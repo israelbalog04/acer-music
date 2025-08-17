@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -35,31 +35,44 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         title: true,
-        createdAt: true,
-        song: {
-          select: {
-            title: true
-          }
-        },
-        user: {
-          select: {
-            firstName: true,
-            lastName: true
-          }
-        }
+        songId: true,
+        userId: true,
+        createdAt: true
       }
     });
 
+    // Récupérer les chansons et utilisateurs associés
+    const songIds = recentRecordings.map(r => r.songId).filter(Boolean) as string[];
+    const userIds = recentRecordings.map(r => r.userId).filter(Boolean) as string[];
+
+    const songs = await prisma.song.findMany({
+      where: { id: { in: songIds } },
+      select: { id: true, title: true }
+    });
+
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, firstName: true, lastName: true }
+    });
+
+    // Créer des maps pour un accès rapide
+    const songMap = new Map(songs.map(s => [s.id, s]));
+    const userMap = new Map(users.map(u => [u.id, u]));
+
     // Formater les uploads
-    const uploads = recentRecordings.map(recording => ({
-      id: recording.id,
-      song: recording.song?.title || recording.title,
-      instrument: 'Enregistrement',
-      uploadedAt: new Date(recording.createdAt).toLocaleDateString('fr-FR'),
-      plays: Math.floor(Math.random() * 50) + 1, // Simulation du nombre d'écoutes
-      status: 'approuvé',
-      uploadedBy: `${recording.user?.firstName} ${recording.user?.lastName}`
-    }));
+    const uploads = recentRecordings.map(recording => {
+      const song = recording.songId ? songMap.get(recording.songId) : null;
+      const user = recording.userId ? userMap.get(recording.userId) : null;
+      return {
+        id: recording.id,
+        song: song?.title || recording.title,
+        instrument: 'Enregistrement',
+        uploadedAt: new Date(recording.createdAt).toLocaleDateString('fr-FR'),
+        plays: Math.floor(Math.random() * 50) + 1, // Simulation du nombre d'écoutes
+        status: 'approuvé',
+        uploadedBy: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Utilisateur inconnu'
+      };
+    });
 
     return NextResponse.json({
       success: true,

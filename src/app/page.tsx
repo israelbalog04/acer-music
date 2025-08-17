@@ -90,15 +90,16 @@ export default function Home() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="w-full sm:w-auto px-8 py-4 text-lg font-semibold border-2 border-[#3244c7] text-[#3244c7] hover:bg-[#3244c7] hover:text-white transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl"
+                className="w-full sm:w-auto"
               >
                 Se connecter
               </Button>
             </Link>
             <Link href="/auth/register">
               <Button 
+                variant="primary"
                 size="lg" 
-                className="w-full sm:w-auto px-8 py-4 text-lg font-semibold bg-[#3244c7] hover:bg-[#2938b3] transition-all duration-300 hover:scale-105 shadow-xl shadow-[#3244c7]/30 rounded-xl hover:shadow-2xl"
+                className="w-full sm:w-auto"
               >
                 Créer un compte
               </Button>

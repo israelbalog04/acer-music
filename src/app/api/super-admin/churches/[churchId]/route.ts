@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -126,7 +126,7 @@ export async function DELETE(
     }
 
     // Vérifier s'il y a des utilisateurs dans cette église
-    if (existingChurch._count.users > 0) {
+    if ((existingChurch as any)._count?.users > 0) {
       return NextResponse.json(
         { error: "Impossible de supprimer une église qui contient des utilisateurs" },
         { status: 400 }

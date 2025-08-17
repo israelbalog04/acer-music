@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -15,18 +15,35 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CHEF_LOUANGE') {
       return NextResponse.json(
-        { error: "Accès refusé. Rôle admin requis." },
+        { error: "Accès refusé. Rôle admin ou chef de louange requis." },
         { status: 403 }
       );
     }
 
-    // Récupérer tous les utilisateurs de l'église de l'admin
+    // Construire les filtres selon le rôle de l'utilisateur
+    let whereClause: any = { churchId: session.user.churchId };
+    
+    // Les ADMIN ne peuvent pas voir les SUPER_ADMIN
+    if (session.user.role === 'ADMIN') {
+      whereClause.role = {
+        not: 'SUPER_ADMIN'
+      };
+    }
+    
+    // Les CHEF_LOUANGE ne peuvent pas voir les ADMIN ni les SUPER_ADMIN
+    if (session.user.role === 'CHEF_LOUANGE') {
+      whereClause.role = {
+        not: {
+          in: ['ADMIN', 'SUPER_ADMIN']
+        }
+      };
+    }
+
+    // Récupérer les utilisateurs selon les permissions
     const users = await prisma.user.findMany({
-      where: {
-        churchId: session.user.churchId
-      },
+      where: whereClause,
       select: {
         id: true,
         firstName: true,

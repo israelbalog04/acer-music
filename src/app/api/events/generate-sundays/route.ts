@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { UserRole } from '@prisma/client';
 import { notifyAllMusicians, NotificationTemplates } from '@/lib/notifications';
 
@@ -9,12 +9,23 @@ import { notifyAllMusicians, NotificationTemplates } from '@/lib/notifications';
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+    console.log('🔍 Session pour génération dimanches:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      email: session?.user?.email,
+      role: session?.user?.role,
+      churchId: session?.user?.churchId,
+      isApproved: session?.user?.isApproved
+    });
+
     if (!session?.user?.churchId) {
+      console.log('❌ Pas de churchId dans la session');
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
     // Seuls les admins peuvent générer les dimanches
     if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
+      console.log('❌ Rôle insuffisant:', session.user.role, 'requis:', [UserRole.ADMIN, UserRole.CHEF_LOUANGE]);
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
@@ -141,11 +152,22 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+    console.log('🔍 Session pour preview dimanches:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      email: session?.user?.email,
+      role: session?.user?.role,
+      churchId: session?.user?.churchId,
+      isApproved: session?.user?.isApproved
+    });
+
     if (!session?.user?.churchId) {
+      console.log('❌ Pas de churchId dans la session (preview)');
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
     if (session.user.role !== UserRole.ADMIN && session.user.role !== UserRole.CHEF_LOUANGE) {
+      console.log('❌ Rôle insuffisant (preview):', session.user.role, 'requis:', [UserRole.ADMIN, UserRole.CHEF_LOUANGE]);
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 

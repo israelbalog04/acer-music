@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { pooledPrisma as prisma } from "@/lib/prisma-pool";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -34,8 +34,19 @@ export async function POST(request: NextRequest) {
 
     // Vérifier que l'utilisateur existe et appartient à la même église
     const userToApprove = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { church: true }
+      where: { id: userId }
+    });
+
+    if (!userToApprove) {
+      return NextResponse.json(
+        { error: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    // Récupérer l'église pour les notifications
+    const church = await prisma.church.findUnique({
+      where: { id: userToApprove.churchId }
     });
 
     if (!userToApprove) {
@@ -76,8 +87,8 @@ export async function POST(request: NextRequest) {
       data: {
         title: approved ? 'Compte approuvé' : 'Compte refusé',
         message: approved 
-          ? `Votre compte a été approuvé par l'administrateur de ${userToApprove.church.name}. Vous pouvez maintenant vous connecter.`
-          : `Votre demande d'inscription pour ${userToApprove.church.name} a été refusée. Veuillez contacter l'administrateur pour plus d'informations.`,
+          ? `Votre compte a été approuvé par l'administrateur de ${church?.name || 'l\'église'}. Vous pouvez maintenant vous connecter.`
+          : `Votre demande d'inscription pour ${church?.name || 'l\'église'} a été refusée. Veuillez contacter l'administrateur pour plus d'informations.`,
         type: approved ? 'SUCCESS' : 'WARNING',
         priority: 'HIGH',
         userId: userId,
@@ -96,8 +107,8 @@ export async function POST(request: NextRequest) {
         lastName: updatedUser.lastName,
         role: updatedUser.role,
         isApproved: updatedUser.isApproved,
-        churchName: updatedUser.church.name,
-        churchCity: updatedUser.church.city,
+        churchName: church?.name || '',
+        churchCity: church?.city || '',
       }
     });
 

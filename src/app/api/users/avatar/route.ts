@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { StorageService } from '@/lib/storage';
 
 // POST /api/users/avatar - Upload avatar
@@ -71,8 +71,21 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erreur upload avatar:', error);
+    
+    // Détails d'erreur pour le debug
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
+      type: error instanceof Error ? error.constructor.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined
+    };
+    
+    console.error('Détails erreur:', errorDetails);
+    
     return NextResponse.json(
-      { error: 'Erreur lors de l\'upload' },
+      { 
+        error: 'Erreur lors de l\'upload',
+        details: process.env.NODE_ENV === 'development' ? errorDetails : undefined
+      },
       { status: 500 }
     );
   }
