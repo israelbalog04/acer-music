@@ -10,10 +10,6 @@ import {
   generateFileName,
   type StorageBucket 
 } from './supabase-storage';
-import { 
-  createGoogleDriveStorage, 
-  type GoogleDriveUploadOptions 
-} from './google-drive-storage';
 
 // Configuration des différents systèmes de stockage
 const s3Client = process.env.AWS_ACCESS_KEY_ID ? new S3Client({
@@ -26,14 +22,10 @@ const s3Client = process.env.AWS_ACCESS_KEY_ID ? new S3Client({
 
 const S3_BUCKET = process.env.AWS_S3_BUCKET || 'acer-music-files';
 
-// Instance Google Drive
-const googleDriveClient = createGoogleDriveStorage();
-
 // Déterminer le type de stockage à utiliser
-const STORAGE_TYPE = process.env.STORAGE_TYPE || 'local'; // 'local', 'supabase', 's3', 'gdrive'
+const STORAGE_TYPE = process.env.STORAGE_TYPE || 'local'; // 'local', 'supabase', 's3'
 const USE_S3 = STORAGE_TYPE === 's3' && s3Client;
 const USE_SUPABASE = STORAGE_TYPE === 'supabase';
-const USE_GDRIVE = STORAGE_TYPE === 'gdrive' && googleDriveClient;
 
 export interface FileUploadResult {
   url: string;
@@ -199,6 +191,7 @@ export class StorageService {
     };
   }
 
+
   /**
    * Supprimer un fichier
    */
@@ -260,11 +253,16 @@ export class StorageService {
    * Obtenir la configuration actuelle
    */
   static getStorageInfo() {
+    let mode = 'Local';
+    if (USE_SUPABASE) mode = 'Supabase';
+    else if (USE_S3) mode = 'S3';
+
     return {
-      mode: USE_S3 ? 'S3' : 'Local',
+      mode,
       bucket: S3_BUCKET,
       region: process.env.AWS_REGION || 'eu-west-3',
       cdnUrl: process.env.AWS_CLOUDFRONT_URL || null,
+      storageType: STORAGE_TYPE,
     };
   }
 }

@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "migrate:prod": "node scripts/production-migrate.js",
     "test": "echo 'Tests unitaires à implémenter'",
     "test:integration": "echo \"Tests d'intégration à implémenter\"",
     "test:coverage": "echo 'Couverture de tests à implémenter'",

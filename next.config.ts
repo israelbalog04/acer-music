@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
   // Désactiver ESLint pendant le build (temporaire - bug Next.js 15)
   eslint: {
     ignoreDuringBuilds: true
+  },
+  // Configuration des images pour autoriser les domaines externes
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'butlptmveyaluxlnwizr.supabase.co',
+        port: '',
+        pathname: '/storage/**',
+      }
+    ],
   }
 };
 

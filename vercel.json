@@ -2,19 +2,25 @@
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm ci",
   "framework": "nextjs",
+  "regions": ["fra1"],
+  "env": {
+    "NODE_ENV": "production",
+    "STORAGE_TYPE": "supabase"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
   "functions": {
-    "app/api/**/*.ts": {
+    "src/app/api/**": {
       "maxDuration": 30
     }
   },
-  "env": {
-    "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true",
-    "DATABASE_URL": "@database_url"
-  },
   "crons": [
     {
-      "path": "/api/health-check",
-      "schedule": "0 */6 * * *"
+      "path": "/api/health",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

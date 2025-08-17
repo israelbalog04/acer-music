@@ -1,0 +1,472 @@
+
+> acer-music@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.106:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · cpus: 1
+
+ ✓ Starting...
+ ✓ Compiled middleware in 345ms
+ ✓ Ready in 2.1s
+ ○ Compiling /api/debug/storage-info ...
+ ✓ Compiled /api/debug/storage-info in 4.4s
+Configuration Google Drive incomplète
+ GET /api/debug/storage-info 200 in 6017ms
+ ○ Compiling /debug/avatar ...
+ ✓ Compiled /debug/avatar in 3s
+ ⨯ ./src/app/debug/avatar/page.tsx:179:67
+Parsing ecmascript source code failed
+[0m [90m 177 |[39m             [33m<[39m[33mli[39m[33m>[39m• [33m<[39m[33mstrong[39m[33m>[39m[35m401[39m [33mNon[39m autorisé[33m:[39m[33m<[39m[33m/[39m[33mstrong[39m[33m>[39m [33mSession[39m expirée[33m,[39m reconnectez[33m-[39mvous[33m<[39m[33m/[39m[33mli[39m[33m>[39m
+ [90m 178 |[39m             [33m<[39m[33mli[39m[33m>[39m• [33m<[39m[33mstrong[39m[33m>[39m[35m400[39m [33mType[39m non supporté[33m:[39m[33m<[39m[33m/[39m[33mstrong[39m[33m>[39m [33mUtilisez[39m [33mJPEG[39m[33m,[39m [33mPNG[39m ou [33mWebP[39m[33m<[39m[33m/[39m[33mli[39m[33m>[39m
+[31m[1m>[22m[39m[90m 179 |[39m             [33m<[39m[33mli[39m[33m>[39m• [33m<[39m[33mstrong[39m[33m>[39m[35m400[39m [33mTrop[39m volumineux[33m:[39m[33m<[39m[33m/[39m[33mstrong[39m[33m>[39m [33mFichier[39m [33m>[39m [35m5[39m[33mMB[39m[33m<[39m[33m/[39m[33mli[39m[33m>[39m
+ [90m     |[39m                                                                   [31m[1m^[22m[39m
+ [90m 180 |[39m             [33m<[39m[33mli[39m[33m>[39m• [33m<[39m[33mstrong[39m[33m>[39m[35m500[39m [33mErreur[39m serveur[33m:[39m[33m<[39m[33m/[39m[33mstrong[39m[33m>[39m [33mProblème[39m de configuration stockage[33m<[39m[33m/[39m[33mli[39m[33m>[39m
+ [90m 181 |[39m             [33m<[39m[33mli[39m[33m>[39m• [33m<[39m[33mstrong[39m[33m>[39m[33mNetwork[39m error[33m:[39m[33m<[39m[33m/[39m[33mstrong[39m[33m>[39m [33mProblème[39m de connexion[33m<[39m[33m/[39m[33mli[39m[33m>[39m
+ [90m 182 |[39m           [33m<[39m[33m/[39m[33mul[39m[33m>[39m[0m
+
+Unexpected token. Did you mean `{'>'}` or `&gt;`?
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1311ms
+ GET /debug/avatar 500 in 4535ms
+ ✓ Compiled in 192ms
+ ✓ Compiled /debug/avatar in 21ms
+ GET /debug/avatar 200 in 397ms
+ ✓ Compiled /auth/login in 461ms
+ GET /auth/login 200 in 594ms
+   Reload env: .env.local
+   Reload env: .env.local
+   Reload env: .env.local
+Configuration Google Drive incomplète
+ GET /api/debug/storage-info 200 in 2011ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1467ms
+ GET / 200 in 1769ms
+ ○ Compiling /_not-found/page ...
+ GET /apple-touch-icon-precomposed.png 404 in 740ms
+ GET /apple-touch-icon.png 404 in 93ms
+ ✓ Compiled /_not-found/page in 1066ms
+ GET /auth/login 200 in 95ms
+ GET /api/auth/session 200 in 1863ms
+ GET /api/auth/providers 200 in 38ms
+ GET /api/auth/csrf 200 in 38ms
+🔍 NextAuth authorize called with: { email: 'lolo@gmail.com' }
+✅ User found: lolo@gmail.com ADMIN
+🔑 Password check: VALID
+✅ Auth successful, returning user: lolo@gmail.com
+ POST /api/auth/callback/credentials 200 in 362ms
+ GET /api/auth/session 200 in 34ms
+ ○ Compiling /app ...
+ ✓ Compiled /app in 564ms
+ GET /app 200 in 685ms
+ GET /api/auth/session 200 in 98ms
+ ○ Compiling /api/notifications ...
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/dashboard/upcoming-services 200 in 857ms
+ ✓ Compiled /api/notifications in 987ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion obtenue (3/10)
+🌊 Connexion obtenue (4/10)
+🌊 Connexion obtenue (5/10)
+🌊 Connexion libérée (4/10)
+🌊 Connexion libérée (3/10)
+🌊 Connexion libérée (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/dashboard/stats 200 in 1109ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/dashboard/recent-uploads 200 in 1345ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/notifications?unread=true&limit=10 200 in 1499ms
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 879ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/dashboard/activity 200 in 1595ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 766ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 165ms
+ ✓ Compiled /app/account/profile in 375ms
+ GET /app/account/profile 200 in 427ms
+ ✓ Compiled /api/users/profile in 156ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/users/profile 200 in 227ms
+🌊 Connexion libérée (0/10)
+ GET /api/users/profile 200 in 225ms
+ ○ Compiling /api/users/avatar ...
+ ✓ Compiled /api/users/avatar in 839ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ POST /api/users/avatar 200 in 948ms
+ GET /api/auth/session 200 in 70ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/notifications?unread=true&limit=10 200 in 95ms
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 95ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 69ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 44ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 47ms
+Configuration Google Drive incomplète
+ GET /api/debug/storage-info 200 in 1511ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 45ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 44ms
+ GET /api/auth/session 200 in 106ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 171ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 183ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 74ms
+ GET /api/auth/session 200 in 48ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 68ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 73ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 56ms
+ GET /api/auth/session 200 in 69ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 131ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 137ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 58ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 45ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 40ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 39ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 37ms
+ ○ Compiling /auth/register ...
+ ✓ Compiled /auth/register in 931ms
+ GET /auth/register 200 in 1027ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 42ms
+ GET /auth/register 200 in 173ms
+ GET /api/auth/session 200 in 69ms
+ GET /api/auth/session 200 in 46ms
+ ✓ Compiled /api/churches in 270ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/churches 200 in 389ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 161ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 165ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 32ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 109ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 43ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 38ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 42ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 40ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 39ms
+ ○ Compiling /app/account/notifications ...
+ ✓ Compiled /app/account/notifications in 830ms
+ GET /app/account/notifications 200 in 1078ms
+ GET /app/account/profile 200 in 188ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 201ms
+ GET /api/auth/session 200 in 190ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 226ms
+ GET /api/auth/session 200 in 216ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/users/profile 200 in 242ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 220ms
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 224ms
+ GET /api/auth/session 200 in 123ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 125ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/notifications?unread=true&limit=10 200 in 129ms
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 127ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 78ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 86ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 92ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 71ms
+ ○ Compiling /app/team/events ...
+ ✓ Compiled /app/team/events in 543ms
+ GET /app/team/events 200 in 818ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 141ms
+ GET /api/auth/session 200 in 147ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 91ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=10 200 in 107ms
+ GET /api/auth/session 200 in 71ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 69ms
+ ○ Compiling /api/teams/by-events ...
+ ✓ Compiled /api/teams/by-events in 523ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/teams/by-events?limit=50&includeCompleted=false 200 in 696ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion obtenue (2/10)
+🌊 Connexion libérée (1/10)
+ GET /api/notifications?unread=true&limit=10 200 in 76ms
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 78ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 67ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 76ms
+   Reload env: .env.local
+ GET /app/account/profile 200 in 264ms
+   Reload env: .env.local
+ GET /app/account/profile 200 in 199ms
+Configuration Google Drive incomplète
+ GET /api/debug/storage-info 200 in 1603ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 143ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 70ms
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+🌊 Connexion obtenue (1/10)
+🌊 Connexion libérée (0/10)
+ GET /api/notifications?unread=true&limit=1000 200 in 98ms
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.106:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · cpus: 1
+
+ ✓ Starting...
+ ○ Compiling middleware ...
+ ✓ Compiled middleware in 552ms
+ ✓ Ready in 2.5s
+ ○ Compiling /api/debug/storage-info ...
+ ✓ Compiled /api/debug/storage-info in 4.2s
+Configuration Google Drive incomplète
+ GET /api/debug/storage-info 200 in 6100ms
+   Reload env: .env.local
+   Reload env: .env
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.106:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · cpus: 1
+
+ ✓ Starting...
+ ✓ Compiled middleware in 437ms
+ ✓ Ready in 2.4s
+ ○ Compiling /api/debug/storage-info ...
+ ✓ Compiled /api/debug/storage-info in 2.3s
+ GET /api/debug/storage-info 200 in 2783ms
+ ✓ Compiled middleware in 1ms
