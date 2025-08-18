@@ -470,3 +470,578 @@ Configuration Google Drive incomplète
  ✓ Compiled /api/debug/storage-info in 2.3s
  GET /api/debug/storage-info 200 in 2783ms
  ✓ Compiled middleware in 1ms
+ ○ Compiling /api/notifications ...
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0tu14jreybtn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0tu14jreybtn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n1j38de3ttq'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n1j38de3ttq'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zkrxb2kq5c'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zkrxb2kq5c'
+}
+ ✓ Compiled /api/notifications in 3.6s
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xezczleb1i'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xezczleb1i'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.p606e5vcuo'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.p606e5vcuo'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.c8s2hsnv7hc'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.c8s2hsnv7hc'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n1j38de3ttq'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n1j38de3ttq'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zkrxb2kq5c'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zkrxb2kq5c'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0tu14jreybtn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0tu14jreybtn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.k1mwy0zxip'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.k1mwy0zxip'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ihfzmng8b89'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ihfzmng8b89'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.hgb7ke3srb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.hgb7ke3srb'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.9pd58rkbshf'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.9pd58rkbshf'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.jnumfqaazl'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.jnumfqaazl'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ti8udv93p1s'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ti8udv93p1s'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7mi00wzmxk2'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7mi00wzmxk2'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rv1186h74'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rv1186h74'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7mi00wzmxk2'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7mi00wzmxk2'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.eufqytbc1gn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.eufqytbc1gn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e2jxhe4zfgb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e2jxhe4zfgb'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nnspxnh2b4p'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nnspxnh2b4p'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.mx6skokkrzq'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.mx6skokkrzq'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.tp7kv7mokp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.tp7kv7mokp'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n5j468vjmm'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n5j468vjmm'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.eufqytbc1gn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.eufqytbc1gn'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e2jxhe4zfgb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e2jxhe4zfgb'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7ydqdzd5kiy'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.7ydqdzd5kiy'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fyvuu25dfch'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fyvuu25dfch'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fzpx8boont4'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fzpx8boont4'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0zimr4ivapzh'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.0zimr4ivapzh'
+}
+   Reload env: .env.local
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6j5fqz9vyov'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6j5fqz9vyov'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.koecg7egk4g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.koecg7egk4g'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zw3i65228h'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zw3i65228h'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.u2pfyv5fxc9'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.u2pfyv5fxc9'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.kvwq0yrho4j'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.kvwq0yrho4j'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.vm0afphixdb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.vm0afphixdb'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e0c1ocqi1ek'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.e0c1ocqi1ek'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.njbygj2qs0c'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.njbygj2qs0c'
+}
+ ○ Compiling /auth/register ...
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6j5fqz9vyov'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6j5fqz9vyov'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.u2pfyv5fxc9'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.u2pfyv5fxc9'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zw3i65228h'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zw3i65228h'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.koecg7egk4g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.koecg7egk4g'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.kbf0ugdqtw'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.kbf0ugdqtw'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.aq1807ob2ca'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.aq1807ob2ca'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.10sl6afyl95c'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.10sl6afyl95c'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fpb4ps7ckow'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fpb4ps7ckow'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ja5ifu1eiq'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ja5ifu1eiq'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ttoux76mps9'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ttoux76mps9'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ybsg47r0rmf'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ybsg47r0rmf'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.l0a8c99h73m'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.l0a8c99h73m'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w58feg1onls'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w58feg1onls'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.qn2cmi3t1mo'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.qn2cmi3t1mo'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nx4zud21pqb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nx4zud21pqb'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rfsrdav37ki'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rfsrdav37ki'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.3t5id3f5135'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.3t5id3f5135'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.m2i6z6ahox'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.m2i6z6ahox'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ztifaox05p'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ztifaox05p'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ez89ohyk3lh'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ez89ohyk3lh'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.a6ttcxt2p2d'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.a6ttcxt2p2d'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w58feg1onls'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w58feg1onls'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.v4p3g5zmmlc'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.v4p3g5zmmlc'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.qn2cmi3t1mo'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.qn2cmi3t1mo'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nx4zud21pqb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.nx4zud21pqb'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rfsrdav37ki'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.rfsrdav37ki'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fa00phty1kg'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.fa00phty1kg'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.m2i6z6ahox'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.m2i6z6ahox'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.hpqqpzg0as5'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.hpqqpzg0as5'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.x9aj5bx839a'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.x9aj5bx839a'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zzsicy7iw5n'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zzsicy7iw5n'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.horz7gmw2cj'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.horz7gmw2cj'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.o27mntiswyc'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.o27mntiswyc'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.x2xx2wuqag'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.x2xx2wuqag'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6n42mka8lju'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.6n42mka8lju'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.bc8aslqgivw'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.bc8aslqgivw'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.obcablehhf'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.obcablehhf'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.uawdhayrpxn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.uawdhayrpxn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zm0fgypkyg8'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zm0fgypkyg8'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.uawdhayrpxn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.uawdhayrpxn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xe6nsybffye'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xe6nsybffye'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xb19zrmx1uk'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.xb19zrmx1uk'
+}
+ ✓ Compiled /auth/register in 4.3s
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.529zp4g3gmp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.529zp4g3gmp'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.c95lj3cy6sp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.c95lj3cy6sp'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.529zp4g3gmp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.529zp4g3gmp'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.856b2ngzyjm'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.856b2ngzyjm'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.53ojn2teibs'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.53ojn2teibs'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.lwibhmcijr'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.lwibhmcijr'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zrwwgkteb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.zrwwgkteb'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.lwibhmcijr'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.lwibhmcijr'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n6a5h05sqmr'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.n6a5h05sqmr'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w8701tmuob'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.w8701tmuob'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.s9g86dv64bl'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.s9g86dv64bl'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ov2rywe60a'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.ov2rywe60a'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.s9g86dv64bl'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.s9g86dv64bl'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.gaucosvc7hc'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.gaucosvc7hc'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.a1614msa9u6'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.a1614msa9u6'
+}

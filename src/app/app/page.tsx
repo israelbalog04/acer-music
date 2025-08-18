@@ -373,9 +373,10 @@ export default function DashboardPage() {
                 };
 
                 return (
-                  <div 
+                  <Link 
                     key={service.id} 
-                    className="p-4 bg-gradient-to-r from-neutral-50 to-white rounded-xl border border-neutral-100 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
+                    href={`/app/events/${service.id}`}
+                    className="block p-4 bg-gradient-to-r from-neutral-50 to-white rounded-xl border border-neutral-100 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group cursor-pointer"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="flex items-center justify-between mb-3">
@@ -423,7 +424,7 @@ export default function DashboardPage() {
                         📍 {service.location}
                       </p>
                     )}
-                  </div>
+                  </Link>
                 );
               })
             ) : (
