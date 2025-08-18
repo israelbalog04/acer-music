@@ -21,7 +21,8 @@ import {
   ListBulletIcon,
   TagIcon,
   ClockIcon,
-  UserIcon
+  UserIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
@@ -88,6 +89,30 @@ export default function RepertoirePage() {
   const toggleFavorite = async (songId: string) => {
     // Logique pour ajouter/supprimer des favoris
     console.log('Toggle favorite:', songId);
+  };
+
+  const deleteSong = async (songId: string, songTitle: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${songTitle}" ? Cette action est irréversible.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/songs?id=${songId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        // Mettre à jour la liste des chansons
+        setSongs(prev => prev.filter(song => song.id !== songId));
+        alert('✅ Chanson supprimée avec succès !');
+      } else {
+        const error = await response.json();
+        alert('❌ ' + (error.error || 'Erreur lors de la suppression'));
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('❌ Erreur de connexion');
+    }
   };
 
 
@@ -388,6 +413,17 @@ export default function RepertoirePage() {
                               YouTube
                             </Button>
                           )}
+                          {(userRole === UserRole.ADMIN || userRole === UserRole.CHEF_LOUANGE) && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => deleteSong(song.id, song.title)}
+                              className="text-red-600 border-red-200 hover:bg-red-50 px-2 py-1 text-xs"
+                            >
+                              <TrashIcon className="h-3 w-3 mr-1" />
+                              Supprimer
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -483,6 +519,17 @@ export default function RepertoirePage() {
                             >
                               <PlayIcon className="h-4 w-4 mr-1" />
                               YouTube
+                            </Button>
+                          )}
+                          {(userRole === UserRole.ADMIN || userRole === UserRole.CHEF_LOUANGE) && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => deleteSong(song.id, song.title)}
+                              className="text-red-600 border-red-200 hover:bg-red-50"
+                            >
+                              <TrashIcon className="h-4 w-4 mr-1" />
+                              Supprimer
                             </Button>
                           )}
                         </div>

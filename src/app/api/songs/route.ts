@@ -191,3 +191,46 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// DELETE /api/songs - Supprimer une chanson
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.churchId || (session.user.role !== 'ADMIN' && session.user.role !== 'CHEF_LOUANGE')) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const songId = searchParams.get('id');
+
+    if (!songId) {
+      return NextResponse.json({ error: 'ID de la chanson manquant' }, { status: 400 });
+    }
+
+    // Vérifier que la chanson existe et appartient à l'église
+    const existingSong = await prisma.song.findFirst({
+      where: {
+        id: songId,
+        churchId: session.user.churchId
+      }
+    });
+
+    if (!existingSong) {
+      return NextResponse.json({ error: 'Chanson non trouvée' }, { status: 404 });
+    }
+
+    // Supprimer la chanson (cascade supprimera automatiquement les relations)
+    await prisma.song.delete({
+      where: { id: songId }
+    });
+
+    return NextResponse.json({ message: 'Chanson supprimée avec succès' });
+
+  } catch (error) {
+    console.error('Erreur suppression chanson:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la suppression de la chanson' },
+      { status: 500 }
+    );
+  }
+}
