@@ -9,20 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ACER Brand Colors
+        // ACER Brand Colors with Dynamic Branding Support
         primary: {
-          50: '#f0f4ff',
-          100: '#e0e7ff', 
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#5d6cd4',
-          500: '#3244c7',
-          600: '#3244c7',
-          700: '#2938a8',
-          800: '#1f2b8a',
-          900: '#16206b',
-          950: '#0d1347',
+          50: 'var(--tw-color-primary-50)',
+          100: 'var(--tw-color-primary-100)', 
+          200: 'var(--tw-color-primary-200)',
+          300: 'var(--tw-color-primary-300)',
+          400: 'var(--tw-color-primary-400)',
+          500: 'var(--tw-color-primary-500)',
+          600: 'var(--tw-color-primary-600)',
+          700: 'var(--tw-color-primary-700)',
+          800: 'var(--tw-color-primary-800)',
+          900: 'var(--tw-color-primary-900)',
+          950: 'var(--primary-950)',
         },
+        // Dynamic branding colors
+        'brand-primary': 'var(--color-primary)',
+        'brand-secondary': 'var(--color-secondary)',
+        'brand-accent': 'var(--color-accent)',
+        'brand-background': 'var(--color-background)',
+        'brand-surface': 'var(--color-surface)',
+        'brand-text': 'var(--color-text)',
+        'brand-text-secondary': 'var(--color-text-secondary)',
+        'brand-success': 'var(--color-success)',
+        'brand-warning': 'var(--color-warning)',
+        'brand-error': 'var(--color-error)',
+        'brand-info': 'var(--color-info)',
+        // Accent colors
         accent: {
           cyan: '#a3fffb',
           coral: '#ffa3a3',

@@ -1997,3 +1997,35 @@ To help make Turbopack better, report this error by ]8;;https://github.com/verc
 -----
 
  ✓ Compiled in 18.1s
+ ○ Compiling /api/branding/[organizationId] ...
+ ✓ Compiled /api/branding/[organizationId] in 3s
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.2t9pyte5cph'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.2t9pyte5cph'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.2t9pyte5cph'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/static/development/_buildManifest.js.tmp.2t9pyte5cph'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/pendygefranie/acer-music/.next/server/pages/_app/build-manifest.json'
+}

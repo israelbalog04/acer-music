@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useBranding } from '@/hooks/useBranding';
+import { useBrandingContext } from '@/providers/BrandingProvider';
 import { BrandingTab } from '@/types/branding';
 import { ColorPaletteEditor } from './ColorPicker';
 import { BrandingAssetsEditor } from './AssetUploader';
+import { BrandingTest } from './BrandingTest';
 import { 
   PaintBrushIcon,
   PhotoIcon,
@@ -26,6 +28,7 @@ interface BrandingDashboardProps {
 
 export function BrandingDashboard({ organizationId }: BrandingDashboardProps) {
   const [activeTab, setActiveTab] = useState<BrandingTab>('colors');
+  const { applyTheme } = useBrandingContext();
   
   const {
     config,
@@ -35,9 +38,9 @@ export function BrandingDashboard({ organizationId }: BrandingDashboardProps) {
     isPreviewMode,
     errors,
     warnings,
-    updateColors,
-    updateTypography,
-    updateLayout,
+    updateColors: originalUpdateColors,
+    updateTypography: originalUpdateTypography,
+    updateLayout: originalUpdateLayout,
     updateAssets,
     updateFeatures,
     uploadAsset,
@@ -52,6 +55,32 @@ export function BrandingDashboard({ organizationId }: BrandingDashboardProps) {
     enablePreview: true,
     autoSave: false
   });
+
+  // Wrapper functions to also apply changes via global provider
+  const updateColors = (colors: Record<string, string>) => {
+    originalUpdateColors(colors);
+    // Apply immediately to global theme for real-time preview
+    const newConfig = { ...config, theme: { ...config.theme, colors: { ...config.theme.colors, ...colors } } };
+    if (isPreviewMode) {
+      applyTheme(newConfig);
+    }
+  };
+
+  const updateTypography = (typography: any) => {
+    originalUpdateTypography(typography);
+    const newConfig = { ...config, theme: { ...config.theme, typography: { ...config.theme.typography, ...typography } } };
+    if (isPreviewMode) {
+      applyTheme(newConfig);
+    }
+  };
+
+  const updateLayout = (layout: any) => {
+    originalUpdateLayout(layout);
+    const newConfig = { ...config, layout: { ...config.layout, ...layout } };
+    if (isPreviewMode) {
+      applyTheme(newConfig);
+    }
+  };
 
   const tabs = [
     { id: 'colors' as BrandingTab, label: 'Couleurs', icon: PaintBrushIcon },
@@ -181,6 +210,14 @@ export function BrandingDashboard({ organizationId }: BrandingDashboardProps) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Preview Panel - Fixed at top */}
+        <div className="bg-white border-b border-gray-200 p-4">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Aperçu en temps réel</h4>
+          <div className="bg-gray-50 border rounded-lg overflow-hidden max-h-32 overflow-y-auto">
+            <BrandingTest />
+          </div>
+        </div>
+
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
