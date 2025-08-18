@@ -176,7 +176,7 @@ export default function AvatarDebugPage() {
           <ul className="text-sm text-gray-700 space-y-1">
             <li>• <strong>401 Non autorisé:</strong> Session expirée, reconnectez-vous</li>
             <li>• <strong>400 Type non supporté:</strong> Utilisez JPEG, PNG ou WebP</li>
-            <li>• <strong>400 Trop volumineux:</strong> Fichier > 5MB</li>
+            <li>• <strong>400 Trop volumineux:</strong> Fichier &gt; 5MB</li>
             <li>• <strong>500 Erreur serveur:</strong> Problème de configuration stockage</li>
             <li>• <strong>Network error:</strong> Problème de connexion</li>
           </ul>

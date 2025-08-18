@@ -1,9 +1,10 @@
 const { execSync } = require('child_process');
 
-console.log('🚀 MIGRATION FORCÉE - ACER Music');
-console.log('='.repeat(50));
+async function runMigration() {
+  console.log('🚀 MIGRATION FORCÉE - ACER Music');
+  console.log('='.repeat(50));
 
-try {
+  try {
   console.log('📋 Variables d\'environnement:');
   console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Configurée' : 'MANQUANTE');
   console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -36,42 +37,53 @@ try {
   // 3. Vérifier les tables critiques
   console.log('🔍 Vérification des tables...');
   const { PrismaClient } = require('@prisma/client');
-  const prisma = new PrismaClient();
+  
+  async function verifyTables() {
+    const prisma = new PrismaClient();
+    try {
+      // Test simple sur les tables principales
+      await prisma.church.findMany({ take: 1 });
+      console.log('✅ Table churches accessible');
 
-  try {
-    // Test simple sur les tables principales
-    await prisma.church.findMany({ take: 1 });
-    console.log('✅ Table churches accessible');
+      await prisma.user.findMany({ take: 1 });
+      console.log('✅ Table users accessible');
 
-    await prisma.user.findMany({ take: 1 });
-    console.log('✅ Table users accessible');
+      await prisma.schedule.findMany({ take: 1 });
+      console.log('✅ Table schedules accessible');
 
-    await prisma.schedule.findMany({ take: 1 });
-    console.log('✅ Table schedules accessible');
+      // Test crucial : table event_messages
+      await prisma.eventMessage.findMany({ take: 1 });
+      console.log('✅ Table event_messages accessible - CHAT FONCTIONNEL');
 
-    // Test crucial : table event_messages
-    await prisma.eventMessage.findMany({ take: 1 });
-    console.log('✅ Table event_messages accessible - CHAT FONCTIONNEL');
+    } catch (error) {
+      console.error('❌ Erreur table:', error.message);
+      if (error.message.includes('event_messages')) {
+        console.log('⚠️  Table event_messages manquante - Chat non fonctionnel');
+      }
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  
+  await verifyTables();
+
+    console.log('');
+    console.log('🎉 Migration forcée terminée !');
+    console.log('🌐 Application prête pour la production');
 
   } catch (error) {
-    console.error('❌ Erreur table:', error.message);
-    if (error.message.includes('event_messages')) {
-      console.log('⚠️  Table event_messages manquante - Chat non fonctionnel');
-    }
-  } finally {
-    await prisma.$disconnect();
+    console.error('❌ Erreur lors de la migration forcée:', error.message);
+    console.log('');
+    console.log('🔧 Solutions:');
+    console.log('1. Vérifier DATABASE_URL dans Vercel Dashboard');
+    console.log('2. Exécuter le script SQL manuellement dans Supabase');
+    console.log('3. Vérifier les permissions de la base de données');
+    process.exit(1);
   }
-
-  console.log('');
-  console.log('🎉 Migration forcée terminée !');
-  console.log('🌐 Application prête pour la production');
-
-} catch (error) {
-  console.error('❌ Erreur lors de la migration forcée:', error.message);
-  console.log('');
-  console.log('🔧 Solutions:');
-  console.log('1. Vérifier DATABASE_URL dans Vercel Dashboard');
-  console.log('2. Exécuter le script SQL manuellement dans Supabase');
-  console.log('3. Vérifier les permissions de la base de données');
-  process.exit(1);
 }
+
+// Exécuter la migration
+runMigration().catch((error) => {
+  console.error('❌ Erreur fatale:', error);
+  process.exit(1);
+});
