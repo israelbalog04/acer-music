@@ -129,14 +129,14 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
       >
         <BellIcon className="h-6 w-6 group-hover:scale-110 transition-transform duration-200" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center notification-badge shadow-lg">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center notification-badge shadow-lg font-medium">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {showDropdown && (
-        <div className="absolute top-full right-0 mt-3 w-80 lg:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden notification-dropdown" style={{ transform: 'translateX(calc(-100% + 2.5rem))' }}>
+        <div className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-[500px] overflow-hidden notification-dropdown" style={{ zIndex: 9999, transform: 'translateX(calc(-100% + 2.5rem))' }}>
           {/* Header */}
           <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
             <div className="flex items-center justify-between">
@@ -146,7 +146,8 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
               </h3>
               {unreadCount > 0 && (
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     notifications.forEach(n => markAsRead(n.id));
                   }}
                   className="text-xs text-purple-600 hover:text-purple-800 font-medium"
@@ -172,11 +173,12 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
             ) : (
               <div className="divide-y divide-gray-100">
                 {notifications.map((notification, index) => (
-                                     <div
-                     key={notification.id}
-                     className="p-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group notification-item"
-                     style={{ animationDelay: `${index * 50}ms` }}
-                   >
+                  <div
+                    key={notification.id}
+                    className="relative p-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group notification-item"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
                     <div className="flex items-start space-x-3">
                       {/* Priority indicator */}
                       <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getPriorityColor(notification.priority)}`}></div>
@@ -226,7 +228,7 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
                                 e.stopPropagation();
                                 markAsRead(notification.id);
                               }}
-                              className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors"
+                              className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors z-10 relative"
                               title="Marquer comme lu"
                             >
                               <EyeIcon className="h-3 w-3" />
@@ -235,12 +237,6 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Click overlay */}
-                    <div 
-                      className="absolute inset-0"
-                      onClick={() => handleNotificationClick(notification)}
-                    />
                   </div>
                 ))}
               </div>
@@ -251,7 +247,8 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-200 bg-gray-50">
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setShowDropdown(false);
                   window.location.href = '/app/notifications';
                 }}
@@ -267,7 +264,8 @@ export default function NotificationBadge({ onNotificationUpdate }: Notification
       {/* Overlay pour fermer le dropdown */}
       {showDropdown && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0"
+          style={{ zIndex: 9998 }}
           onClick={() => setShowDropdown(false)}
         />
       )}
