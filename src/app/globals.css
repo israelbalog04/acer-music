@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Design System Colors - ACER Paris Brand */
+  /* Default Design System Colors - ACER Paris Brand */
   --primary-50: #f0f4ff;
   --primary-100: #e0e7ff;
   --primary-200: #c7d2fe;
@@ -15,6 +15,31 @@
   --primary-800: #1f2b8a;
   --primary-900: #16206b;
   --primary-950: #0d1347;
+
+  /* Dynamic Branding Variables - Override with BrandingProvider */
+  --color-primary: var(--primary-600);
+  --color-secondary: var(--primary-300);
+  --color-accent: var(--accent-cyan);
+  --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Tailwind Integration */
+  --tw-color-primary-50: var(--primary-50);
+  --tw-color-primary-100: var(--primary-100);
+  --tw-color-primary-200: var(--primary-200);
+  --tw-color-primary-300: var(--primary-300);
+  --tw-color-primary-400: var(--primary-400);
+  --tw-color-primary-500: var(--color-primary);
+  --tw-color-primary-600: var(--color-primary);
+  --tw-color-primary-700: var(--primary-700);
+  --tw-color-primary-800: var(--primary-800);
+  --tw-color-primary-900: var(--primary-900);
   
   /* ACER Accent Colors */
   --accent-cyan: #a3fffb;

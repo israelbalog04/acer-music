@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pooledPrisma as prisma } from '@/lib/prisma-pool';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { StorageService, FileValidator } from '@/lib/storage';
 
 // POST /api/sequences/upload - Upload d'un fichier de séquence
 export async function POST(request: NextRequest) {
@@ -28,6 +26,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ID du morceau requis' }, { status: 400 });
     }
 
+    // Valider le fichier (accepter différents types pour les séquences)
+    const allowedTypes = [
+      ...FileValidator.AUDIO_TYPES,
+      ...FileValidator.DOCUMENT_TYPES,
+      ...FileValidator.IMAGE_TYPES
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ 
+        error: 'Type de fichier non supporté. Utilisez: PDF, MP3, WAV, PNG, JPG, XLS, XLSX' 
+      }, { status: 400 });
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+      return NextResponse.json({ 
+        error: 'Fichier trop volumineux (max 10MB)' 
+      }, { status: 400 });
+    }
+
     // Vérifier que le morceau existe et appartient à la même église
     const song = await prisma.song.findFirst({
       where: {
@@ -47,29 +64,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
-    // Générer un nom de fichier unique
-    const fileId = uuidv4();
-    const originalName = file.name;
-    const fileExtension = originalName.split('.').pop() || '';
-    const fileName = `${fileId}.${fileExtension}`;
-
-    // Créer le dossier de destination
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'sequences');
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
-      // Le dossier existe déjà
-    }
-
-    // Sauvegarder le fichier
-    const filePath = join(uploadDir, fileName);
+    // Préparer les données pour l'upload
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
-    await writeFile(filePath, buffer);
+    const originalName = file.name;
 
-    // URL publique du fichier
-    const fileUrl = `/uploads/sequences/${fileName}`;
+    // Upload vers le service de stockage (Supabase)
+    const uploadResult = await StorageService.uploadFile({
+      folder: 'sequences',
+      originalName,
+      buffer,
+      mimeType: file.type,
+      churchId: session.user.churchId
+    });
+
+    const { url: fileUrl, fileName } = uploadResult;
 
     // Créer l'enregistrement en base
     const sequence = await prisma.sequence.create({
@@ -78,7 +87,7 @@ export async function POST(request: NextRequest) {
         description: description || `Séquence pour ${song.title}`,
         songId: songId,
         fileUrl: fileUrl,
-        fileName: originalName,
+        fileName,
         fileSize: file.size,
         fileType: file.type,
         scope: 'GLOBAL', // Séquence globale accessible à tous
