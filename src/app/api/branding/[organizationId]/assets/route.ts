@@ -7,7 +7,7 @@ import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 // POST /api/branding/[organizationId]/assets - Upload d'un asset de branding
 export async function POST(
   request: NextRequest,
-  { params }: { params: { organizationId: string } }
+  context: { params: Promise<{ organizationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ export async function POST(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { organizationId } = params;
+    const { organizationId } = await context.params;
 
     // Vérifier que l'utilisateur appartient à cette organisation
     if (session.user.churchId !== organizationId) {
@@ -71,7 +71,12 @@ export async function POST(
 
     // Vérifier que l'organisation existe
     const organization = await prisma.church.findUnique({
-      where: { id: organizationId }
+      where: { id: organizationId },
+      select: {
+        id: true,
+        name: true,
+        brandingConfig: true
+      }
     });
 
     if (!organization) {
@@ -91,7 +96,7 @@ export async function POST(
       churchId: organizationId
     });
 
-    if (!uploadResult.success || !uploadResult.url) {
+    if (!uploadResult.url) {
       return NextResponse.json({ 
         error: 'Erreur lors de l\'upload du fichier' 
       }, { status: 500 });
@@ -144,7 +149,7 @@ export async function POST(
 // DELETE /api/branding/[organizationId]/assets - Supprimer un asset
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { organizationId: string } }
+  context: { params: Promise<{ organizationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -152,7 +157,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { organizationId } = params;
+    const { organizationId } = await context.params;
     const { searchParams } = new URL(request.url);
     const assetType = searchParams.get('type');
 
@@ -174,7 +179,12 @@ export async function DELETE(
 
     // Récupérer l'organisation
     const organization = await prisma.church.findUnique({
-      where: { id: organizationId }
+      where: { id: organizationId },
+      select: {
+        id: true,
+        name: true,
+        brandingConfig: true
+      }
     });
 
     if (!organization) {

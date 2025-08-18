@@ -6,9 +6,9 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@prisma/client';
 
 export default function BrandingPage() {
-  const { userChurchId } = useUserData();
+  const { churchId } = useUserData();
 
-  if (!userChurchId) {
+  if (!churchId) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -21,7 +21,7 @@ export default function BrandingPage() {
   return (
     <RoleGuard allowedRoles={[UserRole.ADMIN]}>
       <div className="min-h-screen bg-gray-50">
-        <BrandingDashboard organizationId={userChurchId} />
+        <BrandingDashboard organizationId={churchId} />
       </div>
     </RoleGuard>
   );

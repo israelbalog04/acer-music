@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { COLOR_PRESETS } from '@/types/branding';
+import { COLOR_PRESETS, ColorPalette } from '@/types/branding';
 
 interface ColorPickerProps {
   label: string;
@@ -142,7 +142,7 @@ function isValidHexColor(color: string): boolean {
 
 // Composant pour les palettes de couleurs complètes
 interface ColorPaletteEditorProps {
-  colors: Record<string, string>;
+  colors: ColorPalette;
   onChange: (colors: Record<string, string>) => void;
   disabled?: boolean;
 }
@@ -163,10 +163,21 @@ export function ColorPaletteEditor({ colors, onChange, disabled }: ColorPaletteE
   ];
 
   const handleColorChange = (key: string, color: string) => {
-    onChange({
-      ...colors,
+    const newColors: Record<string, string> = {
+      primary: colors.primary,
+      secondary: colors.secondary,
+      accent: colors.accent,
+      background: colors.background,
+      surface: colors.surface,
+      text: colors.text,
+      textSecondary: colors.textSecondary,
+      success: colors.success,
+      warning: colors.warning,
+      error: colors.error,
+      info: colors.info,
       [key]: color
-    });
+    };
+    onChange(newColors);
   };
 
   return (
@@ -176,7 +187,7 @@ export function ColorPaletteEditor({ colors, onChange, disabled }: ColorPaletteE
           <ColorPicker
             key={key}
             label={label}
-            value={colors[key] || '#000000'}
+            value={typeof colors[key] === 'string' ? colors[key] : '#000000'}
             onChange={(color) => handleColorChange(key, color)}
             disabled={disabled}
             description={description}
@@ -192,7 +203,7 @@ export function ColorPaletteEditor({ colors, onChange, disabled }: ColorPaletteE
             <div key={key} className="text-center">
               <div 
                 className="w-full h-12 rounded-md border border-gray-200 mb-1"
-                style={{ backgroundColor: colors[key] }}
+                style={{ backgroundColor: typeof colors[key] === 'string' ? colors[key] : '#000000' }}
               />
               <span className="text-xs text-gray-600">{label}</span>
             </div>

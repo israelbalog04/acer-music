@@ -7,7 +7,7 @@ import { BrandingConfig, validateBrandingConfig, DEFAULT_BRANDING_CONFIG } from 
 // GET /api/branding/[organizationId] - Récupérer la configuration de branding
 export async function GET(
   request: NextRequest,
-  { params }: { params: { organizationId: string } }
+  context: { params: Promise<{ organizationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { organizationId } = params;
+    const { organizationId } = await context.params;
 
     // Vérifier que l'utilisateur appartient à cette organisation
     if (session.user.churchId !== organizationId) {
@@ -80,7 +80,7 @@ export async function GET(
 // PUT /api/branding/[organizationId] - Mettre à jour la configuration de branding
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { organizationId: string } }
+  context: { params: Promise<{ organizationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -88,7 +88,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { organizationId } = params;
+    const { organizationId } = await context.params;
 
     // Vérifier que l'utilisateur appartient à cette organisation
     if (session.user.churchId !== organizationId) {
@@ -175,7 +175,7 @@ export async function PUT(
 // DELETE /api/branding/[organizationId] - Réinitialiser la configuration
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { organizationId: string } }
+  context: { params: Promise<{ organizationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -183,7 +183,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { organizationId } = params;
+    const { organizationId } = await context.params;
 
     // Vérifier que l'utilisateur appartient à cette organisation
     if (session.user.churchId !== organizationId) {

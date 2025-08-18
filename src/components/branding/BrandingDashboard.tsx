@@ -8,7 +8,7 @@ import { BrandingAssetsEditor } from './AssetUploader';
 import { 
   PaintBrushIcon,
   PhotoIcon,
-  TypeIcon,
+  DocumentTextIcon,
   Squares2X2Icon,
   CogIcon,
   CodeBracketIcon,
@@ -55,7 +55,7 @@ export function BrandingDashboard({ organizationId }: BrandingDashboardProps) {
 
   const tabs = [
     { id: 'colors' as BrandingTab, label: 'Couleurs', icon: PaintBrushIcon },
-    { id: 'typography' as BrandingTab, label: 'Typographie', icon: TypeIcon },
+    { id: 'typography' as BrandingTab, label: 'Typographie', icon: DocumentTextIcon },
     { id: 'assets' as BrandingTab, label: 'Logo & Assets', icon: PhotoIcon },
     { id: 'layout' as BrandingTab, label: 'Layout', icon: Squares2X2Icon },
     { id: 'features' as BrandingTab, label: 'Fonctionnalités', icon: CogIcon },

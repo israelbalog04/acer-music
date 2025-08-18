@@ -41,6 +41,9 @@ export interface ColorPalette {
     text: string
     textSecondary: string
   }
+  
+  // Index signature pour compatibilité
+  [key: string]: string | { [key: string]: string } | undefined
 }
 
 export interface TypographyConfig {
