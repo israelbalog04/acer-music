@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pooledPrisma as prisma } from '@/lib/prisma-pool';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync, unlinkSync } from 'fs';
+import { StorageService, FileValidator } from '@/lib/storage';
 
 // POST - Upload d'une image
 export async function POST(request: NextRequest) {
@@ -47,39 +45,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier le type de fichier
-    if (!image.type.startsWith('image/')) {
-      return NextResponse.json(
-        { error: 'Seules les images sont acceptées' },
-        { status: 400 }
-      );
+    // Valider le fichier image
+    const validation = FileValidator.validateImageFile(image);
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Vérifier la taille (10MB max)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (image.size > maxSize) {
-      return NextResponse.json(
-        { error: 'L\'image ne doit pas dépasser 10MB' },
-        { status: 400 }
-      );
-    }
-
-    // Créer le dossier de stockage s'il n'existe pas
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'multimedia');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Générer un nom de fichier unique
-    const timestamp = Date.now();
-    const fileExtension = image.name.split('.').pop();
-    const fileName = `musician_${timestamp}.${fileExtension}`;
-    const filePath = join(uploadDir, fileName);
-
-    // Convertir le fichier en buffer et l'écrire
+    // Upload vers le service de stockage (Supabase)
     const bytes = await image.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
+    
+    const uploadResult = await StorageService.uploadFile({
+      folder: 'multimedia',
+      originalName: image.name,
+      buffer,
+      mimeType: image.type,
+      churchId: user.churchId
+    });
+
+    const { url: fileUrl, fileName } = uploadResult;
 
     // Créer l'enregistrement en base de données
     let imageId;
@@ -92,7 +76,7 @@ export async function POST(request: NextRequest) {
           title: title,
           description: description || null,
           fileName: image.name,
-          fileUrl: `/uploads/multimedia/${fileName}`,
+          fileUrl: fileUrl,
           fileSize: image.size,
           fileType: image.type,
           tags: tags || null,
@@ -108,14 +92,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (error) {
       console.error('❌ Erreur lors de la création en base:', error);
-      // Supprimer le fichier uploadé si la création en base échoue
-      try {
-        if (existsSync(filePath)) {
-          unlinkSync(filePath);
-        }
-      } catch (unlinkError) {
-        console.warn('⚠️ Impossible de supprimer le fichier:', unlinkError);
-      }
+      // TODO: Supprimer le fichier de Supabase en cas d'erreur
       
       return NextResponse.json(
         { error: 'Erreur lors de la sauvegarde en base de données. Vérifiez que le schéma est à jour.' },

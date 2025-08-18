@@ -24,6 +24,11 @@ model Church {
   // Configuration spécifique
   settings    String?  // JSON: config specifique par église
   
+  // Branding et personnalisation
+  brandingConfig String? // JSON: configuration du thème et branding
+  customDomain   String? // Domaine personnalisé (optionnel)
+  subdomain      String? // Sous-domaine (ex: acer-paris.acermusic.com)
+  
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -508,6 +513,7 @@ enum ScheduleType {
   SERVICE
   CONCERT
   FORMATION
+  SPECIAL
 }
 
 enum ScheduleStatus {

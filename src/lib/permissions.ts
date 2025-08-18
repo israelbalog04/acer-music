@@ -241,7 +241,8 @@ export const getNavigationForRole = (role: UserRole) => {
         ...baseNavigation,
         // Gestion Utilisateurs
         { name: 'Utilisateurs', href: '/app/admin/users', icon: 'UsersIcon', section: 'admin' },
-                { name: 'Gestion des Événements', href: '/app/admin/events', icon: 'CalendarIcon', section: 'admin' },
+        { name: 'Personnalisation', href: '/app/admin/branding', icon: 'PaintBrushIcon', section: 'admin' },
+        { name: 'Gestion des Événements', href: '/app/admin/events', icon: 'CalendarIcon', section: 'admin' },
         { name: 'Validation Enregistrements', href: '/app/admin/recordings', icon: 'MicrophoneIcon', section: 'admin' },
         { name: 'Statistiques', href: '/app/admin/analytics', icon: 'ChartBarIcon', section: 'admin' },
         // Musique
