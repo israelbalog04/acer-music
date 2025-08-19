@@ -1,0 +1,786 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// MULTI-TENANT SAAS ARCHITECTURE
+// =============================================================================
+
+// Core - Organizations avec hiérarchie parent/enfant
+model Organization {
+  id              String             @id @default(cuid())
+  name            String
+  slug            String             @unique // acer-paris, acer-lyon, conservatoire-municipal-site-a
+  subdomain       String             @unique // acer-paris.musicplatform.com
+  customDomain    String?            @unique // music.acer-paris.fr
+  
+  // HIÉRARCHIE ORGANISATIONNELLE
+  parentId        String?            // ID de l'organisation mère
+  parent          Organization?      @relation("OrganizationHierarchy", fields: [parentId], references: [id])
+  children        Organization[]     @relation("OrganizationHierarchy")
+  
+  // Type et rôle dans la hiérarchie
+  organizationLevel OrganizationLevel @default(INDEPENDENT) // PARENT, CHILD, INDEPENDENT
+  type            OrganizationType
+  industry        MusicIndustry      @default(RELIGIOUS)
+  size            OrganizationSize   @default(SMALL)
+  
+  // Localisation
+  country         String             @default("FR")
+  region          String?            // Région/Département
+  city            String?
+  timezone        String             @default("Europe/Paris")
+  
+  // Contact & informations
+  email           String?
+  phone           String?
+  address         String?
+  website         String?
+  description     String?
+  
+  // Configuration (héritée du parent si enfant)
+  settings        String?            // JSON: OrganizationSettings
+  branding        String?            // JSON: BrandingConfig (peut override le parent)
+  features        String?            // JSON: FeatureFlags
+  terminology     String?            // JSON: Custom terminology
+  
+  // GESTION CENTRALISÉE DES ABONNEMENTS
+  // Si parentId existe, la facturation est centralisée chez le parent
+  subscriptionPlan      SubscriptionPlan @default(FREE)
+  subscriptionStatus    SubscriptionStatus @default(TRIAL)
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  trialEndDate         DateTime?
+  
+  // Contribution aux quotas du parent (si enfant)
+  contributesToParentQuota Boolean @default(true)
+  
+  // Limites et quotas (calculés différemment selon le niveau)
+  maxMembers      Int                @default(5)
+  storageUsed     Int                @default(0) // en MB
+  storageLimit    Int                @default(1000) // 1GB par défaut
+  
+  // Permissions inter-sites
+  allowCrossSiteAccess   Boolean     @default(false) // Les membres peuvent-ils accéder aux autres sites ?
+  shareBrandingWithChildren Boolean  @default(true)  // Partager le branding avec les enfants
+  allowChildCustomBranding  Boolean  @default(true)  // Autoriser les enfants à personnaliser
+  
+  // État
+  isActive        Boolean            @default(true)
+  isVerified      Boolean            @default(false)
+  isSuspended     Boolean            @default(false)
+  suspendedReason String?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  // Relations (chaque site a ses propres données)
+  users           User[]
+  invitations     Invitation[]
+  songs           Song[]
+  events          Event[]
+  recordings      Recording[]
+  sequences       Sequence[]
+  multimedia      MultimediaFile[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+  
+  // Relations inter-sites (optionnelles)
+  sharedSongs     SharedContent[]    @relation("SharedSongs")
+  sharedEvents    SharedContent[]    @relation("SharedEvents")
+  crossSiteUsers  CrossSiteAccess[]  // Utilisateurs ayant accès à ce site
+  
+  @@map("organizations")
+}
+
+// Utilisateurs du système
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  emailVerified   DateTime?
+  
+  // Informations personnelles
+  firstName       String
+  lastName        String
+  displayName     String?            // Nom d'affichage personnalisé
+  avatar          String?
+  phone           String?
+  bio             String?
+  
+  // Authentification
+  password        String?
+  role            UserRole           @default(MEMBER)
+  
+  // Informations musicales
+  instruments     String?            // JSON: ["Piano", "Guitare"]
+  primaryInstrument String?
+  skillLevel      SkillLevel?        @default(BEGINNER)
+  experience      Int?               // Années d'expérience
+  voiceType       VoiceType?
+  canLead         Boolean            @default(false)
+  genres          String?            // JSON: Genres préférés
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Préférences et paramètres
+  preferences     String?            // JSON: UserPreferences
+  timezone        String?
+  language        String             @default("fr")
+  
+  // État
+  isActive        Boolean            @default(true)
+  isApproved      Boolean            @default(false)
+  lastLoginAt     DateTime?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  // Relations
+  accounts        Account[]
+  sessions        Session[]
+  recordings      Recording[]
+  eventParticipations EventParticipant[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+  invitationsSent Invitation[] @relation("InvitationSender")
+  crossSiteAccess CrossSiteAccess[]  // Accès aux autres sites de l'organisation
+  
+  // Relations inverses manquantes
+  createdEvents   Event[]
+  createdSequences Sequence[]
+  uploadedFiles   MultimediaFile[]
+  
+  @@map("users")
+}
+
+// Invitations pour rejoindre une organisation
+model Invitation {
+  id              String             @id @default(cuid())
+  email           String
+  role            UserRole           @default(MEMBER)
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Invitation
+  invitedById     String
+  invitedBy       User               @relation("InvitationSender", fields: [invitedById], references: [id])
+  
+  // État
+  status          InvitationStatus   @default(PENDING)
+  expiresAt       DateTime
+  acceptedAt      DateTime?
+  
+  // Métadonnées
+  message         String?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@unique([organizationId, email])
+  @@map("invitations")
+}
+
+// Événements/Services/Concerts
+model Event {
+  id              String             @id @default(cuid())
+  title           String
+  description     String?
+  
+  // Planification
+  startDate       DateTime
+  endDate         DateTime?
+  isRecurring     Boolean            @default(false)
+  recurrenceRule  String?            // JSON: Règles de récurrence
+  
+  // Type d'événement adaptatif
+  type            EventType
+  category        String?            // Catégorie personnalisée
+  
+  // Lieu
+  location        String?
+  venue           String?
+  address         String?
+  
+  // Configuration
+  maxParticipants Int?
+  isPublic        Boolean            @default(false)
+  requiresApproval Boolean           @default(false)
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Créateur
+  createdById     String
+  createdBy       User               @relation(fields: [createdById], references: [id])
+  
+  // État
+  status          EventStatus        @default(PLANNED)
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  // Relations
+  participants    EventParticipant[]
+  songs           EventSong[]
+  recordings      Recording[]
+  sequences       Sequence[]
+  notifications   Notification[]
+  
+  @@map("events")
+}
+
+// Participation aux événements
+model EventParticipant {
+  id              String             @id @default(cuid())
+  
+  // Relations
+  eventId         String
+  event           Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Rôle dans l'événement
+  role            ParticipantRole    @default(PARTICIPANT)
+  
+  // Statut
+  status          ParticipationStatus @default(INVITED)
+  
+  // Métadonnées
+  instrument      String?
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@unique([eventId, userId])
+  @@map("event_participants")
+}
+
+// Répertoire musical
+model Song {
+  id              String             @id @default(cuid())
+  title           String
+  artist          String?
+  composer        String?
+  arranger        String?
+  
+  // Métadonnées musicales
+  key             String?            // Tonalité
+  tempo           Int?               // BPM
+  timeSignature   String?            // 4/4, 3/4, etc.
+  duration        Int?               // Durée en secondes
+  genre           String?
+  
+  // Contenu
+  lyrics          String?
+  chords          String?
+  notes           String?
+  
+  // Fichiers
+  audioUrl        String?
+  sheetMusicUrl   String?
+  leadSheetUrl    String?
+  
+  // Difficulté et tags
+  difficulty      DifficultyLevel    @default(EASY)
+  tags            String?            // JSON: ["Gospel", "Contemporain"]
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // État
+  isActive        Boolean            @default(true)
+  isPublic        Boolean            @default(false)
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  // Relations
+  eventSongs      EventSong[]
+  recordings      Recording[]
+  sequences       Sequence[]
+  
+  @@map("songs")
+}
+
+// Association entre événements et chansons
+model EventSong {
+  id              String             @id @default(cuid())
+  
+  // Relations
+  eventId         String
+  event           Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  songId          String
+  song            Song               @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  // Configuration
+  order           Int                @default(0)
+  key             String?            // Tonalité pour cet événement
+  tempo           Int?               // Tempo pour cet événement
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@unique([eventId, songId])
+  @@map("event_songs")
+}
+
+// Enregistrements audio
+model Recording {
+  id              String             @id @default(cuid())
+  title           String
+  description     String?
+  
+  // Fichier
+  fileUrl         String
+  fileName        String
+  fileSize        Int
+  fileType        String
+  duration        Int?               // Durée en secondes
+  
+  // Relations
+  songId          String?
+  song            Song?              @relation(fields: [songId], references: [id])
+  eventId         String?
+  event           Event?             @relation(fields: [eventId], references: [id])
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Créateur
+  uploadedById    String
+  uploadedBy      User               @relation(fields: [uploadedById], references: [id])
+  
+  // État
+  isApproved      Boolean            @default(false)
+  isPublic        Boolean            @default(false)
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@map("recordings")
+}
+
+// Séquences de partitions/tablatures
+model Sequence {
+  id              String             @id @default(cuid())
+  title           String
+  description     String?
+  
+  // Fichier
+  fileUrl         String
+  fileName        String
+  fileSize        Int
+  fileType        String
+  
+  // Relations
+  songId          String?
+  song            Song?              @relation(fields: [songId], references: [id])
+  eventId         String?
+  event           Event?             @relation(fields: [eventId], references: [id])
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Créateur
+  createdById     String
+  createdBy       User               @relation(fields: [createdById], references: [id])
+  
+  // État
+  isPublic        Boolean            @default(false)
+  downloadCount   Int                @default(0)
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@map("sequences")
+}
+
+// Fichiers multimédia (photos, vidéos, etc.)
+model MultimediaFile {
+  id              String             @id @default(cuid())
+  title           String
+  description     String?
+  
+  // Fichier
+  fileUrl         String
+  fileName        String
+  fileSize        Int
+  fileType        String
+  
+  // Métadonnées
+  tags            String?            // JSON
+  location        String?
+  eventDate       DateTime?
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Créateur
+  uploadedById    String
+  uploadedBy      User               @relation(fields: [uploadedById], references: [id])
+  
+  // État
+  isApproved      Boolean            @default(false)
+  isPublic        Boolean            @default(false)
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@map("multimedia_files")
+}
+
+// Notifications système
+model Notification {
+  id              String             @id @default(cuid())
+  title           String
+  message         String
+  type            NotificationType
+  priority        NotificationPriority @default(NORMAL)
+  
+  // Relations
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId         String?
+  event           Event?             @relation(fields: [eventId], references: [id])
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // État
+  isRead          Boolean            @default(false)
+  readAt          DateTime?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@map("notifications")
+}
+
+// Logs d'audit pour traçabilité
+model AuditLog {
+  id              String             @id @default(cuid())
+  action          String             // "user.created", "song.deleted", etc.
+  resourceType    String             // "User", "Song", "Event"
+  resourceId      String?
+  
+  // Détails
+  details         String?            // JSON: Détails de l'action
+  ipAddress       String?
+  userAgent       String?
+  
+  // Relations
+  userId          String?
+  user            User?              @relation(fields: [userId], references: [id])
+  
+  // Multi-tenant
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Timestamp
+  createdAt       DateTime           @default(now())
+  
+  @@map("audit_logs")
+}
+
+// Contenu partagé entre organisations (hiérarchique)
+model SharedContent {
+  id              String             @id @default(cuid())
+  
+  // Type de contenu partagé
+  contentType     SharedContentType  // SONG, EVENT, RECORDING, SEQUENCE
+  resourceId      String             // ID de la ressource partagée
+  
+  // Organisation qui partage
+  sharedById      String
+  sharedBy        Organization       @relation("SharedSongs", fields: [sharedById], references: [id], onDelete: Cascade)
+  
+  // Organisation qui reçoit
+  sharedWithId    String
+  sharedWith      Organization       @relation("SharedEvents", fields: [sharedWithId], references: [id], onDelete: Cascade)
+  
+  // Permissions
+  canEdit         Boolean            @default(false)
+  canDelete       Boolean            @default(false)
+  canReshare      Boolean            @default(false)
+  
+  // Métadonnées
+  title           String
+  description     String?
+  tags            String?            // JSON
+  
+  // État
+  isActive        Boolean            @default(true)
+  acceptedAt      DateTime?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@unique([contentType, resourceId, sharedById, sharedWithId])
+  @@map("shared_content")
+}
+
+// Utilisateurs multi-sites (pour accès cross-site)
+model CrossSiteAccess {
+  id              String             @id @default(cuid())
+  
+  // Utilisateur principal
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Site d'accès
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Rôle sur ce site
+  role            UserRole           @default(GUEST)
+  
+  // Permissions spécifiques
+  permissions     String?            // JSON: Permissions personnalisées
+  
+  // État
+  isActive        Boolean            @default(true)
+  approvedAt      DateTime?
+  approvedById    String?
+  
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@unique([userId, organizationId])
+  @@map("cross_site_access")
+}
+
+// NextAuth.js tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum OrganizationType {
+  CHURCH              // Église / Communauté religieuse
+  CONSERVATORY        // Conservatoire / École de musique
+  PROFESSIONAL_BAND   // Groupe / Band professionnel
+  AMATEUR_BAND        // Groupe amateur
+  ORCHESTRA           // Orchestre
+  CHOIR               // Chœur / Chorale
+  MUSIC_SCHOOL        // École de musique privée
+  STUDIO              // Studio d'enregistrement
+  ASSOCIATION         // Association musicale
+  OTHER               // Autre type
+}
+
+enum MusicIndustry {
+  RELIGIOUS           // Musique religieuse
+  CLASSICAL           // Musique classique
+  CONTEMPORARY        // Musique contemporaine
+  JAZZ                // Jazz
+  ROCK                // Rock/Pop
+  ELECTRONIC          // Électronique
+  WORLD               // Musiques du monde
+  EDUCATIONAL         // Éducation musicale
+  COMMERCIAL          // Musique commerciale
+  OTHER               // Autre
+}
+
+enum OrganizationSize {
+  MICRO               // 1-5 membres
+  SMALL               // 6-25 membres
+  MEDIUM              // 26-100 membres
+  LARGE               // 101-500 membres
+  ENTERPRISE          // 500+ membres
+}
+
+enum SubscriptionPlan {
+  FREE                // Gratuit - 5 membres max
+  STARTER             // 19€/mois - 25 membres
+  PROFESSIONAL        // 49€/mois - 100 membres
+  ENTERPRISE          // 99€/mois - Illimité
+}
+
+enum SubscriptionStatus {
+  TRIAL               // Période d'essai
+  ACTIVE              // Actif
+  PAST_DUE            // Impayé
+  CANCELED            // Annulé
+  SUSPENDED           // Suspendu
+}
+
+enum UserRole {
+  SUPER_ADMIN         // Super administrateur plateforme
+  ORG_ADMIN           // Administrateur organisation
+  DIRECTOR            // Directeur musical / Chef
+  MEMBER              // Membre / Musicien
+  GUEST               // Invité / Observateur
+}
+
+enum SkillLevel {
+  BEGINNER            // Débutant
+  INTERMEDIATE        // Intermédiaire
+  ADVANCED            // Avancé
+  EXPERT              // Expert
+  PROFESSIONAL        // Professionnel
+}
+
+enum VoiceType {
+  SOPRANO             // Soprano
+  ALTO                // Alto
+  TENOR               // Ténor
+  BASS                // Basse
+  MEZZO_SOPRANO       // Mezzo-soprano
+  BARITONE            // Baryton
+  OTHER               // Autre
+}
+
+enum EventType {
+  SERVICE             // Service religieux
+  REHEARSAL           // Répétition
+  CONCERT             // Concert
+  LESSON              // Cours
+  WORKSHOP            // Atelier
+  RECORDING           // Session d'enregistrement
+  AUDITION            // Audition
+  MEETING             // Réunion
+  OTHER               // Autre
+}
+
+enum EventStatus {
+  PLANNED             // Planifié
+  CONFIRMED           // Confirmé
+  IN_PROGRESS         // En cours
+  COMPLETED           // Terminé
+  CANCELED            // Annulé
+  POSTPONED           // Reporté
+}
+
+enum ParticipantRole {
+  DIRECTOR            // Directeur/Chef
+  LEADER              // Leader/Soliste
+  PARTICIPANT         // Participant
+  ACCOMPANIST         // Accompagnateur
+  TECHNICIAN          // Technicien
+  OBSERVER            // Observateur
+}
+
+enum ParticipationStatus {
+  INVITED             // Invité
+  CONFIRMED           // Confirmé
+  DECLINED            // Décliné
+  TENTATIVE           // Incertain
+  NO_RESPONSE         // Pas de réponse
+}
+
+enum DifficultyLevel {
+  VERY_EASY           // Très facile
+  EASY                // Facile
+  MEDIUM              // Moyen
+  HARD                // Difficile
+  VERY_HARD           // Très difficile
+}
+
+enum InvitationStatus {
+  PENDING             // En attente
+  ACCEPTED            // Acceptée
+  DECLINED            // Refusée
+  EXPIRED             // Expirée
+}
+
+enum NotificationType {
+  INFO                // Information
+  SUCCESS             // Succès
+  WARNING             // Avertissement
+  ERROR               // Erreur
+  INVITATION          // Invitation
+  REMINDER            // Rappel
+  ANNOUNCEMENT        // Annonce
+}
+
+enum NotificationPriority {
+  LOW                 // Basse
+  NORMAL              // Normale
+  HIGH                // Haute
+  URGENT              // Urgente
+}
+
+enum OrganizationLevel {
+  PARENT              // Organisation mère (ex: ACER France)
+  CHILD               // Site/démembrement (ex: ACER Paris, ACER Lyon)
+  INDEPENDENT         // Organisation indépendante
+}
+
+enum SharedContentType {
+  SONG                // Chanson partagée
+  EVENT               // Événement partagé
+  RECORDING           // Enregistrement partagé
+  SEQUENCE            // Partition partagée
+  MULTIMEDIA          // Fichier multimédia partagé
+}
