@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, StatCard } from '@/components/ui/card';
-import { UsageDashboard } from '@/components/dashboard/UsageDashboard';
 import {
   MusicalNoteIcon,
   CalendarIcon,
@@ -11,7 +10,6 @@ import {
   UsersIcon,
   PlayIcon,
   ClockIcon,
-  CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 

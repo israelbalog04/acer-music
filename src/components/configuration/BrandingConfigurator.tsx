@@ -34,7 +34,6 @@ interface BrandingConfiguratorProps {
   branding: ExtendedBrandingConfig;
   uiElements: UIElementConfiguration[];
   terminology: Record<string, string>;
-  hierarchyLevels: HierarchyLevel[];
   onChange: (branding: ExtendedBrandingConfig, uiElements: UIElementConfiguration[]) => void;
 }
 
@@ -42,7 +41,6 @@ export function BrandingConfigurator({
   branding, 
   uiElements, 
   terminology, 
-  hierarchyLevels, 
   onChange 
 }: BrandingConfiguratorProps) {
   const [activeTab, setActiveTab] = useState<'colors' | 'elements' | 'layout' | 'preview'>('colors');

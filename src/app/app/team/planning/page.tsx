@@ -235,9 +235,9 @@ export default function PlanningPage() {
       {/* Services List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {services.map((service) => (
-          <Card 
+          <div 
             key={service.id} 
-            className={`hover:shadow-lg transition-all cursor-pointer ${
+            className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all cursor-pointer ${
               selectedService === service.id ? 'ring-2 ring-[#3244c7]' : ''
             }`}
             onClick={() => setSelectedService(selectedService === service.id ? null : service.id)}
@@ -394,7 +394,7 @@ export default function PlanningPage() {
                 </div>
               )}
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 

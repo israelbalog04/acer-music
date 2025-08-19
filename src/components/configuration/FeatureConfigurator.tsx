@@ -262,15 +262,15 @@ export function FeatureConfigurator({
       updatedModules[existingIndex] = { ...updatedModules[existingIndex], enabled };
     } else {
       const moduleInfo = availableModules
-        .flatMap(cat => cat.items)
-        .find(item => item.id === moduleId);
+        .flatMap((cat: any) => cat.items)
+        .find((item: any) => item.id === moduleId);
       
       if (moduleInfo) {
         updatedModules.push({
           id: moduleId,
-          name: moduleInfo.name,
+          name: (moduleInfo as any).name,
           enabled,
-          config: moduleInfo.config || {}
+          config: (moduleInfo as any).config || {}
         });
       }
     }
@@ -327,7 +327,7 @@ export function FeatureConfigurator({
                 {category.items.map((feature) => {
                   const config = getFeatureConfig(feature.id);
                   const isEnabled = config?.enabled || false;
-                  const isRequired = feature.required || false;
+                  const isRequired = (feature as any).required || false;
                   
                   return (
                     <div

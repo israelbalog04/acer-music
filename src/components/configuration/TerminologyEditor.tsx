@@ -591,5 +591,5 @@ function getDefaultTerminology(organizationType: OrganizationType): Record<strin
     }
   };
 
-  return defaults[organizationType] || defaults.CHURCH;
+  return (defaults as any)[organizationType] || defaults.CHURCH;
 }

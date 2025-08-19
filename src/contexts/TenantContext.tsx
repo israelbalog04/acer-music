@@ -34,6 +34,8 @@ interface ExtendedTenantContext extends TenantContextType {
 
 const TenantContext = createContext<ExtendedTenantContext | null>(null);
 
+export { TenantContext };
+
 // =============================================================================
 // TENANT PROVIDER
 // =============================================================================
@@ -44,8 +46,8 @@ interface TenantProviderProps {
 
 export function TenantProvider({ children }: TenantProviderProps) {
   // Demo mode - simulate authenticated session
-  const session = { user: { id: 'demo-user', email: 'demo@example.com', name: 'Demo User' } };
-  const status = 'authenticated';
+  const session = { user: { id: 'demo-user', email: 'demo@example.com', name: 'Demo User', role: 'MEMBER' as UserRole } };
+  const status: 'loading' | 'authenticated' | 'unauthenticated' = 'authenticated';
   const [organization, setOrganization] = useState<ExtendedTenantContext['organization']>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [subscriptionPlan, setSubscriptionPlan] = useState<SubscriptionPlan>('FREE');
@@ -158,7 +160,7 @@ export function TenantProvider({ children }: TenantProviderProps) {
   const hasPermission = (permission: string): boolean => {
     if (!session?.user?.role) return false;
     
-    const rolePermissions = getRolePermissions(session.user.role as UserRole, organization?.type as OrganizationType);
+    const rolePermissions = getRolePermissions(session.user.role, organization?.type as OrganizationType);
     return rolePermissions.includes(permission) || rolePermissions.includes('*');
   };
 
@@ -177,7 +179,7 @@ export function TenantProvider({ children }: TenantProviderProps) {
       email: session.user.email!,
       name: session.user.name!,
       role: session.user.role || 'MEMBER',
-      permissions: session?.user?.role ? getRolePermissions(session.user.role as UserRole, organization?.type as OrganizationType) : []
+      permissions: session?.user?.role ? getRolePermissions(session.user.role, organization?.type as OrganizationType) : []
     } : null,
     isLoading,
     subscriptionPlan,

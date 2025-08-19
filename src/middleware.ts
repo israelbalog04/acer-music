@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   
   // Demo mode: Skip tenant resolution and feature checks for now
   // const tenantInfo = await resolveTenant(request);
-  const tenantInfo = null;
+  const tenantInfo: TenantInfo | null = null;
 
   // =============================================================================
   // RESPONSE SETUP
@@ -35,10 +35,10 @@ export async function middleware(request: NextRequest) {
   
   // Inject tenant context into headers
   if (tenantInfo) {
-    response.headers.set('x-organization-id', tenantInfo.id);
-    response.headers.set('x-organization-slug', tenantInfo.slug);
-    response.headers.set('x-organization-type', tenantInfo.type);
-    response.headers.set('x-subscription-plan', tenantInfo.subscriptionPlan);
+    response.headers.set('x-organization-id', (tenantInfo as any).id);
+    response.headers.set('x-organization-slug', (tenantInfo as any).slug);
+    response.headers.set('x-organization-type', (tenantInfo as any).type);
+    response.headers.set('x-subscription-plan', (tenantInfo as any).subscriptionPlan);
   }
 
   // Security headers

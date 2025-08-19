@@ -116,7 +116,7 @@ export class RevenueCalculator {
     const costs = this.getCostBreakdown();
     
     const totalMonthlyCosts = Object.values(costs).reduce((total, category) => {
-      return total + Object.values(category).reduce((sum, cost) => sum + (typeof cost === 'number' ? cost : 0), 0);
+      return total + Object.values(category).reduce((sum: number, cost) => sum + (typeof cost === 'number' ? cost : 0), 0);
     }, 0);
 
     const monthlyProfit = revenue.mrr - totalMonthlyCosts;

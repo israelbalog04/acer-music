@@ -35,7 +35,7 @@ export function BrandingCustomization({ organizationType, data, onChange }: Bran
 
   const handleColorChange = (colorKey: string, value: string) => {
     const colors = { ...currentBranding.colors, [colorKey]: value };
-    handleBrandingChange({ colors });
+    handleBrandingChange({ colors: colors as any });
   };
 
   const colorFields = [
@@ -132,13 +132,13 @@ export function BrandingCustomization({ organizationType, data, onChange }: Bran
                 <div className="flex space-x-3">
                   <input
                     type="color"
-                    value={currentBranding.colors?.[field.key] || '#6366f1'}
+                    value={(currentBranding.colors as any)?.[field.key] || '#6366f1'}
                     onChange={(e) => handleColorChange(field.key, e.target.value)}
                     className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                   />
                   <input
                     type="text"
-                    value={currentBranding.colors?.[field.key] || '#6366f1'}
+                    value={(currentBranding.colors as any)?.[field.key] || '#6366f1'}
                     onChange={(e) => handleColorChange(field.key, e.target.value)}
                     placeholder="#6366f1"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -155,7 +155,7 @@ export function BrandingCustomization({ organizationType, data, onChange }: Bran
               {getPresetColors().map((preset, index) => (
                 <button
                   key={index}
-                  onClick={() => handleBrandingChange({ colors: preset.colors })}
+                  onClick={() => handleBrandingChange({ colors: preset.colors as any })}
                   className="flex items-center space-x-2 p-2 rounded-lg border hover:bg-white transition-colors"
                 >
                   <div className="flex space-x-1">

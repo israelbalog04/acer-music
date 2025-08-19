@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { OrganizationType } from '@prisma/client';
 import { CheckCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 // Templates prédéfinis pour différents types d'organisations

@@ -337,7 +337,6 @@ export function OrganizationConfigurator({
             branding={config.branding}
             uiElements={config.uiElements}
             terminology={config.terminology}
-            hierarchyLevels={config.hierarchyLevels}
             onChange={(branding, uiElements) => 
               updateConfig({ branding, uiElements })
             }
@@ -536,7 +535,7 @@ function getDefaultHierarchyLevels(organizationType: OrganizationType): Hierarch
     ]
   };
 
-  return defaults[organizationType] || defaults.CHURCH;
+  return (defaults as any)[organizationType] || defaults.CHURCH;
 }
 
 function getDefaultRoles(organizationType: OrganizationType): CustomRole[] {
@@ -711,7 +710,7 @@ interface ApprovalStep {
   order: number;
 }
 
-interface FeatureConfiguration {
+export interface FeatureConfiguration {
   id: string;
   name: string;
   enabled: boolean;
@@ -719,7 +718,7 @@ interface FeatureConfiguration {
   conditions?: string[];
 }
 
-interface ModuleConfiguration {
+export interface ModuleConfiguration {
   id: string;
   name: string;
   enabled: boolean;
